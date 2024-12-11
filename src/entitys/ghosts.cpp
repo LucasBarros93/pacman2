@@ -1,1 +1,1 @@
-#include "ghosts.hpp"
+#include "entitys/ghosts.hpp"
