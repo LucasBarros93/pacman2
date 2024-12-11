@@ -1,3 +1,6 @@
+#ifndef ENTITYS_HPP
+#define ENTITYS_HPP
+
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
@@ -24,3 +27,5 @@ class Ghost{
         bool powerless;
         int dificult;
 };
+
+#endif
