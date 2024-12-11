@@ -4,5 +4,21 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
+class Map{
+    private:
+        std::vector<std::string> mapData;  // Representação do mapa
+        sf::Texture wallTexture;          // Textura para paredes
+        sf::Sprite wallSprite;            // Sprite para paredes
+        sf::CircleShape dotShape;      // Forma para os pontos
+        sf::Vector2f tileSize;            // Tamanho de cada célula do mapa
+        
+    public:
+        Map(const std::string& texturePath, const sf::Vector2f& tileSize);
+    
+        bool loadFromFile(const std::string& filePath); // Carrega o mapa de um arquivo
+        void draw(sf::RenderWindow& window);           // Desenha o mapa na janela
+        const std::vector<std::string>& getMapData() const; // Retorna os dados do mapa
+
+};
 
 #endif

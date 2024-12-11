@@ -9,6 +9,7 @@ EXEC := $(BIN_DIR)/pacman
 SRC := $(wildcard $(SRC_DIR)/**/*.cpp $(SRC_DIR)/*.cpp) ./main.cpp
 OBJ := $(patsubst $(SRC_DIR)/%, $(OBJ_DIR)/%, $(SRC:.cpp=.o))
 OBJ := $(patsubst ./%, $(OBJ_DIR)/%, $(OBJ))
+OBJ := $(filter-out $(OBJ_DIR)/main.o, $(OBJ)) $(OBJ_DIR)/main/main.o
 DEP := $(OBJ:.o=.d)
 
 # Compilador e flags
@@ -27,14 +28,14 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# Trata arquivos fora do SRC_DIR (como main.cpp)
-$(OBJ_DIR)/main.o: ./main.cpp
-	@mkdir -p $(OBJ_DIR)
+# Trata especificamente main.cpp para ser compilado em ./obj/main/main.o
+$(OBJ_DIR)/main/main.o: ./main.cpp
+	@mkdir -p $(OBJ_DIR)/main
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Limpeza
 clean:
-	rm -rf $(OBJ_DIR)/* $(BIN_DIR)/*
+	rm -rf $(OBJ_DIR)/*.o $(OBJ_DIR)/*.d $(OBJ_DIR)/*/*.o $(OBJ_DIR)/*/*.d $(BIN_DIR)/*
 
 # Limpa apenas objetos
 clean-obj:
