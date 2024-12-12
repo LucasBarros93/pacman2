@@ -4,7 +4,7 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
-class Pacman{
+class Pacman {
     private:
         sf::Sprite sprite;       // Sprite para representar o Pacman visualmente
         sf::Texture texture;     // Textura para carregar a imagem do Pacman
@@ -12,6 +12,15 @@ class Pacman{
         sf::Vector2f dir;        // Direção atual (-1, 0, ou 1 para x e y)
 
         float speed;             // Velocidade de movimento
+
+    public:
+        Pacman(const std::string& texturePath, const sf::Vector2f& startPos, float speed);
+
+        void setDirection(const sf::Vector2f& direction); // Define a direção de movimento
+        void update(float deltaTime);                    // Atualiza a posição do Pacman
+        void draw(sf::RenderWindow& window);             // Desenha o Pacman na janela
+        const sf::Vector2f& getPosition() const;         // Retorna a posição atual
+        const sf::Vector2f& getDirection() const;        // Retorna a direção atual
 };
 
-#endif
+#endif // PACMAN_HPP

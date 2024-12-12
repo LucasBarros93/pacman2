@@ -10,7 +10,7 @@ Map::Map(const std::string& texturePath, const sf::Vector2f& tileSize)
     // }
     // this->wallSprite.setTexture(this->wallTexture);
 
-    this->wall.setSize(this->tileSize);
+    this->wall.setSize({this->tileSize.x*2, this->tileSize.y*2});
     this->wall.setFillColor(sf::Color::Blue);
 
     // Configuração para os pontos
@@ -34,9 +34,10 @@ bool Map::loadFromFile(const std::string& filePath) {
 }
 
 void Map::draw(sf::RenderWindow& window) {
-    for (size_t y = 0; y < mapData.size(); ++y) {
-        for (size_t x = 0; x < mapData[y].size(); ++x) {
+    for (size_t y = 0; y < mapData.size(); y+=2) {
+        for (size_t x = 0; x < mapData[y].size(); x+=2) {
             char tile = mapData[y][x];
+            char tile2 = mapData[y][x+1];
             sf::Vector2f position(x * this->tileSize.x, y * this->tileSize.y);
 
             if (tile == '#'){ // Parede
@@ -44,8 +45,8 @@ void Map::draw(sf::RenderWindow& window) {
                 window.draw(this->wall);
             } 
             
-            else if (tile == '.'){ // Ponto
-                this->dot.setPosition((position.x+this->tileSize.x/3), (position.y+this->tileSize.y/3));
+            else if (tile == '.' || tile2 == '.'){ // Ponto
+                this->dot.setPosition((position.x+this->tileSize.x), (position.y+this->tileSize.y));
                 window.draw(this->dot);
             }
             // Outros elementos podem ser adicionados aqui
