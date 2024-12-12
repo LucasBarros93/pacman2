@@ -5,14 +5,17 @@
 
 Map::Map(const std::string& texturePath, const sf::Vector2f& tileSize)
     : tileSize(tileSize) {
-    if (!this->wallTexture.loadFromFile(texturePath)) {
-        throw std::runtime_error("Erro ao carregar a textura do mapa!");
-    }
-    this->wallSprite.setTexture(this->wallTexture);
+    // if (!this->wallTexture.loadFromFile(texturePath)) {
+    //     throw std::runtime_error("Erro ao carregar a textura do mapa!");
+    // }
+    // this->wallSprite.setTexture(this->wallTexture);
+
+    this->wall.setSize(this->tileSize);
+    this->wall.setFillColor(sf::Color::Blue);
 
     // Configuração para os pontos
-    this->dotShape.setScale(this->tileSize);
-    this->dotShape.setFillColor(sf::Color::Yellow);
+    this->dot.setRadius(this->tileSize.x/8);
+    this->dot.setFillColor(sf::Color::Yellow);
 }
 
 bool Map::loadFromFile(const std::string& filePath) {
@@ -36,12 +39,14 @@ void Map::draw(sf::RenderWindow& window) {
             char tile = mapData[y][x];
             sf::Vector2f position(x * this->tileSize.x, y * this->tileSize.y);
 
-            if (tile == '#') { // Parede
-                this->wallSprite.setPosition(position);
-                window.draw(this->wallSprite);
-            } else if (tile == '.') { // Ponto
-                this->dotShape.setPosition(position.x + this->tileSize.x / 3, position.y + this->tileSize.y / 3);
-                window.draw(this->dotShape);
+            if (tile == '#'){ // Parede
+                this->wall.setPosition(position);
+                window.draw(this->wall);
+            } 
+            
+            else if (tile == '.'){ // Ponto
+                this->dot.setPosition((position.x+this->tileSize.x/3), (position.y+this->tileSize.y/3));
+                window.draw(this->dot);
             }
             // Outros elementos podem ser adicionados aqui
         }

@@ -5,8 +5,8 @@
 //#include "entitys.hpp"
 
 int main(){
-sf::RenderWindow window(sf::VideoMode(12000, 6000), "PacMan");
-    Map gameMap("assets/images/wall.png", {30.f, 30.f}); // Cada célula tem 40x40 pixels
+    sf::RenderWindow window(sf::VideoMode(12000, 6000), "Pacman");
+    Map gameMap("assets/images/wall.png", {20.f, 20.f}); // Cada célula tem 40x40 pixels
 
     if (!gameMap.loadFromFile("assets/maps/map.txt")) {
         return 1; // Sai se o arquivo do mapa não for carregado
