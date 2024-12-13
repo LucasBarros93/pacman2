@@ -14,9 +14,11 @@ class Pacman {
         float speed;             // Velocidade de movimento
 
     public:
+        Pacman();
         Pacman(const std::string& texturePath, const sf::Vector2f& startPos, float speed);
 
         void setDirection(const sf::Vector2f& direction); // Define a direção de movimento
+        void setPosition(const sf::Vector2f& position);
         void update(float deltaTime);                    // Atualiza a posição do Pacman
         void draw(sf::RenderWindow& window);             // Desenha o Pacman na janela
         const sf::Vector2f& getPosition() const;         // Retorna a posição atual

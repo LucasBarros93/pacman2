@@ -3,12 +3,9 @@
 #include <fstream>
 #include <iostream>
 
-Map::Map(const std::string& texturePath, const sf::Vector2f& tileSize)
-    : tileSize(tileSize) {
-    // if (!this->wallTexture.loadFromFile(texturePath)) {
-    //     throw std::runtime_error("Erro ao carregar a textura do mapa!");
-    // }
-    // this->wallSprite.setTexture(this->wallTexture);
+Map::Map(const sf::Vector2f& tileSize) : tileSize(tileSize) {
+
+    this->pac = Pacman("assets/images/pacman.png", {100.f, 100.f}, 200.f);
 
     this->wall.setSize({this->tileSize.x*2, this->tileSize.y*2});
     this->wall.setFillColor(sf::Color::Blue);
@@ -44,12 +41,14 @@ void Map::draw(sf::RenderWindow& window) {
                 this->wall.setPosition(position);
                 window.draw(this->wall);
             } 
-            
             else if (tile == '.' || tile2 == '.'){ // Ponto
                 this->dot.setPosition((position.x+this->tileSize.x), (position.y+this->tileSize.y));
                 window.draw(this->dot);
             }
-            // Outros elementos podem ser adicionados aqui
+            else if (tile == 'P'){
+                this->pac.setPosition(position);
+                this->pac.draw(window);
+            }
         }
     }
 }

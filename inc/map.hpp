@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include "entitys/pacman.hpp"
 
 class Map{
     private:
@@ -12,8 +13,10 @@ class Map{
         sf::CircleShape dot;      // Forma para os pontos
         sf::Vector2f tileSize;            // Tamanho de cada célula do mapa
         
+        Pacman pac;
+        
     public:
-        Map(const std::string& texturePath, const sf::Vector2f& tileSize);
+        Map(const sf::Vector2f& tileSize);
     
         bool loadFromFile(const std::string& filePath); // Carrega o mapa de um arquivo
         void draw(sf::RenderWindow& window);           // Desenha o mapa na janela

@@ -8,7 +8,7 @@
 int main(){
 sf::RenderWindow window(sf::VideoMode(12000, 6000), "Pac-Man");
     Pacman pacman("assets/images/pacman.png", {100.f, 100.f}, 200.f); // Posição inicial e velocidade
-    Map gameMap("assets/images/wall.png", {10.f, 10.f}); // Cada célula do mapa tem 40x40 pixels
+    Map gameMap({10.f, 10.f}); // Cada célula do mapa tem 40x40 pixels
 
     if (!gameMap.loadFromFile("assets/maps/map.txt")) {
         return 1; // Sai se o arquivo do mapa não for carregado
@@ -44,7 +44,7 @@ sf::RenderWindow window(sf::VideoMode(12000, 6000), "Pac-Man");
         // Desenho
         window.clear();
         gameMap.draw(window); // Desenha o mapa
-        pacman.draw(window);  // Desenha o Pacman
+        //pacman.draw(window);  // Desenha o Pacman
         window.display();
     }
 
