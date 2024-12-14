@@ -3,7 +3,7 @@
 #include <fstream>
 #include <iostream>
 
-Map::Map(const sf::Vector2<float>& tileSize) : tileSize(tileSize), pac("./assets/images/pacman.png", 200.f) {
+Map::Map(const sf::Vector2<float>& tileSize) : tileSize(tileSize), pac("./assets/images/spritesheet.png", 16, 16, 0.2f, 200.f) {
     this->wall.setSize({this->tileSize.x*2, this->tileSize.y*2});
     this->wall.setFillColor(sf::Color::Blue);
 
@@ -88,5 +88,6 @@ const std::vector<std::vector <char>>& Map::getMapData() const {
 }
 
 void Map::updatePacman(const sf::Vector2<int> direction){
+    this->pac.updateAnimation();
     this->mapData = this->pac.update(this->mapData, direction);
 }

@@ -13,9 +13,19 @@ class Pacman {
 
         float speed;             // Velocidade de movimento
 
-    public:
-        Pacman(const std::string& texturePath, float speed);
+        sf::IntRect currentFrame;
+        sf::Clock animationClock;
 
+        const int frameWidth;      // Largura do frame (ex: 16 pixels)
+        const int frameHeight;     // Altura do frame (ex: 16 pixels)
+        const int frameCount;      // Quantidade de frames por direção
+        float frameDuration;       // Tempo entre frames
+        int currentFrameIndex;     // Índice do frame atual
+
+    public:
+        Pacman(const std::string& texturePath, int fw, int fh, float fd, float speed);
+
+        void updateAnimation();
         std::vector<std::vector <char>> update(std::vector<std::vector <char>> mapData, const sf::Vector2<int> direction);
 
         void setDirection(const sf::Vector2<int>& direction); // Define a direção de movimento
