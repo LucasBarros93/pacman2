@@ -1,9 +1,9 @@
 #include "entitys/pacman.hpp"
 
 
-Pacman::Pacman(const std::string& texturePath, int fw, int fh, float fd, float speed)
-    : frameWidth(fw), frameHeight(fh), frameCount(2), frameDuration(fd),
-          currentFrameIndex(0), dir(0, 0), speed(speed) {
+Pacman::Pacman(const std::string& texturePath, int fw, int fh, float fd)
+    : dir(0, 0), frameWidth(fw), frameHeight(fh), frameCount(2),
+     frameDuration(fd), currentFrameIndex(0){
 
     if (!texture.loadFromFile(texturePath)) {
             throw std::runtime_error("Erro ao carregar spritesheet!");
@@ -86,6 +86,14 @@ std::vector<std::vector <char>> Pacman::update(std::vector<std::vector <char>> m
     mapData[this->pos.y+1][this->pos.x+1] = ' ';
     
     this->pos += this->dir;
+    
+    if (this->pos.x == -1){
+        this->pos.x = mapData[0].size()-2;
+    }
+    else if (this->pos.x == static_cast<int>(mapData[0].size())-2){
+        this->pos.x = 0;
+    }
+
 
     mapData[this->pos.y][this->pos.x]     = 'P';
     mapData[this->pos.y+1][this->pos.x]   = 'P';

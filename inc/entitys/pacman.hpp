@@ -11,8 +11,6 @@ class Pacman {
         sf::Vector2<int> pos;        // Posição atual (x, y)
         sf::Vector2<int> dir;        // Direção atual (-1, 0, ou 1 para x e y)
 
-        float speed;             // Velocidade de movimento
-
         sf::IntRect currentFrame;
         sf::Clock animationClock;
 
@@ -23,7 +21,7 @@ class Pacman {
         int currentFrameIndex;     // Índice do frame atual
 
     public:
-        Pacman(const std::string& texturePath, int fw, int fh, float fd, float speed);
+        Pacman(const std::string& texturePath, int fw, int fh, float fd);
 
         void updateAnimation();
         std::vector<std::vector <char>> update(std::vector<std::vector <char>> mapData, const sf::Vector2<int> direction);
