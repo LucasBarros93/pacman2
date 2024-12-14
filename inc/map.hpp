@@ -7,8 +7,8 @@
 
 class Map{
     private:
-        std::vector<std::string> mapData;  // Representação do mapa
-        sf::Vector2f tileSize;            // Tamanho de cada célula do mapa
+        std::vector<std::vector <char>> mapData;  // Representação do mapa
+        sf::Vector2<float> tileSize;            // Tamanho de cada célula do mapa
 
         sf::RectangleShape wall;            // Sprite para paredes
         sf::CircleShape dot;      // Forma para os pontos
@@ -16,11 +16,13 @@ class Map{
         Pacman pac;
         
     public:
-        Map(const sf::Vector2f& tileSize);
+        Map(const sf::Vector2<float>& tileSize);
     
         bool loadFromFile(const std::string& filePath); // Carrega o mapa de um arquivo
         void draw(sf::RenderWindow& window);           // Desenha o mapa na janela
-        const std::vector<std::string>& getMapData() const; // Retorna os dados do mapa
+        const std::vector<std::vector <char>>& getMapData() const; // Retorna os dados do mapa
+
+        void updatePacman(const sf::Vector2<int> direction);
 
 };
 

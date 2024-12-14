@@ -7,7 +7,6 @@
 
 int main(){
     sf::RenderWindow window(sf::VideoMode(12000, 6000), "Pac-Man");
-    // Pacman pacman("assets/images/pacman.png", {100.f, 100.f}, 200.f); // Posição inicial e velocidade
     Map gameMap({10.f, 10.f}); // Cada célula do mapa tem 40x40 pixels
 
     if (!gameMap.loadFromFile("assets/maps/map.txt")) {
@@ -25,7 +24,7 @@ int main(){
         }
 
         // Controle do Pacman
-        sf::Vector2f direction(0, 0);
+        sf::Vector2<int> direction(0, 0);
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
             direction.y = -1;
         } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
@@ -35,16 +34,13 @@ int main(){
         } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
             direction.x = 1;
         }
-        // pacman.setDirection(direction);
 
         // Atualização do jogo
-        // float deltaTime = clock.restart().asSeconds();
-        // pacman.update(deltaTime);
+        gameMap.updatePacman(direction);
 
         // Desenho
         window.clear();
         gameMap.draw(window); // Desenha o mapa
-        // pacman.draw(window);  // Desenha o Pacman
         window.display();
     }
 
