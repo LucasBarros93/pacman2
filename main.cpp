@@ -14,6 +14,7 @@ int main(){
     }
 
     sf::Clock clock; // Para medir o delta time
+    const float targetFrameTime = 1.f / 10.f; // 30 FPS
 
     while (window.isOpen()) {
         sf::Event event;
@@ -42,6 +43,13 @@ int main(){
         window.clear();
         gameMap.draw(window); // Desenha o mapa
         window.display();
+
+        float elapsed = clock.getElapsedTime().asSeconds();
+        if (elapsed < targetFrameTime) {
+            sf::sleep(sf::seconds(targetFrameTime - elapsed));
+        }
+        clock.restart();
+
     }
 
     return 0;
