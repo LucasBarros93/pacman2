@@ -22,6 +22,7 @@ void Pacman::setDirection(const sf::Vector2f& direction) {
 
 void Pacman::setPosition(const sf::Vector2f& position) {
     this->pos = position;
+    this->sprite.setPosition(this->pos);
 }
 
 void Pacman::update(float deltaTime) {
@@ -29,8 +30,8 @@ void Pacman::update(float deltaTime) {
     this->sprite.setPosition(this->pos);
 }
 
-void Pacman::draw(sf::RenderWindow& window) {
-    window.draw(this->sprite);
+const sf::Sprite Pacman::getSprite() const{
+    return this->sprite;
 }
 
 const sf::Vector2f& Pacman::getPosition() const {

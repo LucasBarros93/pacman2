@@ -8,10 +8,10 @@
 class Map{
     private:
         std::vector<std::string> mapData;  // Representação do mapa
-        // sf::Texture wallTexture;          // Textura para paredes
+        sf::Vector2f tileSize;            // Tamanho de cada célula do mapa
+
         sf::RectangleShape wall;            // Sprite para paredes
         sf::CircleShape dot;      // Forma para os pontos
-        sf::Vector2f tileSize;            // Tamanho de cada célula do mapa
         
         Pacman pac;
         

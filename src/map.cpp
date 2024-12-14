@@ -35,6 +35,7 @@ void Map::draw(sf::RenderWindow& window) {
         for (size_t x = 0; x < mapData[y].size(); x+=2) {
             char tile = mapData[y][x];
             char tile2 = mapData[y][x+1];
+            std::cout << tile << tile2 << std::endl;
             sf::Vector2f position(x * this->tileSize.x, y * this->tileSize.y);
 
             if (tile == '#'){ // Parede
@@ -47,7 +48,7 @@ void Map::draw(sf::RenderWindow& window) {
             }
             else if (tile == 'P'){
                 this->pac.setPosition(position);
-                this->pac.draw(window);
+                window.draw(this->pac.getSprite());
             }
         }
     }

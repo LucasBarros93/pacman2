@@ -20,7 +20,7 @@ class Pacman {
         void setDirection(const sf::Vector2f& direction); // Define a direção de movimento
         void setPosition(const sf::Vector2f& position);
         void update(float deltaTime);                    // Atualiza a posição do Pacman
-        void draw(sf::RenderWindow& window);             // Desenha o Pacman na janela
+        const sf::Sprite getSprite() const;             // Desenha o Pacman na janela
         const sf::Vector2f& getPosition() const;         // Retorna a posição atual
         const sf::Vector2f& getDirection() const;        // Retorna a direção atual
 };
