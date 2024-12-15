@@ -12,15 +12,16 @@ class Fruit {
 
         virtual int getPoints() const = 0; // Pontos da fruta
         virtual void draw(sf::RenderWindow& window) const = 0; // Desenha a fruta
-    };
+};
 
-    // Classe Dot
-    class Dot : public Fruit {
+// Classe Dot
+class Dot : public Fruit {
     private:
         sf::Vector2<int> pos; // Posição da fruta no grid
         int points;
 
     public:
+        Dot() : pos(0, 0), points(10) {};
         Dot(sf::Vector2<int> position);
         int getPoints() const override;
         void draw(sf::RenderWindow& window) const override;
@@ -33,6 +34,7 @@ class Energizer : public Fruit {
         int points;
 
     public:
+        Energizer() : pos(0, 0), points(50) {};
         Energizer(sf::Vector2<int> position);
         int getPoints() const override;
         void draw(sf::RenderWindow& window) const override;

@@ -38,10 +38,10 @@ bool Map::loadFromFile(const std::string& filePath) {
                 std::pair<int, int> position = {static_cast<int>(x), static_cast<int>(y)};
 
                 if (mapData[y][x] == '.' || mapData[y][x+1] == '.') {  // Dot
-                    dots.emplace(position, Dot({static_cast<int>(x), static_cast<int>(y)}));
+                    fruits.emplace(position, std::make_unique<Dot>(sf::Vector2<int>(x, y)));
                 }
                 else if (mapData[y][x] == 'o' || mapData[y][x+1] == 'o') {  // Energizer
-                    energizers.emplace(position, Energizer({static_cast<int>(x), static_cast<int>(y)}));
+                    fruits.emplace(position, std::make_unique<Energizer>(sf::Vector2<int>(x, y)));
                 }
             }
         }
@@ -75,6 +75,11 @@ void Map::draw(sf::RenderWindow& window) {
 
                     this->pac.setPosition({static_cast<int>(x), static_cast<int>(y)}, this->tileSize);
                     window.draw(this->pac.getSprite());
+
+                    if(this->fruits.find({x,y}) != this->fruits.end() || this->fruits.find({x+1,y}) != this->fruits.end()){
+                        //fruits[{x,y}].getPoints();
+                        fruits.erase({x,y});
+                    }
                 }
             
             if (mapData[y][x] == 'B' &&
@@ -116,12 +121,8 @@ void Map::draw(sf::RenderWindow& window) {
     }
 
     // Desenhar frutas (dots e energizers)
-    for (const auto& dot : dots) {
-        dot.second.draw(window);
-    }
-
-    for (const auto& energizer : energizers) {
-        energizer.second.draw(window);
+    for (const auto& fruitPair : fruits) {
+        fruitPair.second->draw(window);
     }
 }
 

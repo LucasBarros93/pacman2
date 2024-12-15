@@ -22,9 +22,7 @@ class Map{
         Clyde clyde;
 
         // Vetores para armazenar frutas
-        std::map <std::pair<int,int>, Dot> dots;
-        std::map <std::pair<int,int>, Energizer> energizers;
-        std::map <std::pair<int,int>, Bonus> bonus;
+        std::map<std::pair<int, int>, std::unique_ptr<Fruit>> fruits;
         
     public:
         Map(const sf::Vector2<float>& tileSize);
