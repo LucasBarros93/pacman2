@@ -10,7 +10,6 @@ class Fruit {
     public:
         virtual ~Fruit() = default;
 
-        virtual void spawn() = 0;      // Método puro virtual para spawn
         virtual int getPoints() const = 0; // Pontos da fruta
         virtual void draw(sf::RenderWindow& window) const = 0; // Desenha a fruta
     };
@@ -55,7 +54,7 @@ class Bonus : public Fruit {
 
     public:
         Bonus(int fw, int fh);
-        void spawn() override;
+        void spawn();
         int getPoints() const override;
         void draw(sf::RenderWindow& window) const override;
 };

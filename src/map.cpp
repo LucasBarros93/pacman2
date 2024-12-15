@@ -12,10 +12,6 @@ Map::Map(const sf::Vector2<float>& tileSize) : tileSize(tileSize),
 
     this->wall.setSize({this->tileSize.x*2, this->tileSize.y*2});
     this->wall.setFillColor(sf::Color::Blue);
-
-    // Configuração para os pontos
-    this->dot.setRadius(this->tileSize.x/8);
-    this->dot.setFillColor(sf::Color::Yellow);
 }
 
 bool Map::loadFromFile(const std::string& filePath) {
@@ -33,6 +29,24 @@ bool Map::loadFromFile(const std::string& filePath) {
 
         mapData.push_back(data);
     }
+
+    for (size_t y = 0; y < mapData.size(); y++) {
+        for (size_t x = 0; x < mapData[y].size(); x++) {
+            bool isFullTile = (x%2 == 0 && y%2 ==0)? true : false;
+
+            if (isFullTile) {
+                std::pair<int, int> position = {static_cast<int>(x), static_cast<int>(y)};
+
+                if (mapData[y][x] == '.' || mapData[y][x+1] == '.') {  // Dot
+                    dots.emplace(position, Dot({static_cast<int>(x), static_cast<int>(y)}));
+                }
+                else if (mapData[y][x] == 'o' || mapData[y][x+1] == 'o') {  // Energizer
+                    energizers.emplace(position, Energizer({static_cast<int>(x), static_cast<int>(y)}));
+                }
+            }
+        }
+    }
+
     return true;
 }
 
@@ -101,28 +115,14 @@ void Map::draw(sf::RenderWindow& window) {
         }
     }
 
-    /*
-    for (int y = 0; y < mapData.size(); y+=2) {
-        for (int x = 0; x < mapData[y].size(); x+=2) {
-            char tile = mapData[y][x];
-            char tile2 = mapData[y][x+1];
-            sf::Vector2<float> position(x * this->tileSize.x, y * this->tileSize.y);
-
-            if (tile == '#'){ // Parede
-                this->wall.setPosition(position);
-                window.draw(this->wall);
-            } 
-            else if (tile == '.' || tile2 == '.'){ // Ponto
-                this->dot.setPosition((position.x+this->tileSize.x), (position.y+this->tileSize.y));
-                window.draw(this->dot);
-            }
-            if (tile == 'P'){
-                this->pac.setPosition({x,y}, this->tileSize);
-                window.draw(this->pac.getSprite());
-            }
-        }
+    // Desenhar frutas (dots e energizers)
+    for (const auto& dot : dots) {
+        dot.second.draw(window);
     }
-    */
+
+    for (const auto& energizer : energizers) {
+        energizer.second.draw(window);
+    }
 }
 
 const std::vector<std::vector <char>>& Map::getMapData() const {

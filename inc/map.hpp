@@ -5,6 +5,7 @@
 #include <SFML/Graphics.hpp>
 #include "entitys/pacman.hpp"
 #include "entitys/ghosts.hpp"
+#include "entitys/fruits.hpp"
 
 class Map{
     private:
@@ -19,6 +20,11 @@ class Map{
         Pinky pinky;
         Inky inky;
         Clyde clyde;
+
+        // Vetores para armazenar frutas
+        std::map <std::pair<int,int>, Dot> dots;
+        std::map <std::pair<int,int>, Energizer> energizers;
+        std::map <std::pair<int,int>, Bonus> bonus;
         
     public:
         Map(const sf::Vector2<float>& tileSize);

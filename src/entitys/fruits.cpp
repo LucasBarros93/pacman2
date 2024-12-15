@@ -18,9 +18,9 @@ int Dot::getPoints() const {
 }
 
 void Dot::draw(sf::RenderWindow& window) const {
-    sf::CircleShape dot(3.0f);
-    dot.setFillColor(sf::Color::White);
-    dot.setPosition(this->pos.x * 16, this->pos.y * 16);
+    sf::CircleShape dot(2.0f);
+    dot.setFillColor(sf::Color(184, 197, 201));
+    dot.setPosition((this->pos.x * 10) + 10, (this->pos.y * 10 )+10);
     window.draw(dot);
 }
 
@@ -33,9 +33,9 @@ int Energizer::getPoints() const {
 }
 
 void Energizer::draw(sf::RenderWindow& window) const {
-    sf::CircleShape energizer(6.0f);
-    energizer.setFillColor(sf::Color::Yellow);
-    energizer.setPosition(this->pos.x * 16, this->pos.y * 16);
+    sf::CircleShape energizer(4.0f);
+    energizer.setFillColor(sf::Color(184, 197, 201));
+    energizer.setPosition((this->pos.x * 10) + 10, (this->pos.y * 10 )+10);
     window.draw(energizer);
 }
 
@@ -47,8 +47,8 @@ Bonus::Bonus(int fw, int fh) : frameWidth(fw), frameHeight(fh) {
 }
 
 void Bonus::spawn() {
-    this->pos = {static_cast<float>(getRandomNumber(0, 20) * 16), 
-                static_cast<float>(getRandomNumber(0, 20) * 16)};
+    this->pos = {static_cast<float>(getRandomNumber(0, 20) * 10), 
+                static_cast<float>(getRandomNumber(0, 20) * 10)};
     randomize();
 }
 
@@ -60,7 +60,7 @@ void Bonus::randomize() {
     if (!texture.loadFromFile(texturePath))
         std::cerr << "Erro ao carregar textura: " << texturePath << std::endl;
     
-    int offsetX = (textureIndex * 16) + 32;
+    int offsetX = (textureIndex * 10) + 32;
 
     this->frame.left = offsetX;
     this->frame.top = 64;
