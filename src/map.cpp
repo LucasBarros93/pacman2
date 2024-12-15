@@ -5,7 +5,10 @@
 
 Map::Map(const sf::Vector2<float>& tileSize) : tileSize(tileSize), 
     pac("./assets/images/spritesheet.png", 16, 16, 0.2f),
-    blinky("./assets/images/spritesheet.png", 16, 16, 0.2f) {
+    blinky("./assets/images/spritesheet.png", 16, 16, 0.2f),
+    pinky("./assets/images/spritesheet.png", 16, 16, 0.2f),
+    inky("./assets/images/spritesheet.png", 16, 16, 0.2f),
+    clyde("./assets/images/spritesheet.png", 16, 16, 0.2f) {
 
     this->wall.setSize({this->tileSize.x*2, this->tileSize.y*2});
     this->wall.setFillColor(sf::Color::Blue);
@@ -68,6 +71,33 @@ void Map::draw(sf::RenderWindow& window) {
                     this->blinky.setPosition({static_cast<int>(x), static_cast<int>(y)},  this->tileSize);
                     window.draw(this->blinky.getSprite());
                 }
+            
+            if (mapData[y][x] == 'R' &&
+                mapData[y+1][x] == 'R' && 
+                mapData[y][x+1] == 'R' && 
+                mapData[y+1][x+1] == 'R') {
+
+                    this->pinky.setPosition({static_cast<int>(x), static_cast<int>(y)},  this->tileSize);
+                    window.draw(this->pinky.getSprite());
+                }
+
+            if (mapData[y][x] == 'I' &&
+                mapData[y+1][x] == 'I' && 
+                mapData[y][x+1] == 'I' && 
+                mapData[y+1][x+1] == 'I') {
+
+                    this->inky.setPosition({static_cast<int>(x), static_cast<int>(y)},  this->tileSize);
+                    window.draw(this->inky.getSprite());
+                }
+
+            if (mapData[y][x] == 'C' &&
+                mapData[y+1][x] == 'C' && 
+                mapData[y][x+1] == 'C' && 
+                mapData[y+1][x+1] == 'C') {
+
+                    this->clyde.setPosition({static_cast<int>(x), static_cast<int>(y)},  this->tileSize);
+                    window.draw(this->clyde.getSprite());
+                }
         }
     }
 
@@ -106,4 +136,7 @@ void Map::updatePacman(const sf::Vector2<int> direction){
 
 void Map::updateGhosts(){
     this->blinky.updateAnimation();
+    this->pinky.updateAnimation();
+    this->inky.updateAnimation();
+    this->clyde.updateAnimation();
 }

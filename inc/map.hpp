@@ -15,7 +15,10 @@ class Map{
         sf::CircleShape dot;      // Forma para os pontos
         
         Pacman pac;
-        Ghost blinky;
+        Blinky blinky;
+        Pinky pinky;
+        Inky inky;
+        Clyde clyde;
         
     public:
         Map(const sf::Vector2<float>& tileSize);

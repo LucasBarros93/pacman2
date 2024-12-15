@@ -26,6 +26,9 @@ class Ghost {
         Ghost(const std::string& texturePath, int fw, int fh, float fd);
 
         // Atualiza a animação e comportamento com base no estado
+        virtual void updateAnimationNormal();
+        // virtual void updateBehaviorNormal();
+
         virtual void updateAnimation();
         virtual void updateBehavior();
 
@@ -43,7 +46,35 @@ class Blinky : public Ghost {
         Blinky(const std::string& texturePath, int fw, int fh, float fd);
 
         // Comportamento específico de Blinky
-        void updateBehavior() override;
+        // void updateBehaviorNormal() override;
+        void updateAnimationNormal() override;
+};
+
+class Pinky : public Ghost {
+    public:
+        Pinky(const std::string& texturePath, int fw, int fh, float fd);
+
+        // Comportamento específico de Blinky
+        //void updateBehaviorNormal() override;
+        void updateAnimationNormal() override;
+};
+
+class Inky : public Ghost {
+    public:
+        Inky(const std::string& texturePath, int fw, int fh, float fd);
+
+        // Comportamento específico de Blinky
+        //void updateBehaviorNormal() override;
+        void updateAnimationNormal() override;
+};
+
+class Clyde : public Ghost {
+    public:
+        Clyde(const std::string& texturePath, int fw, int fh, float fd);
+
+        // Comportamento específico de Blinky
+        //void updateBehaviorNormal() override;
+        void updateAnimationNormal() override;
 };
 
 

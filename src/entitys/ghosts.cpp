@@ -1,8 +1,8 @@
 #include "entitys/ghosts.hpp"
 
 Ghost::Ghost(const std::string& texturePath, int fw, int fh, float fd)
-    : frameWidth(fw), frameHeight(fh), frameCount(2), frameDuration(fd),
-      currentFrameIndex(0), dir(0, 0), currentMode(NORMAL) {
+    : dir(0, 0), frameWidth(fw), frameHeight(fh), frameCount(2), frameDuration(fd),
+      currentFrameIndex(0),  currentMode(NORMAL) {
 
     if (!this->texture.loadFromFile(texturePath))
         throw std::runtime_error("Erro ao carregar spritesheet dos fantasmas!");
@@ -27,11 +27,8 @@ void Ghost::updateAnimation() {
         switch (this->currentMode) {
             case NORMAL:
                 // Frames normais para fantasmas
-                offsetY = 64;
-                if (this->dir.x == -1) offsetX = 32 + (this->currentFrameIndex * this->frameWidth); // Esquerda
-                else if (this->dir.y == -1) offsetX = 64 + (this->currentFrameIndex * this->frameWidth); // Cima
-                else if (this->dir.y == 1)  offsetX = 96 + (this->currentFrameIndex * this->frameWidth); // Baixo
-                else offsetX = 0 + (this->currentFrameIndex * this->frameWidth); // Direita
+                this->updateAnimationNormal();
+                return;
                 break;
 
             case POWERLESS:
@@ -55,6 +52,10 @@ void Ghost::updateAnimation() {
 
     }
     this->sprite.setTextureRect(this->currentFrame);
+}
+
+void Ghost::updateAnimationNormal() {
+    std::cout << "Hello" << std::endl;
 }
 
 void Ghost::updateBehavior() {
@@ -96,4 +97,84 @@ const sf::Vector2<int>& Ghost::getPosition() const {
 
 Ghost::Mode Ghost::getMode() const {
     return this->currentMode;
+}
+
+// Construtor de Blinky que chama o construtor de Ghost
+Blinky::Blinky(const std::string& texturePath, int fw, int fh, float fd)
+    : Ghost(texturePath, fw, fh, fd) {}
+
+void Blinky::updateAnimationNormal(){
+    int offsetY, offsetX;
+
+    // Frames normais para fantasmas
+    offsetY = 64;
+    if (this->dir.x == -1) offsetX = 32 + (this->currentFrameIndex * this->frameWidth); // Esquerda
+    else if (this->dir.y == -1) offsetX = 64 + (this->currentFrameIndex * this->frameWidth); // Cima
+    else if (this->dir.y == 1)  offsetX = 96 + (this->currentFrameIndex * this->frameWidth); // Baixo
+    else offsetX = 0 + (this->currentFrameIndex * this->frameWidth); // Direita
+
+    this->currentFrame.left = offsetX;
+    this->currentFrame.top = offsetY;
+    
+    this->sprite.setTextureRect(this->currentFrame);
+}
+
+// // Construtor de Pinky que chama o construtor de Ghost
+Pinky::Pinky(const std::string& texturePath, int fw, int fh, float fd)
+     : Ghost(texturePath, fw, fh, fd) {}
+
+ void Pinky::updateAnimationNormal(){
+    int offsetY, offsetX;
+
+    // Frames normais para fantasmas
+    offsetY = 80;
+    if (this->dir.x == -1) offsetX = 32 + (this->currentFrameIndex * this->frameWidth); // Esquerda
+    else if (this->dir.y == -1) offsetX = 64 + (this->currentFrameIndex * this->frameWidth); // Cima
+    else if (this->dir.y == 1)  offsetX = 96 + (this->currentFrameIndex * this->frameWidth); // Baixo
+    else offsetX = 0 + (this->currentFrameIndex * this->frameWidth); // Direita
+
+    this->currentFrame.left = offsetX;
+    this->currentFrame.top = offsetY;
+     
+    this->sprite.setTextureRect(this->currentFrame);
+ }
+
+// Construtor de Inky que chama o construtor de Ghost
+Inky::Inky(const std::string& texturePath, int fw, int fh, float fd)
+    : Ghost(texturePath, fw, fh, fd) {}
+
+void Inky::updateAnimationNormal(){
+    int offsetY, offsetX;
+
+    // Frames normais para fantasmas
+    offsetY = 96;
+    if (this->dir.x == -1) offsetX = 32 + (this->currentFrameIndex * this->frameWidth); // Esquerda
+    else if (this->dir.y == -1) offsetX = 64 + (this->currentFrameIndex * this->frameWidth); // Cima
+    else if (this->dir.y == 1)  offsetX = 96 + (this->currentFrameIndex * this->frameWidth); // Baixo
+    else offsetX = 0 + (this->currentFrameIndex * this->frameWidth); // Direita
+
+    this->currentFrame.left = offsetX;
+    this->currentFrame.top = offsetY;
+    
+    this->sprite.setTextureRect(this->currentFrame);
+}
+
+// Construtor de Clyde que chama o construtor de Ghost
+Clyde::Clyde(const std::string& texturePath, int fw, int fh, float fd)
+    : Ghost(texturePath, fw, fh, fd) {}
+
+void Clyde::updateAnimationNormal(){
+    int offsetY, offsetX;
+
+    // Frames normais para fantasmas
+    offsetY = 112;
+    if (this->dir.x == -1) offsetX = 32 + (this->currentFrameIndex * this->frameWidth); // Esquerda
+    else if (this->dir.y == -1) offsetX = 64 + (this->currentFrameIndex * this->frameWidth); // Cima
+    else if (this->dir.y == 1)  offsetX = 96 + (this->currentFrameIndex * this->frameWidth); // Baixo
+    else offsetX = 0 + (this->currentFrameIndex * this->frameWidth); // Direita
+
+    this->currentFrame.left = offsetX;
+    this->currentFrame.top = offsetY;
+    
+    this->sprite.setTextureRect(this->currentFrame);
 }

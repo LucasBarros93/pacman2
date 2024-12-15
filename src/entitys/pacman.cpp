@@ -54,7 +54,7 @@ void Pacman::updateAnimation() {
 
 void Pacman::setPosition(const sf::Vector2<int>& position, const sf::Vector2<float>& tileSize) {
     this->pos = position;
-    this->sprite.setPosition(this->pos.x * 1.02*tileSize.x, this->pos.y * 1.007*tileSize.y);
+    this->sprite.setPosition(this->pos.x * 1.005*tileSize.x, this->pos.y * 1.005*tileSize.y);
 }
 
 std::vector<std::vector <char>> Pacman::update(std::vector<std::vector <char>> mapData, const sf::Vector2<int> direction) {
