@@ -119,11 +119,11 @@ void Blinky::updateAnimationNormal(){
     this->sprite.setTextureRect(this->currentFrame);
 }
 
-// // Construtor de Pinky que chama o construtor de Ghost
+// Construtor de Pinky que chama o construtor de Ghost
 Pinky::Pinky(const std::string& texturePath, int fw, int fh, float fd)
      : Ghost(texturePath, fw, fh, fd) {}
 
- void Pinky::updateAnimationNormal(){
+void Pinky::updateAnimationNormal(){
     int offsetY, offsetX;
 
     // Frames normais para fantasmas
