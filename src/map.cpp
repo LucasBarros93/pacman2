@@ -3,7 +3,10 @@
 #include <fstream>
 #include <iostream>
 
-Map::Map(const sf::Vector2<float>& tileSize) : tileSize(tileSize), pac("./assets/images/spritesheet.png", 16, 16, 0.2f) {
+Map::Map(const sf::Vector2<float>& tileSize) : tileSize(tileSize), 
+    pac("./assets/images/spritesheet.png", 16, 16, 0.2f),
+    blinky("./assets/images/spritesheet.png", 16, 16, 0.2f) {
+
     this->wall.setSize({this->tileSize.x*2, this->tileSize.y*2});
     this->wall.setFillColor(sf::Color::Blue);
 
@@ -49,12 +52,21 @@ void Map::draw(sf::RenderWindow& window) {
             }
             
             if (mapData[y][x] == 'P' &&
-                    mapData[y+1][x] == 'P' && 
-                    mapData[y][x+1] == 'P' && 
-                    mapData[y+1][x+1] == 'P') {
+                mapData[y+1][x] == 'P' && 
+                mapData[y][x+1] == 'P' && 
+                mapData[y+1][x+1] == 'P') {
 
-                        this->pac.setPosition({static_cast<int>(x), static_cast<int>(y)}, this->tileSize);
-                        window.draw(this->pac.getSprite());
+                    this->pac.setPosition({static_cast<int>(x), static_cast<int>(y)}, this->tileSize);
+                    window.draw(this->pac.getSprite());
+                }
+            
+            if (mapData[y][x] == 'B' &&
+                mapData[y+1][x] == 'B' && 
+                mapData[y][x+1] == 'B' && 
+                mapData[y+1][x+1] == 'B') {
+
+                    this->blinky.setPosition({static_cast<int>(x), static_cast<int>(y)},  this->tileSize);
+                    window.draw(this->blinky.getSprite());
                 }
         }
     }
@@ -90,4 +102,8 @@ const std::vector<std::vector <char>>& Map::getMapData() const {
 void Map::updatePacman(const sf::Vector2<int> direction){
     this->pac.updateAnimation();
     this->mapData = this->pac.update(this->mapData, direction);
+}
+
+void Map::updateGhosts(){
+    this->blinky.updateAnimation();
 }

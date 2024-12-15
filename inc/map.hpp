@@ -4,6 +4,7 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include "entitys/pacman.hpp"
+#include "entitys/ghosts.hpp"
 
 class Map{
     private:
@@ -14,6 +15,7 @@ class Map{
         sf::CircleShape dot;      // Forma para os pontos
         
         Pacman pac;
+        Ghost blinky;
         
     public:
         Map(const sf::Vector2<float>& tileSize);
@@ -23,6 +25,7 @@ class Map{
         const std::vector<std::vector <char>>& getMapData() const; // Retorna os dados do mapa
 
         void updatePacman(const sf::Vector2<int> direction);
+        void updateGhosts();
 
 };
 

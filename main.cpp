@@ -118,6 +118,7 @@ int main() {
                 }
 
                 gameMap.updatePacman(direction);
+                gameMap.updateGhosts();
                 elapsedTime = 0.0f;  // Reinicia o timer
             }
 

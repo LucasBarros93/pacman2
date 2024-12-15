@@ -1,18 +1,17 @@
 #include "entitys/pacman.hpp"
 
-
 Pacman::Pacman(const std::string& texturePath, int fw, int fh, float fd)
     : dir(0, 0), frameWidth(fw), frameHeight(fh), frameCount(2),
      frameDuration(fd), currentFrameIndex(0){
 
-    if (!texture.loadFromFile(texturePath)) {
-            throw std::runtime_error("Erro ao carregar spritesheet!");
-        }
-    sprite.setTexture(texture);
+    if (!this->texture.loadFromFile(texturePath))
+        throw std::runtime_error("Erro ao carregar spritesheet!");
+    
+    this->sprite.setTexture(this->texture);
 
     // Configura o primeiro frame (direita)
     this->currentFrame = sf::IntRect(0, 0, this->frameWidth, frameHeight);
-    sprite.setTextureRect(this->currentFrame);
+    this->sprite.setTextureRect(this->currentFrame);
 
     this->sprite.setScale(1.f, 1.f); // Ajuste de escala, se necessário
 }
@@ -55,7 +54,7 @@ void Pacman::updateAnimation() {
 
 void Pacman::setPosition(const sf::Vector2<int>& position, const sf::Vector2<float>& tileSize) {
     this->pos = position;
-    this->sprite.setPosition(this->pos.x * 1.005*tileSize.x, this->pos.y * 1.005*tileSize.y);
+    this->sprite.setPosition(this->pos.x * 1.02*tileSize.x, this->pos.y * 1.007*tileSize.y);
 }
 
 std::vector<std::vector <char>> Pacman::update(std::vector<std::vector <char>> mapData, const sf::Vector2<int> direction) {
