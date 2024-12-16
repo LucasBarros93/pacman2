@@ -60,17 +60,27 @@ void Pacman::setPosition(const sf::Vector2<int>& position, const sf::Vector2<flo
 MapData Pacman::update(MapData mapData, const sf::Vector2<int> direction) {
     std::vector<sf::Vector2<int>> possibleDirections;
 
+    // Verifica os limites antes de acessar o mapa
+    auto isValid = [&](int y, int x) {
+        return y >= 0 && y < static_cast<int>(mapData.size()) &&
+               x >= 0 && x < static_cast<int>(mapData[0].size());
+    };
+
     // Verifica direções válidas (cima, baixo, direita, esquerda)
-    if (mapData[this->pos.y + 2][this->pos.x] != '#' && mapData[this->pos.y + 2][this->pos.x + 1] != '#')
+    if (isValid(this->pos.y + 2, this->pos.x) && isValid(this->pos.y + 2, this->pos.x + 1) &&
+        mapData[this->pos.y + 2][this->pos.x] != '#' && mapData[this->pos.y + 2][this->pos.x + 1] != '#')
         possibleDirections.push_back({0, 1});  // Baixo
 
-    if (mapData[this->pos.y - 1][this->pos.x] != '#' && mapData[this->pos.y - 1][this->pos.x + 1] != '#')
+    if (isValid(this->pos.y - 1, this->pos.x) && isValid(this->pos.y - 1, this->pos.x + 1) &&
+        mapData[this->pos.y - 1][this->pos.x] != '#' && mapData[this->pos.y - 1][this->pos.x + 1] != '#')
         possibleDirections.push_back({0, -1});  // Cima
 
-    if (mapData[this->pos.y][this->pos.x + 2] != '#' && mapData[this->pos.y + 1][this->pos.x + 2] != '#')
+    if (isValid(this->pos.y, this->pos.x + 2) && isValid(this->pos.y + 1, this->pos.x + 2) &&
+        mapData[this->pos.y][this->pos.x + 2] != '#' && mapData[this->pos.y + 1][this->pos.x + 2] != '#')
         possibleDirections.push_back({1, 0});  // Direita
 
-    if (mapData[this->pos.y][this->pos.x - 1] != '#' && mapData[this->pos.y + 1][this->pos.x - 1] != '#')
+    if (isValid(this->pos.y, this->pos.x - 1) && isValid(this->pos.y + 1, this->pos.x - 1) &&
+        mapData[this->pos.y][this->pos.x - 1] != '#' && mapData[this->pos.y + 1][this->pos.x - 1] != '#')
         possibleDirections.push_back({-1, 0});  // Esquerda
 
     // Verifica se a direção solicitada é válida
@@ -78,14 +88,15 @@ MapData Pacman::update(MapData mapData, const sf::Vector2<int> direction) {
         this->setDirection(direction);  // Atualiza a direção
     
     if (std::find(possibleDirections.begin(), possibleDirections.end(), this->dir) == possibleDirections.end())
-        this->dir = {0,0};  // Atualiza a direção
-    
+        this->dir = {0, 0};  // Atualiza a direção para nula se não for válida
 
     // Limpa a posição atual do mapa
-    mapData[this->pos.y][this->pos.x] = ' ';
-    mapData[this->pos.y + 1][this->pos.x] = ' ';
-    mapData[this->pos.y][this->pos.x + 1] = ' ';
-    mapData[this->pos.y + 1][this->pos.x + 1] = ' ';
+    if (isValid(this->pos.y, this->pos.x)) {
+        mapData[this->pos.y][this->pos.x] = ' ';
+        mapData[this->pos.y + 1][this->pos.x] = ' ';
+        mapData[this->pos.y][this->pos.x + 1] = ' ';
+        mapData[this->pos.y + 1][this->pos.x + 1] = ' ';
+    }
 
     // Atualiza a posição com base na direção
     this->pos += this->dir;
@@ -93,18 +104,21 @@ MapData Pacman::update(MapData mapData, const sf::Vector2<int> direction) {
     // Trata teleportação nas bordas horizontais
     if (this->pos.x == -1) {
         this->pos.x = mapData[0].size() - 2;
-    } else if (this->pos.x == static_cast<int>(mapData[0].size()) - 1) {
+    } else if (this->pos.x >= static_cast<int>(mapData[0].size()) - 1) {
         this->pos.x = 0;
     }
 
     // Atualiza o mapa com a nova posição do Pac-Man
-    mapData[this->pos.y][this->pos.x] = 'P';
-    mapData[this->pos.y + 1][this->pos.x] = 'P';
-    mapData[this->pos.y][this->pos.x + 1] = 'P';
-    mapData[this->pos.y + 1][this->pos.x + 1] = 'P';
+    if (isValid(this->pos.y, this->pos.x)) {
+        mapData[this->pos.y][this->pos.x] = 'P';
+        mapData[this->pos.y + 1][this->pos.x] = 'P';
+        mapData[this->pos.y][this->pos.x + 1] = 'P';
+        mapData[this->pos.y + 1][this->pos.x + 1] = 'P';
+    }
 
     return mapData;
 }
+
 
 const sf::Sprite Pacman::getSprite() const{
     return this->sprite;
