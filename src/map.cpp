@@ -5,10 +5,13 @@
 
 Map::Map(const sf::Vector2<float>& tileSize) : tileSize(tileSize), 
     pac("./assets/images/spritesheet.png", 16, 16, 0.2f),
-    blinky("./assets/images/spritesheet.png", 16, 16, 0.2f),
-    pinky("./assets/images/spritesheet.png", 16, 16, 0.2f),
-    inky("./assets/images/spritesheet.png", 16, 16, 0.2f),
-    clyde("./assets/images/spritesheet.png", 16, 16, 0.2f) {
+    blinky("./assets/images/spritesheet.png", 16, 16, 0.2f, 50),
+    pinky("./assets/images/spritesheet.png", 16, 16, 0.2f, 60),
+    inky("./assets/images/spritesheet.png", 16, 16, 0.2f, 70),
+    clyde("./assets/images/spritesheet.png", 16, 16, 0.2f, 85) {
+
+    this->inky.setMode(Ghost::DEAD);
+    this->clyde.setMode(Ghost::POWERLESS);
 
     this->wall.setSize({this->tileSize.x*2, this->tileSize.y*2});
     this->wall.setFillColor(sf::Color::Blue);
@@ -150,13 +153,32 @@ int Map::updatePacman(const sf::Vector2<int> direction) {
 
 void Map::updateGhosts(){
     this->blinky.updateAnimation();
-    // this->mapData = this->blinky.updateBehavior(this->mapData, 'B');
+    // this->mapData = this->blinky.updateBehavior(this->mapData, 'B', this->pac.getPosition());
     this->pinky.updateAnimation();
-    // this->mapData = this->pinky.updateBehavior(this->mapData, 'R');
+    // this->mapData = this->pinky.updateBehavior(this->mapData, 'R', this->pac.getPosition());
     this->inky.updateAnimation();
-    // this->mapData = this->inky.updateBehavior(this->mapData, 'I');
+    this->mapData = this->inky.updateBehavior(this->mapData, 'I', this->pac.getPosition());
     this->clyde.updateAnimation();
     this->mapData = this->clyde.updateBehavior(this->mapData, 'C');
+}
+
+void Map::colision(){
+    if(this->pac.getPosition() == this->clyde.getPosition()){
+        if(this->clyde.getMode() == Ghost::Mode::POWERLESS){
+            this->mapData = this->clyde.kill(this->mapData, 'C');
+        }
+        else if(this->clyde.getMode() == Ghost::Mode::NORMAL){
+            std::cout << "GAME OVER" << std::endl;
+        }
+    }
+    if(this->pac.getPosition() == this->inky.getPosition()){
+        if(this->inky.getMode() == Ghost::Mode::POWERLESS){
+            this->mapData = this->inky.kill(this->mapData, 'I');
+        }
+        else if(this->inky.getMode() == Ghost::Mode::NORMAL){
+            std::cout << "GAME OVER" << std::endl;
+        }
+    }
 }
 
 int Map::getFruitsRemaining() const {

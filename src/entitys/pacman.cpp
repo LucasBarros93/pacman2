@@ -58,46 +58,50 @@ void Pacman::setPosition(const sf::Vector2<int>& position, const sf::Vector2<flo
 }
 
 MapData Pacman::update(MapData mapData, const sf::Vector2<int> direction) {
-    char to1 = '#', to2 = '#';
-    if(direction.x != 0){
-        to1 = mapData[this->pos.y+0][this->pos.x+direction.x];
-        to2 = mapData[this->pos.y+1][this->pos.x+direction.x];
-    } 
-    if(direction.y != 0){
-        to1 = mapData[this->pos.y+direction.y][this->pos.x+0];
-        to2 = mapData[this->pos.y+direction.y][this->pos.x+1];
-    } 
+    std::vector<sf::Vector2<int>> possibleDirections;
 
-    if(to1 != '#' && to2 != '#')
-        this->setDirection(direction);
+    // Verifica direções válidas (cima, baixo, direita, esquerda)
+    if (mapData[this->pos.y + 2][this->pos.x] != '#' && mapData[this->pos.y + 2][this->pos.x + 1] != '#')
+        possibleDirections.push_back({0, 1});  // Baixo
+
+    if (mapData[this->pos.y - 1][this->pos.x] != '#' && mapData[this->pos.y - 1][this->pos.x + 1] != '#')
+        possibleDirections.push_back({0, -1});  // Cima
+
+    if (mapData[this->pos.y][this->pos.x + 2] != '#' && mapData[this->pos.y + 1][this->pos.x + 2] != '#')
+        possibleDirections.push_back({1, 0});  // Direita
+
+    if (mapData[this->pos.y][this->pos.x - 1] != '#' && mapData[this->pos.y + 1][this->pos.x - 1] != '#')
+        possibleDirections.push_back({-1, 0});  // Esquerda
+
+    // Verifica se a direção solicitada é válida
+    if (std::find(possibleDirections.begin(), possibleDirections.end(), direction) != possibleDirections.end())
+        this->setDirection(direction);  // Atualiza a direção
     
-    sf::Vector2<int> temp = this->pos + this->dir;
-    if(mapData[temp.y][temp.x]     == '#' ||
-       mapData[temp.y+1][temp.x]   == '#' ||
-       mapData[temp.y][temp.x+1]   == '#' ||
-       mapData[temp.y+1][temp.x+1] == '#')
-        this->setDirection({0,0});
+    if (std::find(possibleDirections.begin(), possibleDirections.end(), this->dir) == possibleDirections.end())
+        this->dir = {0,0};  // Atualiza a direção
     
-    
+
+    // Limpa a posição atual do mapa
     mapData[this->pos.y][this->pos.x] = ' ';
-    mapData[this->pos.y+1][this->pos.x] = ' ';
-    mapData[this->pos.y][this->pos.x+1] = ' ';
-    mapData[this->pos.y+1][this->pos.x+1] = ' ';
-    
+    mapData[this->pos.y + 1][this->pos.x] = ' ';
+    mapData[this->pos.y][this->pos.x + 1] = ' ';
+    mapData[this->pos.y + 1][this->pos.x + 1] = ' ';
+
+    // Atualiza a posição com base na direção
     this->pos += this->dir;
-    
-    if (this->pos.x == -1){
-        this->pos.x = mapData[0].size()-2;
-    }
-    else if (this->pos.x == static_cast<int>(mapData[0].size())-2){
+
+    // Trata teleportação nas bordas horizontais
+    if (this->pos.x == -1) {
+        this->pos.x = mapData[0].size() - 2;
+    } else if (this->pos.x == static_cast<int>(mapData[0].size()) - 1) {
         this->pos.x = 0;
     }
 
-
-    mapData[this->pos.y][this->pos.x]     = 'P';
-    mapData[this->pos.y+1][this->pos.x]   = 'P';
-    mapData[this->pos.y][this->pos.x+1]   = 'P';
-    mapData[this->pos.y+1][this->pos.x+1] = 'P';
+    // Atualiza o mapa com a nova posição do Pac-Man
+    mapData[this->pos.y][this->pos.x] = 'P';
+    mapData[this->pos.y + 1][this->pos.x] = 'P';
+    mapData[this->pos.y][this->pos.x + 1] = 'P';
+    mapData[this->pos.y + 1][this->pos.x + 1] = 'P';
 
     return mapData;
 }

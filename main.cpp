@@ -122,6 +122,7 @@ int main() {
                 else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) direction.x = 1;
 
                 playerScore += gameMap.updatePacman(direction);
+                gameMap.colision();
                 gameMap.updateGhosts();
                 elapsedTime = 0.0f;
             }

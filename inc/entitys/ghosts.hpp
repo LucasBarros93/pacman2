@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <random>
 
 typedef std::vector<std::vector <char>> MapData;
 
@@ -13,6 +14,9 @@ class Ghost {
         sf::Texture texture;        // Textura do fantasma
         sf::Vector2<int> pos;       // Posição atual (x, y)
         sf::Vector2<int> dir;       // Direção atual (-1, 0, ou 1 para x e y)
+
+        int dificult;               // [0,99] 0 mto facil - 99 mto dificil
+        int count;                  // contador de "turnos"
 
         sf::IntRect currentFrame;   // Frame atual para animação
         sf::Clock animationClock;   // Relógio para controle da animação
@@ -25,21 +29,26 @@ class Ghost {
 
         Mode currentMode; // Estados do fantasma
 
-    public:
-        Ghost(const std::string& texturePath, int fw, int fh, float fd);
-
         MapData spawn(MapData mapData, char self);
+        MapData powerless(MapData mapData, char self);
+
+    protected:
+        virtual void updateAnimationNormal();
+        virtual MapData updateBehaviorNormal(MapData mapData, sf::Vector2<int>pacmanPos);
+   
+    public:
+        Ghost(const std::string& texturePath, int fw, int fh, float fd, int df);
 
         // Atualiza a animação e comportamento com base no estado
-        virtual void updateAnimationNormal();
-        virtual MapData updateBehaviorNormal(MapData mapData);
+        void updateAnimation();
+        MapData updateBehavior(MapData mapData, char self, sf::Vector2<int>pacmanPos);
 
-        virtual void updateAnimation();
-        virtual MapData updateBehavior(MapData mapData, char self);
+        MapData kill(MapData mapData, char self);
 
         void setDirection(const sf::Vector2<int>& direction);  // Define a direção
         void setPosition(const sf::Vector2<int>& position, const sf::Vector2<float>& tileSize);    // Define a posição
         void setMode(Mode mode);                               // Define o modo atual
+        void setDificult(int df);
 
         const sf::Sprite getSprite() const;                    // Retorna o sprite
         const sf::Vector2<int>& getPosition() const;           // Retorna a posição
@@ -47,39 +56,43 @@ class Ghost {
 };
 
 class Blinky : public Ghost {
-    public:
-        Blinky(const std::string& texturePath, int fw, int fh, float fd);
-
+    private:
         // Comportamento específico de Blinky
-        MapData updateBehaviorNormal(MapData mapData) override;
+        MapData updateBehaviorNormal(MapData mapData, sf::Vector2<int>pacmanPos) override;
         void updateAnimationNormal() override;
+    
+    public:
+        Blinky(const std::string& texturePath, int fw, int fh, float fd, int df);
 };
 
 class Pinky : public Ghost {
-    public:
-        Pinky(const std::string& texturePath, int fw, int fh, float fd);
-
+    private:
         // Comportamento específico de Blinky
-        MapData updateBehaviorNormal(MapData mapData) override;
+        MapData updateBehaviorNormal(MapData mapData, sf::Vector2<int>pacmanPos) override;
         void updateAnimationNormal() override;
+    
+    public:
+        Pinky(const std::string& texturePath, int fw, int fh, float fd, int df);
 };
 
 class Inky : public Ghost {
-    public:
-        Inky(const std::string& texturePath, int fw, int fh, float fd);
-
+    private:
         // Comportamento específico de Blinky
-        MapData updateBehaviorNormal(MapData mapData) override;
+        MapData updateBehaviorNormal(MapData mapData, sf::Vector2<int>pacmanPos) override;
         void updateAnimationNormal() override;
+ 
+    public:
+        Inky(const std::string& texturePath, int fw, int fh, float fd, int df);
 };
 
 class Clyde : public Ghost {
-    public:
-        Clyde(const std::string& texturePath, int fw, int fh, float fd);
-
+    private:
         // Comportamento específico de Blinky
-        MapData updateBehaviorNormal(MapData mapData) override;
+        MapData updateBehaviorNormal(MapData mapData, sf::Vector2<int>pacmanPos) override;
         void updateAnimationNormal() override;
+
+    public:
+        Clyde(const std::string& texturePath, int fw, int fh, float fd, int df);
 };
 
 
