@@ -7,6 +7,7 @@
 typedef std::vector<std::vector <char>> MapData;
 
 class Ghost {
+    public: enum Mode { NORMAL, POWERLESS, DEAD, SPAWN };
     protected:
         sf::Sprite sprite;          // Sprite do fantasma
         sf::Texture texture;        // Textura do fantasma
@@ -22,9 +23,9 @@ class Ghost {
         float frameDuration;        // Tempo entre frames
         int currentFrameIndex;      // Índice do frame atual
 
+        Mode currentMode; // Estados do fantasma
 
     public:
-        enum Mode { NORMAL, POWERLESS, DEAD, SPAWN } currentMode; // Estados do fantasma
         Ghost(const std::string& texturePath, int fw, int fh, float fd);
 
         MapData spawn(MapData mapData, char self);

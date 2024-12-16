@@ -44,6 +44,8 @@ int main() {
         if (!inGame) {
             menu.draw(window);
         } else {
+            // Desenha o jogo
+            gameMap.draw(window);
             // Atualiza o movimento do Pac-Man somente após atingir o tempo limite
             if (elapsedTime >= updateTime) {
                 sf::Vector2<int> direction(0, 0);
@@ -62,8 +64,6 @@ int main() {
                 elapsedTime = 0.0f;  // Reinicia o timer
             }
 
-            // Desenha o jogo
-            gameMap.draw(window);
         }
 
         window.display();

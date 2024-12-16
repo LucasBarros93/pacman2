@@ -137,9 +137,11 @@ void Map::updatePacman(const sf::Vector2<int> direction){
 
 void Map::updateGhosts(){
     this->blinky.updateAnimation();
-    //this->blinky.setMode(Ghost::Mode::SPAWN);
-    //this->blinky.updateBehavior(this->mapData, 'B');
+    // this->mapData = this->blinky.updateBehavior(this->mapData, 'B');
     this->pinky.updateAnimation();
+    // this->mapData = this->pinky.updateBehavior(this->mapData, 'R');
     this->inky.updateAnimation();
+    // this->mapData = this->inky.updateBehavior(this->mapData, 'I');
     this->clyde.updateAnimation();
+    this->mapData = this->clyde.updateBehavior(this->mapData, 'C');
 }

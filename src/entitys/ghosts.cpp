@@ -17,9 +17,9 @@ Ghost::Ghost(const std::string& texturePath, int fw, int fh, float fd)
 
 MapData Ghost::spawn(MapData mapData, char self){
     this->dir = {0,-1};
-
+    
     char to = mapData[this->pos.y + this->dir.y][this->pos.x];
-    /**/
+    
     if(to == ' '){
         mapData[this->pos.y][this->pos.x] = ' ';
         mapData[this->pos.y+1][this->pos.x] = ' ';
@@ -105,7 +105,6 @@ void Ghost::updateAnimationNormal() {
 }
 
 MapData Ghost::updateBehavior(MapData mapData, char self) {
-    this->setMode(SPAWN);
     // Comportamento base dos fantasmas
     // Cada fantasma específico pode sobrescrever este comportamento
     switch (this->currentMode) {
@@ -180,6 +179,7 @@ void Blinky::updateAnimationNormal(){
 }
 
 MapData Blinky::updateBehaviorNormal(MapData mapData) {
+    /*
     // Possíveis direções para o fantasma
     const std::vector<sf::Vector2<int>> directions = {
         {1, 0},   // Direita
@@ -242,6 +242,7 @@ MapData Blinky::updateBehaviorNormal(MapData mapData) {
     mapData[this->pos.y][this->pos.x + 1] = 'B';
     mapData[this->pos.y + 1][this->pos.x + 1] = 'B';
 
+    */
     return mapData;
 
 }
