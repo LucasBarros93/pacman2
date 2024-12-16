@@ -20,35 +20,53 @@ int main() {
 
     bool inGame = false, enteringName = false, gameOver = false;
 
+    // Carrega a fonte
     sf::Font font;
-    if (!font.loadFromFile("assets/fonts/arial.ttf")) {
+    if (!font.loadFromFile("assets/fonts/qager.ttf")) {
         throw std::runtime_error("Erro ao carregar a fonte!");
     }
 
+    // Carrega a imagem de Game Over
+    sf::Texture gameOverTexture;
+    if (!gameOverTexture.loadFromFile("assets/images/gameover.png")) {
+        throw std::runtime_error("Erro ao carregar a imagem de Game Over!");
+    }
+    sf::Sprite gameOverSprite;
+    gameOverSprite.setTexture(gameOverTexture);
+
+    // Centraliza a imagem de Game Over
+    float scaleX = 0.5f; // Ajuste a escala para caber bem na tela
+    float scaleY = 0.5f;
+    gameOverSprite.setScale(scaleX, scaleY);
+    gameOverSprite.setPosition(
+        400 - (gameOverTexture.getSize().x * scaleX) / 2,
+        400 - (gameOverTexture.getSize().y * scaleY) / 2
+    );
+
+    // Textos da interface
     sf::Text inputText, gameOverText, scoreText, phaseText;
     inputText.setFont(font);
     inputText.setCharacterSize(30);
     inputText.setFillColor(sf::Color::White);
-    inputText.setPosition(100, 400);
+    inputText.setPosition(100, 200);
 
     gameOverText.setFont(font);
-    gameOverText.setCharacterSize(40);
-    gameOverText.setFillColor(sf::Color::Red);
-    gameOverText.setString("Fim de Jogo!\nPressione Enter para voltar ao menu.");
-    gameOverText.setPosition(100, 350);
+    gameOverText.setCharacterSize(30);
+    gameOverText.setFillColor(sf::Color::Yellow);
+    gameOverText.setString("Pressione Enter para voltar ao menu");
+    gameOverText.setPosition(200, 650);
 
     scoreText.setFont(font);
     scoreText.setCharacterSize(24);
     scoreText.setFillColor(sf::Color::Yellow);
     scoreText.setStyle(sf::Text::Bold);
-    scoreText.setPosition(20.f, 10.f); // Coordenada absoluta (20px da esquerda, 10px do topo)
+    scoreText.setPosition(100.f, 700.f);
 
-    // Configuração do texto de fase
     phaseText.setFont(font);
     phaseText.setCharacterSize(24);
     phaseText.setFillColor(sf::Color::Yellow);
     phaseText.setStyle(sf::Text::Bold);
-    phaseText.setPosition(20.f, 40.f); // Logo abaixo da pontuação
+    phaseText.setPosition(400.f, 700.f);
 
     sf::Clock clock;
     float updateTime = 0.1f, elapsedTime = 0.0f;
@@ -74,15 +92,21 @@ int main() {
                 } else if (event.text.unicode < 128 && playerName.size() < 15) {
                     playerName += static_cast<char>(event.text.unicode);
                 }
+            } else if (gameOver) {
+                if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Enter) {
+                    gameOver = false;
+                    menu.setState(MAIN_MENU);
+                }
             }
         }
 
-        window.clear();
+        window.clear(sf::Color(10, 10, 50)); // Fundo azul escuro em todas as telas
 
         if (enteringName) {
             inputText.setString("Digite seu nome: " + playerName);
             window.draw(inputText);
         } else if (gameOver) {
+            window.draw(gameOverSprite); // Desenha a imagem de Game Over
             window.draw(gameOverText);
         } else if (!inGame) {
             menu.draw(window);

@@ -1,47 +1,101 @@
 #include "menu.hpp"
 
-Menu::Menu() : selectedOption(0), currentState(MAIN_MENU) {
-    if (!font.loadFromFile("assets/fonts/arial.ttf")) {
-        throw std::runtime_error("Erro ao carregar a fonte!");
-    }
+Menu::Menu() : selectedOption(0), currentState(MAIN_MENU){
 
-    // Título principal
-    title.setFont(font);
-    title.setString("PAC-MAN");
-    title.setCharacterSize(60);
-    title.setFillColor(sf::Color::Yellow);
-    title.setPosition(300, 100);
+    font.loadFromFile("assets/fonts/qager.ttf"); //carregando fonte
+    // Carrega as imagens de fundo
+    backgroundTextureMain.loadFromFile("assets/images/menu.png");
+    backgroundTextureRules.loadFromFile("assets/images/regras.png");
+    backgroundTextureLeaderboard.loadFromFile("assets/images/quadroLideres.png");
+    gameOverTexture.loadFromFile("assets/images/gameover.png");
+
+    // colocando a imagem do gameOver
+    gameOverSprite.setTexture(gameOverTexture);
+    float scaleX = 0.5f; // Ajuste a escala para caber bem na tela
+    float scaleY = 0.5f;
+    gameOverSprite.setScale(scaleX, scaleY);
+    float posX = 400 - (gameOverTexture.getSize().x * scaleX) / 2;
+    float posY = 400 - (gameOverTexture.getSize().y * scaleY) / 2;
+    gameOverSprite.setPosition(posX, posY);
+
+
+    backgroundSpriteMain.setTexture(backgroundTextureMain);
+    backgroundSpriteMain.setScale(0.22f, 0.22f);
+    backgroundSpriteMain.setPosition(380 - backgroundTextureMain.getSize().x * 0.1f, 90);
+
+    backgroundSpriteRules.setTexture(backgroundTextureRules);
+    backgroundSpriteRules.setScale(0.2f, 0.2f);
+    backgroundSpriteRules.setPosition(400 - backgroundTextureRules.getSize().x * 0.1f, 50);
+
+    backgroundSpriteLeaderboard.setTexture(backgroundTextureLeaderboard);
+    backgroundSpriteLeaderboard.setScale(0.2f, 0.2f);
+    backgroundSpriteLeaderboard.setPosition(400 - backgroundTextureLeaderboard.getSize().x * 0.1f, 50);
+
+    // Configuração do título "Regras"
+    rulesTitle.setFont(font);
+    rulesTitle.setString("Regras");
+    rulesTitle.setCharacterSize(30);
+    rulesTitle.setFillColor(sf::Color::Yellow);
+    rulesTitle.setStyle(sf::Text::Bold);
+    rulesTitle.setPosition(400 - 50, 300); // Posição centralizada abaixo da imagem
+
+    // Configuração do título "Quadro de Líderes"
+    leaderboardTitle.setFont(font);
+    leaderboardTitle.setString("Quadro de Lideres");
+    leaderboardTitle.setCharacterSize(30);
+    leaderboardTitle.setFillColor(sf::Color::Yellow);
+    leaderboardTitle.setStyle(sf::Text::Bold);
+    leaderboardTitle.setPosition(400 - 110, 300); // Posição centralizada abaixo da imagem
+
+    // Configuração do texto de regras
+    rulesText.setFont(font);
+    rulesText.setString("Use as setas para mover\nComa as frutas para pontuar\nEvite os fantasmas!");
+    rulesText.setCharacterSize(20);
+    rulesText.setFillColor(sf::Color::White);
+    rulesText.setPosition(50, 250);
+
+    // Configuração do quadro de líderes
+    leaderboardText.setFont(font);
+    leaderboardText.setCharacterSize(20);
+    leaderboardText.setFillColor(sf::Color::White);
+    leaderboardText.setPosition(50, 250);
+
+    // Botão voltar
+    backButton.setFont(font);
+    backButton.setString("Pressione Enter para Voltar");
+    backButton.setCharacterSize(20);
+    backButton.setFillColor(sf::Color::Yellow);
+    backButton.setPosition(50, 500);
 
     // Opções do menu principal
     std::vector<std::string> optionTexts = {"Jogar", "Regras", "Quadro de Lideres", "Sair"};
     for (size_t i = 0; i < optionTexts.size(); i++) {
         sf::Text text;
-        initMenuText(text, optionTexts[i], 350, 200 + i * 100);
+        initMenuText(text, optionTexts[i], 300, 300 + i * 100);
         options.push_back(text);
     }
 
     // Texto para as regras
     rulesText.setFont(font);
-    rulesText.setString("Regras:\n- Use as setas para mover.\n- Coma os pontos.\n- Evite os fantasmas!");
-    rulesText.setCharacterSize(30);
+    rulesText.setString("- Use as setas para mover\n- Pontue comendo as frutas (pontos)\n- Elimine momentaneamente os fantasmas quando comer a fruta especial\n- Pontue o maximo possivel para entrar no quadro de lideres!");
+    rulesText.setCharacterSize(15);
     rulesText.setFillColor(sf::Color::White);
-    rulesText.setPosition(50, 200);
+    rulesText.setPosition(50, 400);
 
     leaderboardText.setFont(font);
     leaderboardText.setCharacterSize(30);
     leaderboardText.setFillColor(sf::Color::White);
-    leaderboardText.setPosition(50, 200);
+    leaderboardText.setPosition(50, 400);
 
     backButton.setFont(font);
     backButton.setString("Pressione Enter para Voltar");
     backButton.setCharacterSize(30);
     backButton.setFillColor(sf::Color::Yellow);
-    backButton.setPosition(50, 500);
+    backButton.setPosition(50, 700);
 }
 
 void Menu::setLeaderboard(const std::vector<ScoreEntry>& scores) {
     std::ostringstream stream;
-    stream << "Quadro de Lideres:\n";
     for (size_t i = 0; i < scores.size(); ++i) {
         stream << i + 1 << ". " << scores[i].name << " - " << scores[i].score << "\n";
     }
@@ -57,20 +111,27 @@ void Menu::initMenuText(sf::Text& text, const std::string& str, float x, float y
 }
 
 void Menu::draw(sf::RenderWindow& window) {
+    window.clear(sf::Color(10, 10, 50)); // Fundo azul escuro
+
     if (currentState == MAIN_MENU) {
-        window.draw(title);
+        window.draw(backgroundSpriteMain);
         for (size_t i = 0; i < options.size(); i++) {
             options[i].setFillColor(i == selectedOption ? sf::Color::Red : sf::Color::White);
             window.draw(options[i]);
         }
     } else if (currentState == RULES_SCREEN) {
-        window.draw(rulesText);
+        window.draw(backgroundSpriteRules);
+        window.draw(rulesTitle);   // Título "Regras"
+        window.draw(rulesText);    // Texto das regras
         window.draw(backButton);
     } else if (currentState == LEADERBOARD_SCREEN) {
-        window.draw(leaderboardText);
+        window.draw(backgroundSpriteLeaderboard);
+        window.draw(leaderboardTitle);  // Título "Quadro de Líderes"
+        window.draw(leaderboardText);   // Texto do quadro de líderes
         window.draw(backButton);
     }
 }
+
 
 void Menu::updateSelection(int direction) {
     selectedOption = (selectedOption + direction + options.size()) % options.size();

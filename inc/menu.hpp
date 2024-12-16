@@ -20,9 +20,21 @@ private:
     int selectedOption; // Índice da opção selecionada
     MenuState currentState; // Estado atual do menu
 
+    sf::Text rulesTitle;          // Título para a tela de regras
+    sf::Text leaderboardTitle;    // Título para o quadro de líderes
     sf::Text rulesText; // Texto para as regras
     sf::Text leaderboardText; // Texto para o quadro de líderes
     sf::Text backButton; // Botão de voltar ao menu principal
+    
+    // Texturas e sprites para diferentes seções
+    sf::Texture backgroundTextureMain;
+    sf::Sprite backgroundSpriteMain;
+    sf::Texture backgroundTextureRules;
+    sf::Sprite backgroundSpriteRules;
+    sf::Texture backgroundTextureLeaderboard;
+    sf::Sprite backgroundSpriteLeaderboard;
+    sf::Texture gameOverTexture;    // Textura para a imagem de game over
+    sf::Sprite gameOverSprite;      // Sprite para exibir a imagem
 
     void initMenuText(sf::Text& text, const std::string& str, float x, float y);
 
