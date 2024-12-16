@@ -130,10 +130,23 @@ const MapData& Map::getMapData() const {
     return this->mapData;
 }
 
-void Map::updatePacman(const sf::Vector2<int> direction){
+int Map::updatePacman(const sf::Vector2<int> direction) {
+    int pointsEarned = 0;
+
+    // Atualiza a posição do Pac-Man
     this->pac.updateAnimation();
     this->mapData = this->pac.update(this->mapData, direction);
+
+    // Verifica se o Pac-Man coletou uma fruta
+    auto it = this->fruits.find({pac.getPosition().x, pac.getPosition().y});
+    if (it != this->fruits.end()) {
+        pointsEarned = it->second->getPoints(); // Pontos da fruta
+        this->fruits.erase(it); // Remove a fruta
+    }
+
+    return pointsEarned;
 }
+
 
 void Map::updateGhosts(){
     this->blinky.updateAnimation();
@@ -144,4 +157,8 @@ void Map::updateGhosts(){
     // this->mapData = this->inky.updateBehavior(this->mapData, 'I');
     this->clyde.updateAnimation();
     this->mapData = this->clyde.updateBehavior(this->mapData, 'C');
+}
+
+int Map::getFruitsRemaining() const {
+    return fruits.size();
 }

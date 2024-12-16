@@ -33,8 +33,9 @@ class Map{
         void draw(sf::RenderWindow& window);           // Desenha o mapa na janela
         const MapData& getMapData() const; // Retorna os dados do mapa
 
-        void updatePacman(const sf::Vector2<int> direction);
+        int updatePacman(const sf::Vector2<int> direction);
         void updateGhosts();
+        int getFruitsRemaining() const;
 
 };
 
