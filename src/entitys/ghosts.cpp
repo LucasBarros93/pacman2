@@ -163,12 +163,12 @@ Blinky::Blinky(const std::string& texturePath, int fw, int fh, float fd)
     : Ghost(texturePath, fw, fh, fd) {}
 
 void Blinky::updateAnimationNormal(){
-    int offsetY=0, offsetX=0;
+    int offsetY, offsetX;
 
     // Frames normais para fantasmas
     offsetY = 64;
     if (this->dir.x == -1) offsetX = 32 + (this->currentFrameIndex * this->frameWidth); // Esquerda
-    else if (this->dir.y == -1) offsetX = 1 + (this->currentFrameIndex * this->frameWidth); // Cima
+    else if (this->dir.y == -1) offsetX = 64 + (this->currentFrameIndex * this->frameWidth); // Cima
     else if (this->dir.y == 1)  offsetX = 96 + (this->currentFrameIndex * this->frameWidth); // Baixo
     else offsetX = 0 + (this->currentFrameIndex * this->frameWidth); // Direita
 
