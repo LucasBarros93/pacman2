@@ -136,9 +136,9 @@ int main() {
                 else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) direction.x = -1;
                 else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) direction.x = 1;
 
-                playerScore += gameMap.updatePacman(direction);
-                gameOver = gameMap.colision();
-                gameMap.updateGhosts();
+                // playerScore += gameMap.updatePacman(direction);
+                // gameOver = gameMap.colision();
+                // gameMap.updateGhosts();
                 elapsedTime = 0.0f;
             }
 

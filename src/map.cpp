@@ -10,9 +10,6 @@ Map::Map(const sf::Vector2<float>& tileSize) : tileSize(tileSize),
     inky("./assets/images/spritesheet.png", 16, 16, 0.2f, 70),
     clyde("./assets/images/spritesheet.png", 16, 16, 0.2f, 85) {
 
-    this->inky.setMode(Ghost::DEAD);
-    this->clyde.setMode(Ghost::POWERLESS);
-
     this->wall.setSize({this->tileSize.x*2, this->tileSize.y*2});
     this->wall.setFillColor(sf::Color::Blue);
 }
@@ -151,9 +148,9 @@ void Map::updateGhosts(){
     this->pinky.updateAnimation();
     // this->mapData = this->pinky.updateBehavior(this->mapData, 'R', this->pac.getPosition());
     this->inky.updateAnimation();
-    this->mapData = this->inky.updateBehavior(this->mapData, 'I', this->pac.getPosition());
+    // this->mapData = this->inky.updateBehavior(this->mapData, 'I', this->pac.getPosition());
     this->clyde.updateAnimation();
-    this->mapData = this->clyde.updateBehavior(this->mapData, 'C', this->pac.getPosition());
+    // this->mapData = this->clyde.updateBehavior(this->mapData, 'C', this->pac.getPosition());
 }
 
 bool Map::colision(){
@@ -163,7 +160,7 @@ bool Map::colision(){
             return false;
         }
         else if(this->clyde.getMode() == Ghost::Mode::NORMAL){
-            std::cout << "GAME OVER" << std::endl;
+            return true;
         }
     }
     if(this->pac.getPosition() == this->inky.getPosition()){
