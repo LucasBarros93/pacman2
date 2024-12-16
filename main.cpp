@@ -10,6 +10,7 @@ int main() {
 
     sf::RenderWindow window(sf::VideoMode(800, 800), "Pac-Man");
 
+
     Menu menu;
     Map gameMap({10.f, 10.f});
     ScoreManager scoreManager("scores.txt");
@@ -55,18 +56,22 @@ int main() {
     gameOverText.setFillColor(sf::Color::Yellow);
     gameOverText.setString("Pressione Enter para voltar ao menu");
     gameOverText.setPosition(200, 650);
+    // Ajusta a posição do scoreText e phaseText de acordo com o tamanho da janela
+    sf::Vector2u winSize = window.getSize(); 
+    scoreText.setPosition( (winSize.x * 0.125f), (winSize.y * 0.875f) );   // Por exemplo, 12.5% da largura, 87.5% da altura
+    phaseText.setPosition( (winSize.x * 0.5f),   (winSize.y * 0.875f) );   // 50% da largura, 87.5% da altura
 
     scoreText.setFont(font);
     scoreText.setCharacterSize(24);
     scoreText.setFillColor(sf::Color::Yellow);
     scoreText.setStyle(sf::Text::Bold);
-    scoreText.setPosition(100.f, 700.f);
+    //scoreText.setPosition(100.f, 700.f);
 
     phaseText.setFont(font);
     phaseText.setCharacterSize(24);
     phaseText.setFillColor(sf::Color::Yellow);
     phaseText.setStyle(sf::Text::Bold);
-    phaseText.setPosition(400.f, 700.f);
+    //phaseText.setPosition(400.f, 700.f);
 
     sf::Clock clock;
     float updateTime = 0.1f, elapsedTime = 0.0f;
