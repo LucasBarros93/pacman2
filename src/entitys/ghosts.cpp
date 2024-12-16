@@ -94,6 +94,13 @@ MapData Ghost::powerless(MapData mapData, char self){
         this->pos += this->dir;  // Move o fantasma
     }
 
+    // Trata teleportação nas bordas horizontais
+    if (this->pos.x == -1) {
+        this->pos.x = mapData[0].size() - 2;
+    } else if (this->pos.x == static_cast<int>(mapData[0].size()) - 1) {
+        this->pos.x = 0;
+    }
+
     // Atualiza a nova posição no mapa
     mapData[this->pos.y][this->pos.x] = self;
     mapData[this->pos.y+1][this->pos.x] = self;
@@ -296,6 +303,13 @@ MapData Blinky::updateBehaviorNormal(MapData mapData, sf::Vector2<int>pacmanPos)
         this->pos += this->dir;  // Move o fantasma
     }
 
+    // Trata teleportação nas bordas horizontais
+    if (this->pos.x == -1) {
+        this->pos.x = mapData[0].size() - 2;
+    } else if (this->pos.x == static_cast<int>(mapData[0].size()) - 1) {
+        this->pos.x = 0;
+    }
+
     // Atualiza a nova posição no mapa
     mapData[this->pos.y][this->pos.x] = 'B';
     mapData[this->pos.y + 1][this->pos.x] = 'B';
@@ -402,6 +416,13 @@ MapData Pinky::updateBehaviorNormal(MapData mapData, sf::Vector2<int>pacmanPos) 
         this->pos += this->dir;  // Move o fantasma
     }
 
+    // Trata teleportação nas bordas horizontais
+    if (this->pos.x == -1) {
+        this->pos.x = mapData[0].size() - 2;
+    } else if (this->pos.x == static_cast<int>(mapData[0].size()) - 1) {
+        this->pos.x = 0;
+    }
+
     // Atualiza a nova posição no mapa
     mapData[this->pos.y][this->pos.x] = 'R';
     mapData[this->pos.y + 1][this->pos.x] = 'R';
@@ -493,6 +514,13 @@ MapData Inky::updateBehaviorNormal(MapData mapData, sf::Vector2<int>pacmanPos) {
         mapData[this->pos.y + 1][this->pos.x + 1] = ' ';
 
         this->pos += this->dir;  // Move o fantasma
+    }
+
+    // Trata teleportação nas bordas horizontais
+    if (this->pos.x == -1) {
+        this->pos.x = mapData[0].size() - 2;
+    } else if (this->pos.x == static_cast<int>(mapData[0].size()) - 1) {
+        this->pos.x = 0;
     }
 
     // Atualiza a nova posição no mapa
@@ -599,6 +627,13 @@ MapData Clyde::updateBehaviorNormal(MapData mapData, sf::Vector2<int>pacmanPos) 
         mapData[this->pos.y + 1][this->pos.x + 1] = ' ';
 
         this->pos += this->dir;  // Move o fantasma
+    }
+
+    // Trata teleportação nas bordas horizontais
+    if (this->pos.x == -1) {
+        this->pos.x = mapData[0].size() - 2;
+    } else if (this->pos.x == static_cast<int>(mapData[0].size()) - 1) {
+        this->pos.x = 0;
     }
 
     // Atualiza a nova posição no mapa
