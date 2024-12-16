@@ -78,11 +78,6 @@ void Map::draw(sf::RenderWindow& window) {
 
                     this->pac.setPosition({static_cast<int>(x), static_cast<int>(y)}, this->tileSize);
                     window.draw(this->pac.getSprite());
-
-                    if(this->fruits.find({x,y}) != this->fruits.end() || this->fruits.find({x+1,y}) != this->fruits.end()){
-                        //fruits[{x,y}].getPoints();
-                        fruits.erase({x,y});
-                    }
                 }
             
             if (mapData[y][x] == 'B' &&
@@ -150,7 +145,6 @@ int Map::updatePacman(const sf::Vector2<int> direction) {
     return pointsEarned;
 }
 
-
 void Map::updateGhosts(){
     this->blinky.updateAnimation();
     // this->mapData = this->blinky.updateBehavior(this->mapData, 'B', this->pac.getPosition());
@@ -159,7 +153,7 @@ void Map::updateGhosts(){
     this->inky.updateAnimation();
     this->mapData = this->inky.updateBehavior(this->mapData, 'I', this->pac.getPosition());
     this->clyde.updateAnimation();
-    this->mapData = this->clyde.updateBehavior(this->mapData, 'C');
+    this->mapData = this->clyde.updateBehavior(this->mapData, 'C', this->pac.getPosition());
 }
 
 void Map::colision(){
