@@ -5,10 +5,10 @@
 
 Map::Map(const sf::Vector2<float>& tileSize) : tileSize(tileSize), 
     pac("./assets/images/spritesheet.png", 16, 16, 0.2f),
-    blinky("./assets/images/spritesheet.png", 16, 16, 0.2f),
-    pinky("./assets/images/spritesheet.png", 16, 16, 0.2f),
-    inky("./assets/images/spritesheet.png", 16, 16, 0.2f),
-    clyde("./assets/images/spritesheet.png", 16, 16, 0.2f) {
+    blinky("./assets/images/spritesheet.png", 16, 16, 0.2f, 10),
+    pinky("./assets/images/spritesheet.png", 16, 16, 0.2f, 50),
+    inky("./assets/images/spritesheet.png", 16, 16, 0.2f, 20),
+    clyde("./assets/images/spritesheet.png", 16, 16, 0.2f, 70) {
 
     this->wall.setSize({this->tileSize.x*2, this->tileSize.y*2});
     this->wall.setFillColor(sf::Color::Blue);

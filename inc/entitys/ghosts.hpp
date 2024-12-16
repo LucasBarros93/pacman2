@@ -14,6 +14,7 @@ class Ghost {
         sf::Texture texture;        // Textura do fantasma
         sf::Vector2<int> pos;       // Posição atual (x, y)
         sf::Vector2<int> dir;       // Direção atual (-1, 0, ou 1 para x e y)
+        int dificult;               // [0,99] 0 mto facil - 99 mto dificil
 
         sf::IntRect currentFrame;   // Frame atual para animação
         sf::Clock animationClock;   // Relógio para controle da animação
@@ -34,7 +35,7 @@ class Ghost {
         virtual MapData updateBehaviorNormal(MapData mapData, sf::Vector2<int>pacmanPos);
    
     public:
-        Ghost(const std::string& texturePath, int fw, int fh, float fd);
+        Ghost(const std::string& texturePath, int fw, int fh, float fd, int df);
 
         // Atualiza a animação e comportamento com base no estado
         void updateAnimation();
@@ -43,6 +44,7 @@ class Ghost {
         void setDirection(const sf::Vector2<int>& direction);  // Define a direção
         void setPosition(const sf::Vector2<int>& position, const sf::Vector2<float>& tileSize);    // Define a posição
         void setMode(Mode mode);                               // Define o modo atual
+        void setDificult(int df);
 
         const sf::Sprite getSprite() const;                    // Retorna o sprite
         const sf::Vector2<int>& getPosition() const;           // Retorna a posição
@@ -56,7 +58,7 @@ class Blinky : public Ghost {
         void updateAnimationNormal() override;
     
     public:
-        Blinky(const std::string& texturePath, int fw, int fh, float fd);
+        Blinky(const std::string& texturePath, int fw, int fh, float fd, int df);
 };
 
 class Pinky : public Ghost {
@@ -66,7 +68,7 @@ class Pinky : public Ghost {
         void updateAnimationNormal() override;
     
     public:
-        Pinky(const std::string& texturePath, int fw, int fh, float fd);
+        Pinky(const std::string& texturePath, int fw, int fh, float fd, int df);
 };
 
 class Inky : public Ghost {
@@ -76,7 +78,7 @@ class Inky : public Ghost {
         void updateAnimationNormal() override;
  
     public:
-        Inky(const std::string& texturePath, int fw, int fh, float fd);
+        Inky(const std::string& texturePath, int fw, int fh, float fd, int df);
 };
 
 class Clyde : public Ghost {
@@ -86,7 +88,7 @@ class Clyde : public Ghost {
         void updateAnimationNormal() override;
 
     public:
-        Clyde(const std::string& texturePath, int fw, int fh, float fd);
+        Clyde(const std::string& texturePath, int fw, int fh, float fd, int df);
 };
 
 
