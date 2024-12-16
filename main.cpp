@@ -86,7 +86,13 @@ int main() {
                 else if (option == 1)
                     menu.setState(RULES_SCREEN);
                 else if (option == 2) {
-                    menu.setLeaderboard(scoreManager.getScores());
+                    // Converte o vetor de pares para ScoreEntry antes de enviar
+                    auto scores = scoreManager.getScores();
+                    std::vector<ScoreEntry> leaderboard;
+                    for (const auto& score : scores) {
+                        leaderboard.emplace_back(score.first, score.second);
+                    }
+                    menu.setLeaderboard(leaderboard); 
                     menu.setState(LEADERBOARD_SCREEN);
                 }
                 else if (option == 3) 
@@ -109,6 +115,7 @@ int main() {
             } else if (gameOver) {
                 if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Enter) {
                     inGame = false;
+                    scoreManager.saveScore(playerName, playerScore.getValue());  // Salva a pontuação
                     enteringName = false;
                     gameOver = false;
                     playerName.clear();

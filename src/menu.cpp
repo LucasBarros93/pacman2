@@ -3,6 +3,28 @@
 Menu::Menu() : selectedOption(0), currentState(MAIN_MENU){
 
     font.loadFromFile("assets/fonts/qager.ttf"); //carregando fonte
+
+    // Configuração do quadro de líderes
+    leaderboardText.clear(); // Limpa o vetor antes de adicionar novos elementos
+    // Adiciona 5 textos padrão ao vetor como placeholders
+    for (int i = 0; i < 5; ++i) {
+        sf::Text text;
+        text.setFont(font);
+        text.setCharacterSize(20);
+        text.setFillColor(sf::Color::White);
+        text.setPosition(50, 250 + i * 40); // Posiciona verticalmente
+        leaderboardText.push_back(text);
+    }
+
+    // Configuração do título "Quadro de Líderes"
+    leaderboardTitle.setFont(font);
+    leaderboardTitle.setString("Quadro de Lideres");
+    leaderboardTitle.setCharacterSize(30);
+    leaderboardTitle.setFillColor(sf::Color::Yellow);
+    leaderboardTitle.setStyle(sf::Text::Bold);
+    leaderboardTitle.setPosition(400 - 110, 300); // Posição centralizada abaixo da imagem
+
+
     // Carrega as imagens de fundo
     backgroundTextureMain.loadFromFile("assets/images/menu.png");
     backgroundTextureRules.loadFromFile("assets/images/regras.png");
@@ -54,16 +76,10 @@ Menu::Menu() : selectedOption(0), currentState(MAIN_MENU){
     rulesText.setFillColor(sf::Color::White);
     rulesText.setPosition(50, 250);
 
-    // Configuração do quadro de líderes
-    leaderboardText.setFont(font);
-    leaderboardText.setCharacterSize(20);
-    leaderboardText.setFillColor(sf::Color::White);
-    leaderboardText.setPosition(50, 250);
-
     // Botão voltar
     backButton.setFont(font);
     backButton.setString("Pressione Enter para Voltar");
-    backButton.setCharacterSize(20);
+    backButton.setCharacterSize(30);
     backButton.setFillColor(sf::Color::Yellow);
     backButton.setPosition(50, 500);
 
@@ -81,26 +97,23 @@ Menu::Menu() : selectedOption(0), currentState(MAIN_MENU){
     rulesText.setCharacterSize(15);
     rulesText.setFillColor(sf::Color::White);
     rulesText.setPosition(50, 400);
-
-    leaderboardText.setFont(font);
-    leaderboardText.setCharacterSize(30);
-    leaderboardText.setFillColor(sf::Color::White);
-    leaderboardText.setPosition(50, 400);
-
-    backButton.setFont(font);
-    backButton.setString("Pressione Enter para Voltar");
-    backButton.setCharacterSize(30);
-    backButton.setFillColor(sf::Color::Yellow);
-    backButton.setPosition(50, 700);
 }
 
 void Menu::setLeaderboard(const std::vector<ScoreEntry>& scores) {
-    std::ostringstream stream;
+    leaderboardText.clear(); // Limpa o vetor
+
     for (size_t i = 0; i < scores.size(); ++i) {
-        stream << i + 1 << ". " << scores[i].name << " - " << scores[i].score << "\n";
+        sf::Text text;
+        text.setFont(font);
+        text.setCharacterSize(20);
+        text.setFillColor(sf::Color::White);
+        text.setString(std::to_string(i + 1) + ". " + scores[i].name + " - " + std::to_string(scores[i].score));
+        text.setPosition(50, 350 + i * 40); // Posiciona cada linha
+        leaderboardText.push_back(text);    // Adiciona o texto ao vetor
     }
-    leaderboardText.setString(stream.str());
 }
+
+
 
 void Menu::initMenuText(sf::Text& text, const std::string& str, float x, float y) {
     text.setFont(font);
@@ -121,16 +134,19 @@ void Menu::draw(sf::RenderWindow& window) {
         }
     } else if (currentState == RULES_SCREEN) {
         window.draw(backgroundSpriteRules);
-        window.draw(rulesTitle);   // Título "Regras"
-        window.draw(rulesText);    // Texto das regras
+        window.draw(rulesTitle);
+        window.draw(rulesText);
         window.draw(backButton);
     } else if (currentState == LEADERBOARD_SCREEN) {
         window.draw(backgroundSpriteLeaderboard);
-        window.draw(leaderboardTitle);  // Título "Quadro de Líderes"
-        window.draw(leaderboardText);   // Texto do quadro de líderes
+        window.draw(leaderboardTitle);
+        for (const auto& text : leaderboardText) { // Desenha cada linha do quadro
+            window.draw(text);
+        }
         window.draw(backButton);
     }
 }
+
 
 
 void Menu::updateSelection(int direction) {

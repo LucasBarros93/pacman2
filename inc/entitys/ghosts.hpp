@@ -42,7 +42,8 @@ class Ghost {
         // Atualiza a animação e comportamento com base no estado
         void updateAnimation();
         MapData updateBehavior(MapData mapData, char self, sf::Vector2<int>pacmanPos);
-        void reset(const sf::Vector2<int>& position, Mode mode); // reseta dps que da gameover
+        void reset(const sf::Vector2<int>& position);// reseta dps que da gameover
+ 
 
         MapData kill(MapData mapData, char self);
 

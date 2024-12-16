@@ -12,24 +12,21 @@ struct ScoreEntry {
     std::string name;
     int score;
 
-    bool operator<(const ScoreEntry& other) const {
-        return score > other.score; // Ordenar em ordem decrescente
-    }
+    ScoreEntry(const std::string& name, int score) : name(name), score(score) {}
 };
 
+
 class ScoreManager {
-private:
-    std::vector<ScoreEntry> scores;
-    const std::string filePath;
-
-    void loadScores();
-    void saveScores();
-
 public:
     ScoreManager(const std::string& filePath);
+    void saveScore(const std::string& playerName, int score);
+    std::vector<std::pair<std::string, int>> getScores() const;
 
-    void addScore(const std::string& name, int score);
-    const std::vector<ScoreEntry>& getScores() const;
+
+private:
+    std::string filePath;
+    std::vector<std::pair<std::string, int>> scores;
+    void loadScores();
 };
 
 #endif

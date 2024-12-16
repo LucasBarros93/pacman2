@@ -241,12 +241,14 @@ MapData Ghost::updateBehavior(MapData mapData, char self, sf::Vector2<int>pacman
     return mapData;
 }
 
-void Ghost::reset(const sf::Vector2<int>& position, Mode mode) {
-    this->pos = position;  // Posição inicial do fantasma
-    this->dir = {0, 0};    // Sem movimento inicialmente
-    this->currentMode = mode;  // Modo inicial
-    this->count = 0;       // Resetar contador
+void Ghost::reset(const sf::Vector2<int>& position) {
+    this->pos = position;       // Posição inicial do fantasma
+    this->dir = {0, 0};         // Direção inicial
+    this->currentMode = NORMAL; // Modo inicial NORMAL
+    this->currentFrameIndex = 0;
+    this->sprite.setPosition(this->pos.x * 10, this->pos.y * 10);
 }
+
 
 
 MapData Ghost::updateBehaviorNormal(MapData mapData, sf::Vector2<int>pacmanPos) {

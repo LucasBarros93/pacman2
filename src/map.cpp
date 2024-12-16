@@ -48,20 +48,21 @@ bool Map::loadFromFile(const std::string& filePath) {
 }
 
 void Map::reset() {
-    // Recarrega o mapa do arquivo original
+    // Recarrega o mapa
     this->loadFromFile("assets/maps/map.txt");
 
-    // Reinicializa o Pac-Man
+    // Reseta Pac-Man
     this->pac.reset();
 
-    // Reinicializa os fantasmas em suas posições iniciais e modos
-    this->blinky.reset({27, 22}, Ghost::NORMAL);
-    this->pinky.reset({27, 22}, Ghost::NORMAL);
-    this->inky.reset({27, 22}, Ghost::DEAD);
-    this->clyde.reset({27, 22}, Ghost::POWERLESS);
+    // Reseta fantasmas (posições e modos iniciais)
+    this->blinky.reset({27, 22});  // Posição inicial
+    this->pinky.reset({29, 22});
+    this->inky.reset({25, 22});
+    this->clyde.reset({31, 22});
+
+    // Limpa frutas
+    this->fruits.clear();
 }
-
-
 
 void Map::draw(sf::RenderWindow& window) {
     bool isFullTile;
