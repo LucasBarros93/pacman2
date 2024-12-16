@@ -74,27 +74,42 @@ int main() {
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed) window.close();
+            if (event.type == sf::Event::Closed)
+                window.close();
 
             if (!inGame && !enteringName && !gameOver) {
                 int option = menu.handleInput(event);
-                if (option == 0) { enteringName = true; playerName.clear(); }
-                else if (option == 1) menu.setState(RULES_SCREEN);
+                if (option == 0) {
+                    enteringName = true; 
+                    playerName.clear(); 
+                }
+                else if (option == 1)
+                    menu.setState(RULES_SCREEN);
                 else if (option == 2) {
                     menu.setLeaderboard(scoreManager.getScores());
                     menu.setState(LEADERBOARD_SCREEN);
-                } else if (option == 3) window.close();
-            } else if (enteringName && event.type == sf::Event::TextEntered) {
-                if (event.text.unicode == '\b' && !playerName.empty()) playerName.pop_back();
-                else if (event.text.unicode == '\r' && !playerName.empty()) {
-                    enteringName = false; inGame = true; playerScore = 0; currentPhase = 1;
-                    gameMap.loadFromFile("assets/maps/map.txt");
-                } else if (event.text.unicode < 128 && playerName.size() < 15) {
-                    playerName += static_cast<char>(event.text.unicode);
                 }
+                else if (option == 3) 
+                    window.close();
+            }
+            else if (enteringName && event.type == sf::Event::TextEntered) {
+                if (event.text.unicode == '\b' && !playerName.empty())
+                    playerName.pop_back();
+
+                else if (event.text.unicode == '\r' && !playerName.empty()) {
+                    enteringName = false;
+                    inGame = true;
+                    playerScore = 0; 
+                    currentPhase = 1;
+                    gameMap.loadFromFile("assets/maps/map.txt");
+
+                } else if (event.text.unicode < 128 && playerName.size() < 15)
+                    playerName += static_cast<char>(event.text.unicode);
+                
             } else if (gameOver) {
                 if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Enter) {
-                    gameOver = false;
+                    inGame = false, enteringName = false, gameOver = false;
+                    playerName.clear();
                     menu.setState(MAIN_MENU);
                 }
             }
@@ -122,7 +137,7 @@ int main() {
                 else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) direction.x = 1;
 
                 playerScore += gameMap.updatePacman(direction);
-                gameMap.colision();
+                gameOver = gameMap.colision();
                 gameMap.updateGhosts();
                 elapsedTime = 0.0f;
             }
@@ -146,6 +161,3 @@ int main() {
 
     return 0;
 }
-
-
-// pro teste ai

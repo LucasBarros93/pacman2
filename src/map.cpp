@@ -156,10 +156,11 @@ void Map::updateGhosts(){
     this->mapData = this->clyde.updateBehavior(this->mapData, 'C', this->pac.getPosition());
 }
 
-void Map::colision(){
+bool Map::colision(){
     if(this->pac.getPosition() == this->clyde.getPosition()){
         if(this->clyde.getMode() == Ghost::Mode::POWERLESS){
             this->mapData = this->clyde.kill(this->mapData, 'C');
+            return false;
         }
         else if(this->clyde.getMode() == Ghost::Mode::NORMAL){
             std::cout << "GAME OVER" << std::endl;
@@ -168,11 +169,13 @@ void Map::colision(){
     if(this->pac.getPosition() == this->inky.getPosition()){
         if(this->inky.getMode() == Ghost::Mode::POWERLESS){
             this->mapData = this->inky.kill(this->mapData, 'I');
+            return false;
         }
         else if(this->inky.getMode() == Ghost::Mode::NORMAL){
-            std::cout << "GAME OVER" << std::endl;
+            return true;
         }
     }
+    return false;
 }
 
 int Map::getFruitsRemaining() const {

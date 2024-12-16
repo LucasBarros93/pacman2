@@ -37,7 +37,7 @@ class Map{
         void updateGhosts();
         int getFruitsRemaining() const;
 
-        void colision();
+        bool colision();
 
 };
 
