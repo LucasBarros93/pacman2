@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <random>
 
 typedef std::vector<std::vector <char>> MapData;
 
