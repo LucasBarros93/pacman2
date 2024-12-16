@@ -186,6 +186,7 @@ MapData Ghost::updateBehavior(MapData mapData, char self, sf::Vector2<int>pacman
 }
 
 MapData Ghost::updateBehaviorNormal(MapData mapData, sf::Vector2<int>pacmanPos) {
+    pacmanPos = {0,0};
     return mapData;
 }
 
