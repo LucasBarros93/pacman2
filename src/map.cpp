@@ -126,8 +126,8 @@ void Map::draw(sf::RenderWindow& window) {
     }
 }
 
-const std::vector<std::vector <char>>& Map::getMapData() const {
-    return mapData;
+const MapData& Map::getMapData() const {
+    return this->mapData;
 }
 
 void Map::updatePacman(const sf::Vector2<int> direction){
@@ -137,6 +137,8 @@ void Map::updatePacman(const sf::Vector2<int> direction){
 
 void Map::updateGhosts(){
     this->blinky.updateAnimation();
+    //this->blinky.setMode(Ghost::Mode::SPAWN);
+    //this->blinky.updateBehavior(this->mapData, 'B');
     this->pinky.updateAnimation();
     this->inky.updateAnimation();
     this->clyde.updateAnimation();

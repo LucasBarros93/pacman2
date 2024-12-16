@@ -7,9 +7,11 @@
 #include "entitys/ghosts.hpp"
 #include "entitys/fruits.hpp"
 
+typedef std::vector<std::vector <char>> MapData;
+
 class Map{
     private:
-        std::vector<std::vector <char>> mapData;  // Representação do mapa
+        MapData mapData;  // Representação do mapa
         sf::Vector2<float> tileSize;            // Tamanho de cada célula do mapa
 
         sf::RectangleShape wall;            // Sprite para paredes
@@ -29,7 +31,7 @@ class Map{
     
         bool loadFromFile(const std::string& filePath); // Carrega o mapa de um arquivo
         void draw(sf::RenderWindow& window);           // Desenha o mapa na janela
-        const std::vector<std::vector <char>>& getMapData() const; // Retorna os dados do mapa
+        const MapData& getMapData() const; // Retorna os dados do mapa
 
         void updatePacman(const sf::Vector2<int> direction);
         void updateGhosts();

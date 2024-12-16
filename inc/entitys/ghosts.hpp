@@ -4,6 +4,8 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
+typedef std::vector<std::vector <char>> MapData;
+
 class Ghost {
     protected:
         sf::Sprite sprite;          // Sprite do fantasma
@@ -20,17 +22,19 @@ class Ghost {
         float frameDuration;        // Tempo entre frames
         int currentFrameIndex;      // Índice do frame atual
 
-        enum Mode { NORMAL, POWERLESS, DEAD } currentMode; // Estados do fantasma
 
     public:
+        enum Mode { NORMAL, POWERLESS, DEAD, SPAWN } currentMode; // Estados do fantasma
         Ghost(const std::string& texturePath, int fw, int fh, float fd);
+
+        MapData spawn(MapData mapData, char self);
 
         // Atualiza a animação e comportamento com base no estado
         virtual void updateAnimationNormal();
-        // virtual void updateBehaviorNormal();
+        virtual MapData updateBehaviorNormal(MapData mapData);
 
         virtual void updateAnimation();
-        virtual void updateBehavior();
+        virtual MapData updateBehavior(MapData mapData, char self);
 
         void setDirection(const sf::Vector2<int>& direction);  // Define a direção
         void setPosition(const sf::Vector2<int>& position, const sf::Vector2<float>& tileSize);    // Define a posição
@@ -46,7 +50,7 @@ class Blinky : public Ghost {
         Blinky(const std::string& texturePath, int fw, int fh, float fd);
 
         // Comportamento específico de Blinky
-        // void updateBehaviorNormal() override;
+        MapData updateBehaviorNormal(MapData mapData) override;
         void updateAnimationNormal() override;
 };
 
@@ -55,7 +59,7 @@ class Pinky : public Ghost {
         Pinky(const std::string& texturePath, int fw, int fh, float fd);
 
         // Comportamento específico de Blinky
-        //void updateBehaviorNormal() override;
+        MapData updateBehaviorNormal(MapData mapData) override;
         void updateAnimationNormal() override;
 };
 
@@ -64,7 +68,7 @@ class Inky : public Ghost {
         Inky(const std::string& texturePath, int fw, int fh, float fd);
 
         // Comportamento específico de Blinky
-        //void updateBehaviorNormal() override;
+        MapData updateBehaviorNormal(MapData mapData) override;
         void updateAnimationNormal() override;
 };
 
@@ -73,7 +77,7 @@ class Clyde : public Ghost {
         Clyde(const std::string& texturePath, int fw, int fh, float fd);
 
         // Comportamento específico de Blinky
-        //void updateBehaviorNormal() override;
+        MapData updateBehaviorNormal(MapData mapData) override;
         void updateAnimationNormal() override;
 };
 

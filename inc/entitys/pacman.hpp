@@ -4,6 +4,8 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
+typedef std::vector<std::vector <char>> MapData;
+
 class Pacman {
     private:
         sf::Sprite sprite;       // Sprite para representar o Pacman visualmente
@@ -24,7 +26,7 @@ class Pacman {
         Pacman(const std::string& texturePath, int fw, int fh, float fd);
 
         void updateAnimation();
-        std::vector<std::vector <char>> update(std::vector<std::vector <char>> mapData, const sf::Vector2<int> direction);
+        MapData update(MapData mapData, const sf::Vector2<int> direction);
 
         void setDirection(const sf::Vector2<int>& direction); // Define a direção de movimento
         void setPosition(const sf::Vector2<int>& position, const sf::Vector2<float>& tileSize);
