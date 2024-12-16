@@ -1,8 +1,5 @@
 #include "map.hpp"
 
-#include <fstream>
-#include <iostream>
-
 Map::Map(const sf::Vector2<float>& tileSize) : tileSize(tileSize), 
     pac("./assets/images/spritesheet.png", 16, 16, 0.2f),
     blinky("./assets/images/spritesheet.png", 16, 16, 0.2f, 50),

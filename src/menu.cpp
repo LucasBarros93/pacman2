@@ -116,7 +116,7 @@ void Menu::draw(sf::RenderWindow& window) {
     if (currentState == MAIN_MENU) {
         window.draw(backgroundSpriteMain);
         for (size_t i = 0; i < options.size(); i++) {
-            options[i].setFillColor(i == selectedOption ? sf::Color::Red : sf::Color::White);
+            options[i].setFillColor(static_cast<int>(i) == selectedOption ? sf::Color::Red : sf::Color::White);
             window.draw(options[i]);
         }
     } else if (currentState == RULES_SCREEN) {

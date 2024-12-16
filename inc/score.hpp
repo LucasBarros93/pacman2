@@ -4,26 +4,19 @@
 #include <iostream>
 
 class Score {
-private:
-    int value;
+    private:
+        int value;
 
-public:
-    Score(int val = 0) : value(val) {}
+    public:
+        Score(int val);
 
-    // Sobrecarga do operador +
-    Score operator+(int points) const {
-        return Score(value + points);
-    }
+        // Sobrecarga do operador +
+        Score operator+(int points) const;
 
-    // Sobrecarga de operador de atribuição +=
-    Score& operator+=(int points) {
-        value += points;
-        return *this;
-    }
+        // Sobrecarga de operador de atribuição +=
+        Score& operator+=(int points);
 
-    int getValue() const {
-        return value;
-    }
+        int getValue() const;
 };
 
 #endif
