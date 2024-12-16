@@ -120,54 +120,50 @@ MapData Ghost::updateBehavior(MapData mapData, char self) {
             // Movimento mais lento ou aleatório
             break;
         case DEAD:
-            sf::Vector2<int> spawn = {27,22};
-            sf::Vector2<int> direction = {0, 0};
+            sf::Vector2<int> spawn = {27, 22};
+            
             std::vector<sf::Vector2<int>> possibleDirections;
 
-            // Verifica direções horizontais
-            if (this->pos.x < spawn.x) {
-                possibleDirections.push_back({1, 0}); // Direita
-            } else if (this->pos.x > spawn.x) {
-                possibleDirections.push_back({-1, 0}); // Esquerda
-            }
+            if(mapData[this->pos.y+2][this->pos.x] != '#' && mapData[this->pos.y+2][this->pos.x+1] != '#')
+                possibleDirections.push_back({0,1});
 
-            // Verifica direções verticais
-            if (this->pos.y < spawn.y) {
-                possibleDirections.push_back({0, 1}); // Baixo
-            } else if (this->pos.y > spawn.y) {
-                possibleDirections.push_back({0, -1}); // Cima
-            }
+            if(mapData[this->pos.y-1][this->pos.x] != '#' && mapData[this->pos.y-1][this->pos.x+1] != '#')
+                possibleDirections.push_back({0,-1});
 
-            // Escolhe aleatoriamente uma direção entre as possíveis
-            if (!possibleDirections.empty()) {
-                std::random_device rd;                          // Fonte de aleatoriedade
-                std::mt19937 gen(rd());                         // Gerador de números aleatórios
+            if(mapData[this->pos.y][this->pos.x+2] != '#' && mapData[this->pos.y+1][this->pos.x+2] != '#')
+                possibleDirections.push_back({1,0});
+
+            if(mapData[this->pos.y][this->pos.x-1] != '#' && mapData[this->pos.y+1][this->pos.x-1] != '#')
+                possibleDirections.push_back({-1,0});
+
+            // Verifica se é uma encruzilhada (mais de 2 direções válidas)
+            if (possibleDirections.size() > 1) {
+                // Escolhe aleatoriamente uma nova direção válida
+                std::random_device rd;
+                std::mt19937 gen(rd());
                 std::uniform_int_distribution<> dis(0, possibleDirections.size() - 1);
 
-                int randIndex = dis(gen);                       // Escolhe um índice aleatório
-                direction = possibleDirections[randIndex];      // Define a direção
+                int randIndex = dis(gen);
+                this->dir = possibleDirections[randIndex];  // Nova direção escolhida
             }
 
-            //std::cout << direction.x << " " << direction.y << std::endl;
-            // Atualiza a direção
-            this->dir = direction;
-
-            // Atualiza a posição
+            // Atualiza a posição com a direção atual
             sf::Vector2<int> nextPos = this->pos + this->dir;
 
             // Verifica colisão
             if (mapData[nextPos.y][nextPos.x] != '#') {
                 mapData[this->pos.y][this->pos.x] = ' ';
-                mapData[this->pos.y+1][this->pos.x] = ' ';
-                mapData[this->pos.y][this->pos.x+1] = ' ';
-                mapData[this->pos.y+1][this->pos.x+1] = ' ';
+                mapData[this->pos.y + 1][this->pos.x] = ' ';
+                mapData[this->pos.y][this->pos.x + 1] = ' ';
+                mapData[this->pos.y + 1][this->pos.x + 1] = ' ';
 
-                this->pos += this->dir;
+                this->pos += this->dir;  // Move o fantasma
             }
 
-            mapData[this->pos.y][this->pos.x]     = self;
-            mapData[this->pos.y+1][this->pos.x]   = self;
-            mapData[this->pos.y][this->pos.x+1]   = self;
+            // Atualiza a nova posição no mapa
+            mapData[this->pos.y][this->pos.x] = self;
+            mapData[this->pos.y+1][this->pos.x] = self;
+            mapData[this->pos.y][this->pos.x+1] = self;
             mapData[this->pos.y+1][this->pos.x+1] = self;
 
             // Verifica se chegou ao spawn
@@ -178,17 +174,18 @@ MapData Ghost::updateBehavior(MapData mapData, char self) {
                 mapData[this->pos.y+1][this->pos.x+1] = ' ';
                 
                 int aux = 24;
-                while(mapData[28][aux] != ' ')
+                while (mapData[28][aux] != ' ')
                     aux++;
 
                 this->pos = {28, aux};
-                mapData[this->pos.y][this->pos.x]     = self;
-                mapData[this->pos.y+1][this->pos.x]   = self;
-                mapData[this->pos.y][this->pos.x+1]   = self;
-                mapData[this->pos.y+1][this->pos.x+1] = self;
+                mapData[this->pos.y][this->pos.x] = self;
+                mapData[this->pos.y + 1][this->pos.x] = self;
+                mapData[this->pos.y][this->pos.x + 1] = self;
+                mapData[this->pos.y + 1][this->pos.x + 1] = self;
 
-                this->currentMode = NORMAL; // Volta ao modo normal
+                this->currentMode = NORMAL;  // Volta ao modo normal
             }
+
 
             return mapData;
     }

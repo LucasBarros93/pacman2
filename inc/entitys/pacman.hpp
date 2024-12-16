@@ -2,6 +2,7 @@
 #define PACMAN_HPP
 
 #include <iostream>
+#include <algorithm>
 #include <SFML/Graphics.hpp>
 
 typedef std::vector<std::vector <char>> MapData;
