@@ -1,7 +1,7 @@
 #include "entitys/ghosts.hpp"
 
 Ghost::Ghost(const std::string& texturePath, int fw, int fh, float fd, int df)
-    : dir(0, 0), dificult(df), count(0), frameWidth(fw), frameHeight(fh), frameCount(2), frameDuration(fd),
+    : dir(0, 0), pos(27,26), dificult(df), count(0), frameWidth(fw), frameHeight(fh), frameCount(2), frameDuration(fd),
       currentFrameIndex(0),  currentMode(NORMAL) {
 
     if (!this->texture.loadFromFile(texturePath))

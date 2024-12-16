@@ -12,8 +12,8 @@ class Ghost {
     protected:
         sf::Sprite sprite;          // Sprite do fantasma
         sf::Texture texture;        // Textura do fantasma
-        sf::Vector2<int> pos;       // Posição atual (x, y)
         sf::Vector2<int> dir;       // Direção atual (-1, 0, ou 1 para x e y)
+        sf::Vector2<int> pos;       // Posição atual (x, y)
 
         int dificult;               // [0,99] 0 mto facil - 99 mto dificil
         int count;                  // contador de "turnos"
@@ -32,7 +32,6 @@ class Ghost {
         MapData spawn(MapData mapData, char self);
         MapData powerless(MapData mapData, char self);
 
-    protected:
         virtual void updateAnimationNormal();
         virtual MapData updateBehaviorNormal(MapData mapData, sf::Vector2<int>pacmanPos);
    
