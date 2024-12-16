@@ -12,6 +12,7 @@ typedef std::vector<std::vector <char>> MapData;
 class Map{
     private:
         MapData mapData;  // Representação do mapa
+        int count;
         sf::Vector2<float> tileSize;            // Tamanho de cada célula do mapa
 
         sf::RectangleShape wall;            // Sprite para paredes
@@ -34,11 +35,13 @@ class Map{
         void draw(sf::RenderWindow& window);           // Desenha o mapa na janela
         const MapData& getMapData() const; // Retorna os dados do mapa
 
-        int updatePacman(const sf::Vector2<int> direction);
+        void operator++(int);
+
+        void updatePacman(const sf::Vector2<int> direction);
         void updateGhosts();
         int getFruitsRemaining() const;
 
-        bool colision();
+        int colision();
 
 };
 

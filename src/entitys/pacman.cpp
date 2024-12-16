@@ -116,7 +116,6 @@ void Pacman::reset() {
     this->sprite.setTextureRect(this->currentFrame);
 }
 
-
 const sf::Sprite Pacman::getSprite() const{
     return this->sprite;
 }

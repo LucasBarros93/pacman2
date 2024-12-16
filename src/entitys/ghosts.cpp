@@ -2,7 +2,7 @@
 
 Ghost::Ghost(const std::string& texturePath, int fw, int fh, float fd, int df)
     : dir(0, 0), pos(27,26), dificult(df), count(0), frameWidth(fw), frameHeight(fh), frameCount(2), frameDuration(fd),
-      currentFrameIndex(0),  currentMode(NORMAL) {
+      currentFrameIndex(0),  currentMode(OUTGAME) {
 
     if (!this->texture.loadFromFile(texturePath))
         throw std::runtime_error("Erro ao carregar spritesheet dos fantasmas!");
@@ -153,6 +153,8 @@ MapData Ghost::kill(MapData mapData, char self){
     mapData[this->pos.y + 1][this->pos.x + 1] = self;
 
     this->setMode(DEAD);
+    this->dir = {0,0};
+    this->count = 0;
 
     return mapData;
 }
@@ -167,6 +169,11 @@ void Ghost::updateAnimation() {
         int offsetX = 0;
 
         switch (this->currentMode) {
+            case OUTGAME:
+                // Frames normais para fantasmas
+                this->updateAnimationNormal();
+                return;
+
             case SPAWN:
                 // Frames normais para fantasmas
                 this->updateAnimationNormal();
@@ -208,6 +215,9 @@ MapData Ghost::updateBehavior(MapData mapData, char self, sf::Vector2<int>pacman
     // Comportamento base dos fantasmas
     // Cada fantasma específico pode sobrescrever este comportamento
     switch (this->currentMode) {
+        case OUTGAME:
+            // fora do jogo n se mexe
+            return mapData;
         case SPAWN:
             // Spanwnando
             mapData = this->spawn(mapData, self);
@@ -229,7 +239,7 @@ MapData Ghost::updateBehavior(MapData mapData, char self, sf::Vector2<int>pacman
             return mapData;
         
         case DEAD:
-            if(this->count++ > 100){
+            if(this->count++ > 80){
                 this->setMode(SPAWN);
                 this->count = 0;
             }
@@ -247,7 +257,6 @@ void Ghost::reset(const sf::Vector2<int>& position, Mode mode) {
     this->currentMode = mode;  // Modo inicial
     this->count = 0;       // Resetar contador
 }
-
 
 MapData Ghost::updateBehaviorNormal(MapData mapData, sf::Vector2<int>pacmanPos) {
     pacmanPos = {0,0};
@@ -269,6 +278,10 @@ void Ghost::setMode(Mode mode) {
 
 void Ghost::setDificult(int df) {
     this->dificult = df;
+}
+
+void Ghost::setCount(int i) {
+    this->count = i;
 }
 
 const sf::Sprite Ghost::getSprite() const {

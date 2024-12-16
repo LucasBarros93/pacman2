@@ -13,6 +13,7 @@ int main() {
     Menu menu;
     Map gameMap({10.f, 10.f});
     ScoreManager scoreManager("scores.txt");
+    int result;
 
     std::string playerName;
     Score playerScore(0);
@@ -141,9 +142,12 @@ int main() {
                 else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) direction.x = -1;
                 else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) direction.x = 1;
 
-                playerScore += gameMap.updatePacman(direction);
-                gameOver = gameMap.colision();
+                gameMap.updatePacman(direction);
+                result = gameMap.colision();
+                playerScore += result>0? result : 0;
+                gameOver = result == -1? true : false;
                 gameMap.updateGhosts();
+                gameMap++;
                 elapsedTime = 0.0f;
             }
 
