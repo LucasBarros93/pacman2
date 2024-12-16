@@ -43,6 +43,8 @@ class Ghost {
         void updateAnimation();
         MapData updateBehavior(MapData mapData, char self, sf::Vector2<int>pacmanPos);
 
+        MapData kill(MapData mapData, char self);
+
         void setDirection(const sf::Vector2<int>& direction);  // Define a direção
         void setPosition(const sf::Vector2<int>& position, const sf::Vector2<float>& tileSize);    // Define a posição
         void setMode(Mode mode);                               // Define o modo atual

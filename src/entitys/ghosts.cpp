@@ -99,9 +99,6 @@ MapData Ghost::powerless(MapData mapData, char self){
     if (possibleDirections.size() > 1) {
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::uniform_int_distribution<> dis(0, 99);
-        int randomNumber = dis(gen);
-
         
         // Escolhe uma direção aleatória
         std::uniform_int_distribution<> randomDir(0, possibleDirections.size() - 1);
@@ -134,6 +131,28 @@ MapData Ghost::powerless(MapData mapData, char self){
     mapData[this->pos.y + 1][this->pos.x] = self;
     mapData[this->pos.y][this->pos.x + 1] = self;
     mapData[this->pos.y + 1][this->pos.x + 1] = self;
+
+    return mapData;
+}
+
+MapData Ghost::kill(MapData mapData, char self){
+    int aux = 24;
+                
+    while(mapData[28][aux] != ' ')
+        aux++;
+    
+    mapData[this->pos.y][this->pos.x] = ' ';
+    mapData[this->pos.y + 1][this->pos.x] = ' ';
+    mapData[this->pos.y][this->pos.x + 1] = ' ';
+    mapData[this->pos.y + 1][this->pos.x + 1] = ' ';
+
+    this->pos = {aux, 28};  // Move o fantasma
+    mapData[this->pos.y][this->pos.x] = self;
+    mapData[this->pos.y + 1][this->pos.x] = self;
+    mapData[this->pos.y][this->pos.x + 1] = self;
+    mapData[this->pos.y + 1][this->pos.x + 1] = self;
+
+    this->setMode(DEAD);
 
     return mapData;
 }

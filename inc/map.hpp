@@ -36,6 +36,8 @@ class Map{
         void updatePacman(const sf::Vector2<int> direction);
         void updateGhosts();
 
+        void colision();
+
 };
 
 #endif
