@@ -5,10 +5,13 @@
 
 Map::Map(const sf::Vector2<float>& tileSize) : tileSize(tileSize), 
     pac("./assets/images/spritesheet.png", 16, 16, 0.2f),
-    blinky("./assets/images/spritesheet.png", 16, 16, 0.2f, 10),
-    pinky("./assets/images/spritesheet.png", 16, 16, 0.2f, 50),
-    inky("./assets/images/spritesheet.png", 16, 16, 0.2f, 20),
-    clyde("./assets/images/spritesheet.png", 16, 16, 0.2f, 70) {
+    blinky("./assets/images/spritesheet.png", 16, 16, 0.2f, 50),
+    pinky("./assets/images/spritesheet.png", 16, 16, 0.2f, 60),
+    inky("./assets/images/spritesheet.png", 16, 16, 0.2f, 70),
+    clyde("./assets/images/spritesheet.png", 16, 16, 0.2f, 85) {
+
+    this->inky.setMode(Ghost::DEAD);
+    this->clyde.setMode(Ghost::POWERLESS);
 
     this->wall.setSize({this->tileSize.x*2, this->tileSize.y*2});
     this->wall.setFillColor(sf::Color::Blue);
@@ -137,12 +140,11 @@ void Map::updatePacman(const sf::Vector2<int> direction){
 
 void Map::updateGhosts(){
     this->blinky.updateAnimation();
-    // this->mapData = this->blinky.updateBehavior(this->mapData, 'B');
+    // this->mapData = this->blinky.updateBehavior(this->mapData, 'B', this->pac.getPosition());
     this->pinky.updateAnimation();
-    // this->mapData = this->pinky.updateBehavior(this->mapData, 'R');
+    // this->mapData = this->pinky.updateBehavior(this->mapData, 'R', this->pac.getPosition());
     this->inky.updateAnimation();
-    // this->mapData = this->inky.updateBehavior(this->mapData, 'I');
+    this->mapData = this->inky.updateBehavior(this->mapData, 'I', this->pac.getPosition());
     this->clyde.updateAnimation();
-    // this->clyde.setMode(Ghost::DEAD);
     this->mapData = this->clyde.updateBehavior(this->mapData, 'C', this->pac.getPosition());
 }

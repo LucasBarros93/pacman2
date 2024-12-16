@@ -14,7 +14,9 @@ class Ghost {
         sf::Texture texture;        // Textura do fantasma
         sf::Vector2<int> pos;       // Posição atual (x, y)
         sf::Vector2<int> dir;       // Direção atual (-1, 0, ou 1 para x e y)
+
         int dificult;               // [0,99] 0 mto facil - 99 mto dificil
+        int count;                  // contador de "turnos"
 
         sf::IntRect currentFrame;   // Frame atual para animação
         sf::Clock animationClock;   // Relógio para controle da animação

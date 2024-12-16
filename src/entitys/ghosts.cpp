@@ -1,7 +1,7 @@
 #include "entitys/ghosts.hpp"
 
 Ghost::Ghost(const std::string& texturePath, int fw, int fh, float fd, int df)
-    : dir(0, 0), dificult(df), frameWidth(fw), frameHeight(fh), frameCount(2), frameDuration(fd),
+    : dir(0, 0), dificult(df), count(0), frameWidth(fw), frameHeight(fh), frameCount(2), frameDuration(fd),
       currentFrameIndex(0),  currentMode(NORMAL) {
 
     if (!this->texture.loadFromFile(texturePath))
@@ -16,6 +16,9 @@ Ghost::Ghost(const std::string& texturePath, int fw, int fh, float fd, int df)
 }
 
 MapData Ghost::spawn(MapData mapData, char self){
+    if(this->count++%5 !=0)
+        return mapData;
+
     this->dir = {0,-1};
     
     char to = mapData[this->pos.y + this->dir.y][this->pos.x];
@@ -57,35 +60,60 @@ MapData Ghost::spawn(MapData mapData, char self){
 }
 
 MapData Ghost::powerless(MapData mapData, char self){
-    std::vector<sf::Vector2<int>> possibleDirections;
-    if(mapData[this->pos.y+2][this->pos.x] != '#' && mapData[this->pos.y+2][this->pos.x+1] != '#')
-        possibleDirections.push_back({0,1});
+        std::vector<sf::Vector2<int>> possibleDirections;
 
-    if(mapData[this->pos.y-1][this->pos.x] != '#' && mapData[this->pos.y-1][this->pos.x+1] != '#')
-        possibleDirections.push_back({0,-1});
+    // Verifica direções válidas (baixo, cima, direita, esquerda)
+    if (mapData[this->pos.y + 2][this->pos.x] != '#' && mapData[this->pos.y + 2][this->pos.x + 1] != '#')
+        possibleDirections.push_back({0, 1});  // Baixo
 
-    if(mapData[this->pos.y][this->pos.x+2] != '#' && mapData[this->pos.y+1][this->pos.x+2] != '#')
-        possibleDirections.push_back({1,0});
+    if (mapData[this->pos.y - 1][this->pos.x] != '#' && mapData[this->pos.y - 1][this->pos.x + 1] != '#')
+        possibleDirections.push_back({0, -1}); // Cima
 
-    if(mapData[this->pos.y][this->pos.x-1] != '#' && mapData[this->pos.y+1][this->pos.x-1] != '#')
-        possibleDirections.push_back({-1,0});
+    if (mapData[this->pos.y][this->pos.x + 2] != '#' && mapData[this->pos.y + 1][this->pos.x + 2] != '#')
+        possibleDirections.push_back({1, 0});  // Direita
 
-    // Verifica se é uma encruzilhada (mais de 2 direções válidas)
+    if (mapData[this->pos.y][this->pos.x - 1] != '#' && mapData[this->pos.y + 1][this->pos.x - 1] != '#')
+        possibleDirections.push_back({-1, 0}); // Esquerda
+
+    // Caso não haja direções válidas, não faz nada
+    if (possibleDirections.empty()) {
+        return mapData;
+    }
+
+    // Identificar corredores retos: 2 direções válidas, sendo uma delas oposta à atual
+    if (possibleDirections.size() == 2) {
+        for (const auto& dir : possibleDirections) {
+            if (dir == -this->dir) { // Direção oposta
+                // Mantém a direção atual e não muda
+                possibleDirections.erase(std::remove(possibleDirections.begin(), possibleDirections.end(), dir), possibleDirections.end());
+                break;
+            }
+        }
+        // Se ainda restar apenas 1 direção válida, continua na mesma direção
+        if (possibleDirections.size() == 1) {
+            this->dir = possibleDirections[0];
+        }
+    }
+
+    // Se estiver em uma encruzilhada, escolha nova direção com probabilidade
     if (possibleDirections.size() > 1) {
-        // Escolhe aleatoriamente uma nova direção válida
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::uniform_int_distribution<> dis(0, possibleDirections.size() - 1);
+        std::uniform_int_distribution<> dis(0, 99);
+        int randomNumber = dis(gen);
 
-        int randIndex = dis(gen);
-        this->dir = possibleDirections[randIndex];  // Nova direção escolhida
+        
+        // Escolhe uma direção aleatória
+        std::uniform_int_distribution<> randomDir(0, possibleDirections.size() - 1);
+        this->dir = possibleDirections[randomDir(gen)];
+        
     }
 
     // Atualiza a posição com a direção atual
     sf::Vector2<int> nextPos = this->pos + this->dir;
 
-    // Verifica colisão
     if (mapData[nextPos.y][nextPos.x] != '#') {
+        // Limpa a posição atual
         mapData[this->pos.y][this->pos.x] = ' ';
         mapData[this->pos.y + 1][this->pos.x] = ' ';
         mapData[this->pos.y][this->pos.x + 1] = ' ';
@@ -103,9 +131,9 @@ MapData Ghost::powerless(MapData mapData, char self){
 
     // Atualiza a nova posição no mapa
     mapData[this->pos.y][this->pos.x] = self;
-    mapData[this->pos.y+1][this->pos.x] = self;
-    mapData[this->pos.y][this->pos.x+1] = self;
-    mapData[this->pos.y+1][this->pos.x+1] = self;
+    mapData[this->pos.y + 1][this->pos.x] = self;
+    mapData[this->pos.y][this->pos.x + 1] = self;
+    mapData[this->pos.y + 1][this->pos.x + 1] = self;
 
     return mapData;
 }
@@ -139,10 +167,10 @@ void Ghost::updateAnimation() {
             case DEAD:
                 // Frames "dead" (linha 5)
                 offsetY = 80;  // Linha 5
-                if (this->dir.x == 1)      offsetX = 144;  // Direita
-                else if (this->dir.x == -1) offsetX = 160; // Esquerda
+                if (this->dir.x == -1) offsetX = 160; // Esquerda
                 else if (this->dir.y == -1) offsetX = 176; // Cima
                 else if (this->dir.y == 1)  offsetX = 192; // Baixo
+                else                        offsetX = 144;  // Direita
                 break;
         }
 
@@ -174,9 +202,18 @@ MapData Ghost::updateBehavior(MapData mapData, char self, sf::Vector2<int>pacman
         case POWERLESS:
             // Movimento aleatório
             mapData = this->powerless(mapData, self);
+            if(this->count++ > 100){
+                this->setMode(NORMAL);
+                this->count = 0;
+            }
+
             return mapData;
         
         case DEAD:
+            if(this->count++ > 100){
+                this->setMode(SPAWN);
+                this->count = 0;
+            }
             // voltar para o spawn
             break;
             
