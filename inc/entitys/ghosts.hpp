@@ -28,17 +28,17 @@ class Ghost {
 
         MapData spawn(MapData mapData, char self);
         MapData powerless(MapData mapData, char self);
+
+    protected:
+        virtual void updateAnimationNormal();
+        virtual MapData updateBehaviorNormal(MapData mapData, sf::Vector2<int>pacmanPos);
    
     public:
         Ghost(const std::string& texturePath, int fw, int fh, float fd);
 
-
         // Atualiza a animação e comportamento com base no estado
-        virtual void updateAnimationNormal();
-        virtual MapData updateBehaviorNormal(MapData mapData);
-
-        virtual void updateAnimation();
-        virtual MapData updateBehavior(MapData mapData, char self);
+        void updateAnimation();
+        MapData updateBehavior(MapData mapData, char self, sf::Vector2<int>pacmanPos);
 
         void setDirection(const sf::Vector2<int>& direction);  // Define a direção
         void setPosition(const sf::Vector2<int>& position, const sf::Vector2<float>& tileSize);    // Define a posição
@@ -50,39 +50,43 @@ class Ghost {
 };
 
 class Blinky : public Ghost {
+    private:
+        // Comportamento específico de Blinky
+        MapData updateBehaviorNormal(MapData mapData, sf::Vector2<int>pacmanPos) override;
+        void updateAnimationNormal() override;
+    
     public:
         Blinky(const std::string& texturePath, int fw, int fh, float fd);
-
-        // Comportamento específico de Blinky
-        MapData updateBehaviorNormal(MapData mapData) override;
-        void updateAnimationNormal() override;
 };
 
 class Pinky : public Ghost {
+    private:
+        // Comportamento específico de Blinky
+        MapData updateBehaviorNormal(MapData mapData, sf::Vector2<int>pacmanPos) override;
+        void updateAnimationNormal() override;
+    
     public:
         Pinky(const std::string& texturePath, int fw, int fh, float fd);
-
-        // Comportamento específico de Blinky
-        MapData updateBehaviorNormal(MapData mapData) override;
-        void updateAnimationNormal() override;
 };
 
 class Inky : public Ghost {
+    private:
+        // Comportamento específico de Blinky
+        MapData updateBehaviorNormal(MapData mapData, sf::Vector2<int>pacmanPos) override;
+        void updateAnimationNormal() override;
+ 
     public:
         Inky(const std::string& texturePath, int fw, int fh, float fd);
-
-        // Comportamento específico de Blinky
-        MapData updateBehaviorNormal(MapData mapData) override;
-        void updateAnimationNormal() override;
 };
 
 class Clyde : public Ghost {
+    private:
+        // Comportamento específico de Blinky
+        MapData updateBehaviorNormal(MapData mapData, sf::Vector2<int>pacmanPos) override;
+        void updateAnimationNormal() override;
+
     public:
         Clyde(const std::string& texturePath, int fw, int fh, float fd);
-
-        // Comportamento específico de Blinky
-        MapData updateBehaviorNormal(MapData mapData) override;
-        void updateAnimationNormal() override;
 };
 
 

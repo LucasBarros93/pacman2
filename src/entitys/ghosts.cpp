@@ -100,7 +100,7 @@ MapData Ghost::powerless(MapData mapData, char self){
     mapData[this->pos.y][this->pos.x+1] = self;
     mapData[this->pos.y+1][this->pos.x+1] = self;
 
-            return mapData;
+    return mapData;
 }
 
 void Ghost::updateAnimation() {
@@ -150,7 +150,7 @@ void Ghost::updateAnimationNormal() {
     std::cout << "Hello" << std::endl;
 }
 
-MapData Ghost::updateBehavior(MapData mapData, char self) {
+MapData Ghost::updateBehavior(MapData mapData, char self, sf::Vector2<int>pacmanPos) {
     // Comportamento base dos fantasmas
     // Cada fantasma específico pode sobrescrever este comportamento
     switch (this->currentMode) {
@@ -161,7 +161,7 @@ MapData Ghost::updateBehavior(MapData mapData, char self) {
 
         case NORMAL:
             // Movimento normal
-            mapData = this->updateBehaviorNormal(mapData);
+            mapData = this->updateBehaviorNormal(mapData, pacmanPos);
             return mapData;
             
         case POWERLESS:
@@ -172,35 +172,13 @@ MapData Ghost::updateBehavior(MapData mapData, char self) {
         case DEAD:
             // voltar para o spawn
             break;
-            /*
-            // Remove direções opostas desnecessárias se ainda não chegou no spawn
-            if (this->pos.x < spawn.x){
-                if (std::find(possibleDirections.begin(), possibleDirections.end(), sf::Vector2<int>(1, 0)) != possibleDirections.end())
-                    possibleDirections.erase(
-                        std::remove(possibleDirections.begin(), possibleDirections.end(), sf::Vector2<int>{-1, 0}), possibleDirections.end());
-            } else if (this->pos.x >= spawn.x) {
-                if (std::find(possibleDirections.begin(), possibleDirections.end(), sf::Vector2<int>(-1, 0)) != possibleDirections.end())
-                possibleDirections.erase(
-                        std::remove(possibleDirections.begin(), possibleDirections.end(), sf::Vector2<int>{1, 0}), possibleDirections.end());
-            }
-
-            // Verifica direções verticais
-            if (this->pos.y < spawn.y) {
-                if (std::find(possibleDirections.begin(), possibleDirections.end(), sf::Vector2<int>(0, 1)) != possibleDirections.end())
-                    possibleDirections.erase(
-                        std::remove(possibleDirections.begin(), possibleDirections.end(), sf::Vector2<int>{0, -1}), possibleDirections.end());
-            } else if (this->pos.y >= spawn.y) {
-                if (std::find(possibleDirections.begin(), possibleDirections.end(), sf::Vector2<int>(0, -1)) != possibleDirections.end())
-                    possibleDirections.erase(                    
-                        std::remove(possibleDirections.begin(), possibleDirections.end(), sf::Vector2<int>{0, 1}), possibleDirections.end());
-            }
-            */
+            
     }
 
     return mapData;
 }
 
-MapData Ghost::updateBehaviorNormal(MapData mapData) {
+MapData Ghost::updateBehaviorNormal(MapData mapData, sf::Vector2<int>pacmanPos) {
     return mapData;
 }
 
@@ -250,73 +228,65 @@ void Blinky::updateAnimationNormal(){
     this->sprite.setTextureRect(this->currentFrame);
 }
 
-MapData Blinky::updateBehaviorNormal(MapData mapData) {
-    /*
-    // Possíveis direções para o fantasma
-    const std::vector<sf::Vector2<int>> directions = {
-        {1, 0},   // Direita
-        {-1, 0},  // Esquerda
-        {0, 1},   // Baixo
-        {0, -1}   // Cima
-    };
+MapData Blinky::updateBehaviorNormal(MapData mapData, sf::Vector2<int>pacmanPos) {
+    std::vector<sf::Vector2<int>> possibleDirections;
 
-    // Checa se a direção atual é válida (sem paredes)
-    char to1 = '#', to2 = '#';
-    if (this->dir.x != 0) {
-        to1 = mapData[this->pos.y][this->pos.x + this->dir.x];
-        to2 = mapData[this->pos.y + 1][this->pos.x + this->dir.x];
-    }
-    if (this->dir.y != 0) {
-        to1 = mapData[this->pos.y + this->dir.y][this->pos.x];
-        to2 = mapData[this->pos.y + this->dir.y][this->pos.x + 1];
-    }
+    // Verifica direções válidas (baixo, cima, direita, esquerda)
+    if (mapData[this->pos.y + 2][this->pos.x] != '#' && mapData[this->pos.y + 2][this->pos.x + 1] != '#')
+        possibleDirections.push_back({0, 1});  // Baixo
 
-    // Se a direção atual estiver bloqueada, escolhe uma nova direção aleatória válida
-    if (to1 == '#' || to2 == '#') {
-        std::vector<sf::Vector2<int>> validDirections;
+    if (mapData[this->pos.y - 1][this->pos.x] != '#' && mapData[this->pos.y - 1][this->pos.x + 1] != '#')
+        possibleDirections.push_back({0, -1}); // Cima
 
-        for (const auto& d : directions) {
-            char t1 = mapData[this->pos.y + d.y][this->pos.x + d.x];
-            char t2 = mapData[this->pos.y + d.y][this->pos.x + d.x + 1];
-            char t3 = mapData[this->pos.y + d.y + 1][this->pos.x + d.x];
-            char t4 = mapData[this->pos.y + d.y + 1][this->pos.x + d.x + 1];
+    if (mapData[this->pos.y][this->pos.x + 2] != '#' && mapData[this->pos.y + 1][this->pos.x + 2] != '#')
+        possibleDirections.push_back({1, 0});  // Direita
 
-            if (t1 != '#' && t2 != '#' && t3 != '#' && t4 != '#') {
-                validDirections.push_back(d);
-            }
-        }
+    if (mapData[this->pos.y][this->pos.x - 1] != '#' && mapData[this->pos.y + 1][this->pos.x - 1] != '#')
+        possibleDirections.push_back({-1, 0}); // Esquerda
 
-        // Escolhe aleatoriamente uma nova direção válida
-        if (!validDirections.empty()) {
-            int randIndex = rand() % validDirections.size();
-            this->setDirection(validDirections[randIndex]);
-        } else {
-            this->setDirection({0, 0}); // Fantasma para se não houver direção válida
+    // Calcula a direção ideal para seguir o Pac-Man
+    sf::Vector2<int> bestDirection = {0, 0};
+    int minDistance = std::numeric_limits<int>::max();
+
+    for (const auto& dir : possibleDirections) {
+        sf::Vector2<int> nextPos = this->pos + dir;
+
+        // Calcula a distância Manhattan até o Pac-Man
+        int distance = abs(pacmanPos.x - nextPos.x) + abs(pacmanPos.y - nextPos.y);
+
+        if (distance < minDistance) {
+            minDistance = distance;
+            bestDirection = dir;
         }
     }
 
-    // Atualiza a posição do fantasma
+    // Se encontrou uma direção válida, atualiza a direção
+    if (bestDirection != sf::Vector2<int>{0, 0}) {
+        this->dir = bestDirection;
+    }
+
+    // Atualiza a posição com a direção atual
     sf::Vector2<int> nextPos = this->pos + this->dir;
-    mapData[this->pos.y][this->pos.x] = ' '; // Limpa a posição atual
 
-    // Trata teleportação horizontal
-    if (nextPos.x < 0) {
-        nextPos.x = mapData[0].size() - 2;
-    } else if (nextPos.x >= static_cast<int>(mapData[0].size()) - 1) {
-        nextPos.x = 0;
+    // Verifica colisão
+    if (mapData[nextPos.y][nextPos.x] != '#') {
+        // Limpa a posição atual
+        mapData[this->pos.y][this->pos.x] = ' ';
+        mapData[this->pos.y + 1][this->pos.x] = ' ';
+        mapData[this->pos.y][this->pos.x + 1] = ' ';
+        mapData[this->pos.y + 1][this->pos.x + 1] = ' ';
+
+        this->pos += this->dir;  // Move o fantasma
     }
 
-    this->pos = nextPos;
-
-    // Atualiza o mapa com a nova posição do fantasma
-    mapData[this->pos.y][this->pos.x] = 'B'; // Representa o fantasma no mapa
+    // Atualiza a nova posição no mapa
+    mapData[this->pos.y][this->pos.x] = 'B';
     mapData[this->pos.y + 1][this->pos.x] = 'B';
     mapData[this->pos.y][this->pos.x + 1] = 'B';
     mapData[this->pos.y + 1][this->pos.x + 1] = 'B';
 
-    */
-    return mapData;
 
+    return mapData;
 }
 
 // Construtor de Pinky que chama o construtor de Ghost
@@ -339,7 +309,7 @@ void Pinky::updateAnimationNormal(){
     this->sprite.setTextureRect(this->currentFrame);
  }
 
-MapData Pinky::updateBehaviorNormal(MapData mapData) {
+MapData Pinky::updateBehaviorNormal(MapData mapData, sf::Vector2<int>pacmanPos) {
     return mapData;
 }
 
@@ -363,7 +333,7 @@ void Inky::updateAnimationNormal(){
     this->sprite.setTextureRect(this->currentFrame);
 }
 
-MapData Inky::updateBehaviorNormal(MapData mapData) {
+MapData Inky::updateBehaviorNormal(MapData mapData, sf::Vector2<int>pacmanPos) {
     return mapData;
 }
 
@@ -387,7 +357,89 @@ void Clyde::updateAnimationNormal(){
     this->sprite.setTextureRect(this->currentFrame);
 }
 
-MapData Clyde::updateBehaviorNormal(MapData mapData) {
+MapData Clyde::updateBehaviorNormal(MapData mapData, sf::Vector2<int>pacmanPos) {
+    std::vector<sf::Vector2<int>> possibleDirections;
+
+    // Verifica direções válidas (baixo, cima, direita, esquerda)
+    if (mapData[this->pos.y + 2][this->pos.x] != '#' && mapData[this->pos.y + 2][this->pos.x + 1] != '#')
+        possibleDirections.push_back({0, 1});  // Baixo
+
+    if (mapData[this->pos.y - 1][this->pos.x] != '#' && mapData[this->pos.y - 1][this->pos.x + 1] != '#')
+        possibleDirections.push_back({0, -1}); // Cima
+
+    if (mapData[this->pos.y][this->pos.x + 2] != '#' && mapData[this->pos.y + 1][this->pos.x + 2] != '#')
+        possibleDirections.push_back({1, 0});  // Direita
+
+    if (mapData[this->pos.y][this->pos.x - 1] != '#' && mapData[this->pos.y + 1][this->pos.x - 1] != '#')
+        possibleDirections.push_back({-1, 0}); // Esquerda
+
+    // Caso não haja direções válidas, não faz nada
+    if (possibleDirections.empty()) {
+        return mapData;
+    }
+
+    // Identificar corredores retos: 2 direções válidas, sendo uma delas oposta à atual
+    if (possibleDirections.size() == 2) {
+        for (const auto& dir : possibleDirections) {
+            if (dir == -this->dir) { // Direção oposta
+                // Mantém a direção atual e não muda
+                possibleDirections.erase(std::remove(possibleDirections.begin(), possibleDirections.end(), dir), possibleDirections.end());
+                break;
+            }
+        }
+        // Se ainda restar apenas 1 direção válida, continua na mesma direção
+        if (possibleDirections.size() == 1) {
+            this->dir = possibleDirections[0];
+        }
+    }
+
+    // Se estiver em uma encruzilhada, escolha nova direção com probabilidade
+    if (possibleDirections.size() > 1) {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> dis(0, 99);
+        int randomNumber = dis(gen);
+
+        if (randomNumber < 70) { // Fantasma segue o Pac-Man
+            sf::Vector2<int> bestDirection = {0, 0};
+            int minDistance = std::numeric_limits<int>::max();
+
+            // Calcula a melhor direção para seguir o Pac-Man
+            for (const auto& dir : possibleDirections) {
+                sf::Vector2<int> nextPos = this->pos + dir;
+                int distance = abs(pacmanPos.x - nextPos.x) + abs(pacmanPos.y - nextPos.y);
+
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    bestDirection = dir;
+                }
+            }
+            this->dir = bestDirection;
+        } else { // Escolhe uma direção aleatória
+            std::uniform_int_distribution<> randomDir(0, possibleDirections.size() - 1);
+            this->dir = possibleDirections[randomDir(gen)];
+        }
+    }
+
+    // Atualiza a posição com a direção atual
+    sf::Vector2<int> nextPos = this->pos + this->dir;
+
+    if (mapData[nextPos.y][nextPos.x] != '#') {
+        // Limpa a posição atual
+        mapData[this->pos.y][this->pos.x] = ' ';
+        mapData[this->pos.y + 1][this->pos.x] = ' ';
+        mapData[this->pos.y][this->pos.x + 1] = ' ';
+        mapData[this->pos.y + 1][this->pos.x + 1] = ' ';
+
+        this->pos += this->dir;  // Move o fantasma
+    }
+
+    // Atualiza a nova posição no mapa
+    mapData[this->pos.y][this->pos.x] = 'C';
+    mapData[this->pos.y + 1][this->pos.x] = 'C';
+    mapData[this->pos.y][this->pos.x + 1] = 'C';
+    mapData[this->pos.y + 1][this->pos.x + 1] = 'C';
+
     return mapData;
 }
 
