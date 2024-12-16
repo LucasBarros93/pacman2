@@ -26,10 +26,12 @@ class Ghost {
 
         Mode currentMode; // Estados do fantasma
 
+        MapData spawn(MapData mapData, char self);
+        MapData powerless(MapData mapData, char self);
+   
     public:
         Ghost(const std::string& texturePath, int fw, int fh, float fd);
 
-        MapData spawn(MapData mapData, char self);
 
         // Atualiza a animação e comportamento com base no estado
         virtual void updateAnimationNormal();

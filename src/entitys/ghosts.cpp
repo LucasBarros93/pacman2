@@ -56,6 +56,53 @@ MapData Ghost::spawn(MapData mapData, char self){
     return mapData;
 }
 
+MapData Ghost::powerless(MapData mapData, char self){
+    std::vector<sf::Vector2<int>> possibleDirections;
+    if(mapData[this->pos.y+2][this->pos.x] != '#' && mapData[this->pos.y+2][this->pos.x+1] != '#')
+        possibleDirections.push_back({0,1});
+
+    if(mapData[this->pos.y-1][this->pos.x] != '#' && mapData[this->pos.y-1][this->pos.x+1] != '#')
+        possibleDirections.push_back({0,-1});
+
+    if(mapData[this->pos.y][this->pos.x+2] != '#' && mapData[this->pos.y+1][this->pos.x+2] != '#')
+        possibleDirections.push_back({1,0});
+
+    if(mapData[this->pos.y][this->pos.x-1] != '#' && mapData[this->pos.y+1][this->pos.x-1] != '#')
+        possibleDirections.push_back({-1,0});
+
+    // Verifica se é uma encruzilhada (mais de 2 direções válidas)
+    if (possibleDirections.size() > 1) {
+        // Escolhe aleatoriamente uma nova direção válida
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> dis(0, possibleDirections.size() - 1);
+
+        int randIndex = dis(gen);
+        this->dir = possibleDirections[randIndex];  // Nova direção escolhida
+    }
+
+    // Atualiza a posição com a direção atual
+    sf::Vector2<int> nextPos = this->pos + this->dir;
+
+    // Verifica colisão
+    if (mapData[nextPos.y][nextPos.x] != '#') {
+        mapData[this->pos.y][this->pos.x] = ' ';
+        mapData[this->pos.y + 1][this->pos.x] = ' ';
+        mapData[this->pos.y][this->pos.x + 1] = ' ';
+        mapData[this->pos.y + 1][this->pos.x + 1] = ' ';
+
+        this->pos += this->dir;  // Move o fantasma
+    }
+
+    // Atualiza a nova posição no mapa
+    mapData[this->pos.y][this->pos.x] = self;
+    mapData[this->pos.y+1][this->pos.x] = self;
+    mapData[this->pos.y][this->pos.x+1] = self;
+    mapData[this->pos.y+1][this->pos.x+1] = self;
+
+            return mapData;
+}
+
 void Ghost::updateAnimation() {
     if (this->animationClock.getElapsedTime().asSeconds() > this->frameDuration) {
         this->animationClock.restart();
@@ -114,80 +161,40 @@ MapData Ghost::updateBehavior(MapData mapData, char self) {
 
         case NORMAL:
             // Movimento normal
-            this->updateBehaviorNormal(mapData);
-            break;
-        case POWERLESS:
-            // Movimento mais lento ou aleatório
-            break;
-        case DEAD:
-            sf::Vector2<int> spawn = {27, 22};
-            
-            std::vector<sf::Vector2<int>> possibleDirections;
-
-            if(mapData[this->pos.y+2][this->pos.x] != '#' && mapData[this->pos.y+2][this->pos.x+1] != '#')
-                possibleDirections.push_back({0,1});
-
-            if(mapData[this->pos.y-1][this->pos.x] != '#' && mapData[this->pos.y-1][this->pos.x+1] != '#')
-                possibleDirections.push_back({0,-1});
-
-            if(mapData[this->pos.y][this->pos.x+2] != '#' && mapData[this->pos.y+1][this->pos.x+2] != '#')
-                possibleDirections.push_back({1,0});
-
-            if(mapData[this->pos.y][this->pos.x-1] != '#' && mapData[this->pos.y+1][this->pos.x-1] != '#')
-                possibleDirections.push_back({-1,0});
-
-            // Verifica se é uma encruzilhada (mais de 2 direções válidas)
-            if (possibleDirections.size() > 1) {
-                // Escolhe aleatoriamente uma nova direção válida
-                std::random_device rd;
-                std::mt19937 gen(rd());
-                std::uniform_int_distribution<> dis(0, possibleDirections.size() - 1);
-
-                int randIndex = dis(gen);
-                this->dir = possibleDirections[randIndex];  // Nova direção escolhida
-            }
-
-            // Atualiza a posição com a direção atual
-            sf::Vector2<int> nextPos = this->pos + this->dir;
-
-            // Verifica colisão
-            if (mapData[nextPos.y][nextPos.x] != '#') {
-                mapData[this->pos.y][this->pos.x] = ' ';
-                mapData[this->pos.y + 1][this->pos.x] = ' ';
-                mapData[this->pos.y][this->pos.x + 1] = ' ';
-                mapData[this->pos.y + 1][this->pos.x + 1] = ' ';
-
-                this->pos += this->dir;  // Move o fantasma
-            }
-
-            // Atualiza a nova posição no mapa
-            mapData[this->pos.y][this->pos.x] = self;
-            mapData[this->pos.y+1][this->pos.x] = self;
-            mapData[this->pos.y][this->pos.x+1] = self;
-            mapData[this->pos.y+1][this->pos.x+1] = self;
-
-            // Verifica se chegou ao spawn
-            if (this->pos == spawn) {
-                mapData[this->pos.y][this->pos.x] = ' ';
-                mapData[this->pos.y+1][this->pos.x] = ' ';
-                mapData[this->pos.y][this->pos.x+1] = ' ';
-                mapData[this->pos.y+1][this->pos.x+1] = ' ';
-                
-                int aux = 24;
-                while (mapData[28][aux] != ' ')
-                    aux++;
-
-                this->pos = {28, aux};
-                mapData[this->pos.y][this->pos.x] = self;
-                mapData[this->pos.y + 1][this->pos.x] = self;
-                mapData[this->pos.y][this->pos.x + 1] = self;
-                mapData[this->pos.y + 1][this->pos.x + 1] = self;
-
-                this->currentMode = NORMAL;  // Volta ao modo normal
-            }
-
-
+            mapData = this->updateBehaviorNormal(mapData);
             return mapData;
+            
+        case POWERLESS:
+            // Movimento aleatório
+            mapData = this->powerless(mapData, self);
+            return mapData;
+        
+        case DEAD:
+            // voltar para o spawn
+            break;
+            /*
+            // Remove direções opostas desnecessárias se ainda não chegou no spawn
+            if (this->pos.x < spawn.x){
+                if (std::find(possibleDirections.begin(), possibleDirections.end(), sf::Vector2<int>(1, 0)) != possibleDirections.end())
+                    possibleDirections.erase(
+                        std::remove(possibleDirections.begin(), possibleDirections.end(), sf::Vector2<int>{-1, 0}), possibleDirections.end());
+            } else if (this->pos.x >= spawn.x) {
+                if (std::find(possibleDirections.begin(), possibleDirections.end(), sf::Vector2<int>(-1, 0)) != possibleDirections.end())
+                possibleDirections.erase(
+                        std::remove(possibleDirections.begin(), possibleDirections.end(), sf::Vector2<int>{1, 0}), possibleDirections.end());
+            }
+
+            // Verifica direções verticais
+            if (this->pos.y < spawn.y) {
+                if (std::find(possibleDirections.begin(), possibleDirections.end(), sf::Vector2<int>(0, 1)) != possibleDirections.end())
+                    possibleDirections.erase(
+                        std::remove(possibleDirections.begin(), possibleDirections.end(), sf::Vector2<int>{0, -1}), possibleDirections.end());
+            } else if (this->pos.y >= spawn.y) {
+                if (std::find(possibleDirections.begin(), possibleDirections.end(), sf::Vector2<int>(0, -1)) != possibleDirections.end())
+                    possibleDirections.erase(                    
+                        std::remove(possibleDirections.begin(), possibleDirections.end(), sf::Vector2<int>{0, 1}), possibleDirections.end());
+            }
+            */
     }
 
     return mapData;

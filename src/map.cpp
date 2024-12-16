@@ -143,6 +143,6 @@ void Map::updateGhosts(){
     this->inky.updateAnimation();
     // this->mapData = this->inky.updateBehavior(this->mapData, 'I');
     this->clyde.updateAnimation();
-    this->clyde.setMode(Ghost::DEAD);
+    this->clyde.setMode(Ghost::POWERLESS);
     this->mapData = this->clyde.updateBehavior(this->mapData, 'C');
 }
