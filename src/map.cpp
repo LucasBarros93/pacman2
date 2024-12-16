@@ -1,17 +1,11 @@
 #include "map.hpp"
 
-#include <fstream>
-#include <iostream>
-
 Map::Map(const sf::Vector2<float>& tileSize) : tileSize(tileSize), 
     pac("./assets/images/spritesheet.png", 16, 16, 0.2f),
     blinky("./assets/images/spritesheet.png", 16, 16, 0.2f, 50),
     pinky("./assets/images/spritesheet.png", 16, 16, 0.2f, 60),
     inky("./assets/images/spritesheet.png", 16, 16, 0.2f, 70),
     clyde("./assets/images/spritesheet.png", 16, 16, 0.2f, 85) {
-
-    this->inky.setMode(Ghost::DEAD);
-    this->clyde.setMode(Ghost::POWERLESS);
 
     this->wall.setSize({this->tileSize.x*2, this->tileSize.y*2});
     this->wall.setFillColor(sf::Color::Blue);
@@ -78,11 +72,6 @@ void Map::draw(sf::RenderWindow& window) {
 
                     this->pac.setPosition({static_cast<int>(x), static_cast<int>(y)}, this->tileSize);
                     window.draw(this->pac.getSprite());
-
-                    if(this->fruits.find({x,y}) != this->fruits.end() || this->fruits.find({x+1,y}) != this->fruits.end()){
-                        //fruits[{x,y}].getPoints();
-                        fruits.erase({x,y});
-                    }
                 }
             
             if (mapData[y][x] == 'B' &&
@@ -133,9 +122,21 @@ const MapData& Map::getMapData() const {
     return this->mapData;
 }
 
-void Map::updatePacman(const sf::Vector2<int> direction){
+int Map::updatePacman(const sf::Vector2<int> direction) {
+    int pointsEarned = 0;
+
+    // Atualiza a posição do Pac-Man
     this->pac.updateAnimation();
     this->mapData = this->pac.update(this->mapData, direction);
+
+    // Verifica se o Pac-Man coletou uma fruta
+    auto it = this->fruits.find({pac.getPosition().x, pac.getPosition().y});
+    if (it != this->fruits.end()) {
+        pointsEarned = it->second->getPoints(); // Pontos da fruta
+        this->fruits.erase(it); // Remove a fruta
+    }
+
+    return pointsEarned;
 }
 
 void Map::updateGhosts(){
@@ -144,26 +145,33 @@ void Map::updateGhosts(){
     this->pinky.updateAnimation();
     // this->mapData = this->pinky.updateBehavior(this->mapData, 'R', this->pac.getPosition());
     this->inky.updateAnimation();
-    this->mapData = this->inky.updateBehavior(this->mapData, 'I', this->pac.getPosition());
+    // this->mapData = this->inky.updateBehavior(this->mapData, 'I', this->pac.getPosition());
     this->clyde.updateAnimation();
-    this->mapData = this->clyde.updateBehavior(this->mapData, 'C', this->pac.getPosition());
+    // this->mapData = this->clyde.updateBehavior(this->mapData, 'C', this->pac.getPosition());
 }
 
-void Map::colision(){
+bool Map::colision(){
     if(this->pac.getPosition() == this->clyde.getPosition()){
         if(this->clyde.getMode() == Ghost::Mode::POWERLESS){
             this->mapData = this->clyde.kill(this->mapData, 'C');
+            return false;
         }
         else if(this->clyde.getMode() == Ghost::Mode::NORMAL){
-            std::cout << "GAME OVER" << std::endl;
+            return true;
         }
     }
     if(this->pac.getPosition() == this->inky.getPosition()){
         if(this->inky.getMode() == Ghost::Mode::POWERLESS){
             this->mapData = this->inky.kill(this->mapData, 'I');
+            return false;
         }
         else if(this->inky.getMode() == Ghost::Mode::NORMAL){
-            std::cout << "GAME OVER" << std::endl;
+            return true;
         }
     }
+    return false;
+}
+
+int Map::getFruitsRemaining() const {
+    return fruits.size();
 }

@@ -1,7 +1,7 @@
 #include "entitys/pacman.hpp"
 
 Pacman::Pacman(const std::string& texturePath, int fw, int fh, float fd)
-    : dir(0, 0), frameWidth(fw), frameHeight(fh), frameCount(2),
+    : pos (27,46), dir(0, 0), frameWidth(fw), frameHeight(fh), frameCount(2),
      frameDuration(fd), currentFrameIndex(0){
 
     if (!this->texture.loadFromFile(texturePath))

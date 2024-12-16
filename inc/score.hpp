@@ -2,7 +2,21 @@
 #define SCORE_HPP
 
 #include <iostream>
-#include <SFML/Graphics.hpp>
 
+class Score {
+    private:
+        int value;
+
+    public:
+        Score(int val);
+
+        // Sobrecarga do operador +
+        Score operator+(int points) const;
+
+        // Sobrecarga de operador de atribuição +=
+        Score& operator+=(int points);
+
+        int getValue() const;
+};
 
 #endif
