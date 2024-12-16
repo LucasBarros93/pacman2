@@ -106,6 +106,17 @@ MapData Pacman::update(MapData mapData, const sf::Vector2<int> direction) {
     return mapData;
 }
 
+void Pacman::reset() {
+    this->pos = {27, 46};  // Posição inicial do Pacman
+    this->dir = {0, 0};    // Direção inicial
+    this->currentFrameIndex = 0;
+
+    this->currentFrame.left = 0;
+    this->currentFrame.top = 0;
+    this->sprite.setTextureRect(this->currentFrame);
+}
+
+
 const sf::Sprite Pacman::getSprite() const{
     return this->sprite;
 }

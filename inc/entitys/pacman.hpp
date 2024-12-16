@@ -28,6 +28,8 @@ class Pacman {
 
         void updateAnimation();
         MapData update(MapData mapData, const sf::Vector2<int> direction);
+        void reset(); // reseta dps do gameover
+
 
         void setDirection(const sf::Vector2<int>& direction); // Define a direção de movimento
         void setPosition(const sf::Vector2<int>& position, const sf::Vector2<float>& tileSize);

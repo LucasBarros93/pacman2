@@ -30,6 +30,7 @@ class Map{
         Map(const sf::Vector2<float>& tileSize);
     
         bool loadFromFile(const std::string& filePath); // Carrega o mapa de um arquivo
+        void reset(); // reseta o mapa depois de ter acontecido um gameover
         void draw(sf::RenderWindow& window);           // Desenha o mapa na janela
         const MapData& getMapData() const; // Retorna os dados do mapa
 
