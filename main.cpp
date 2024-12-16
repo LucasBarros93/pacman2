@@ -108,8 +108,13 @@ int main() {
                 
             } else if (gameOver) {
                 if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Enter) {
-                    inGame = false, enteringName = false, gameOver = false;
+                    inGame = false;
+                    enteringName = false;
+                    gameOver = false;
                     playerName.clear();
+                    playerScore = 0;  // Reseta o score
+                    currentPhase = 1; // Reseta a fase
+                    gameMap.reset();  // Reseta o mapa e as entidades
                     menu.setState(MAIN_MENU);
                 }
             }
