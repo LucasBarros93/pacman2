@@ -105,11 +105,11 @@ MapData Pacman::update(MapData mapData, const sf::Vector2<int> direction) {
     this->pos += this->dir;
 
     // Trata teleportação nas bordas horizontais
-    if (this->pos.x == -1) {
+    if (this->pos.x == -1)
         this->pos.x = mapData[0].size() - 2; // Teleporta para a borda direita
-    } else if (this->pos.x == static_cast<int>(mapData[0].size()) - 1) {
+    
+    else if (this->pos.x == static_cast<int>(mapData[0].size()) - 1)
         this->pos.x = 0; // Teleporta para a borda esquerda
-    }
 
     // Atualiza o mapa com a nova posição do PacMan
     mapData[this->pos.y][this->pos.x] = 'P';
