@@ -227,10 +227,6 @@ void Map::setLevel(int currentLevel){
 }
 
 void Map::updateBonusFruit() {
-    // Spawna a fruta bônus se estiver inativa
-    if (!bonusFruit.isActive()) {
-        bonusFruit.spawn(mapData);
-    }
     bonusFruit.update(this->mapData);
 }
 

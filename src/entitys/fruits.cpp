@@ -53,8 +53,8 @@ void Bonus::spawn(const std::vector<std::vector<char>>& mapData) {
 
     // Encontra posições livres no mapa
     std::vector<sf::Vector2<int>> emptyPositions;
-    for (size_t y = 0; y < mapData.size(); ++y) {
-        for (size_t x = 0; x < mapData[y].size(); ++x) {
+    for (size_t y = 0; y < mapData.size(); y+=2) {
+        for (size_t x = 0; x < mapData[y].size(); x+=2) {
             if (mapData[y][x] == ' ') {
                 emptyPositions.push_back({static_cast<int>(x), static_cast<int>(y)});
             }
@@ -96,16 +96,23 @@ void Bonus::update(const std::vector<std::vector<char>>& mapData) {
 
 void Bonus::randomize() {
     const int pointsOptions[8] = {100, 300, 500, 700, 1000, 2000, 3000, 5000};
-    int textureIndex = getRandomNumber(0, 7);
+    std::vector<int> weights = {40, 20, 15, 10, 7, 5, 2, 1}; 
+
+
+    // Configuração do gerador de números aleatórios
+    std::random_device rd;  // Fonte de entropia
+    std::mt19937 gen(rd()); // Gerador de números aleatórios
+    std::discrete_distribution<> dist(weights.begin(), weights.end());
+    int textureIndex = dist(gen);
 
     std::string texturePath = "./assets/images/spritesheet.png";
     if (!texture.loadFromFile(texturePath)) {
         std::cerr << "Erro ao carregar textura: " << texturePath << std::endl;
     }
 
-    int offsetX = (textureIndex * 10) + 32;
+    int offsetX = (textureIndex * 16) + 32;
     this->frame.left = offsetX;
-    this->frame.top = 64;
+    this->frame.top = 48;
 
     this->sprite.setTexture(texture);
     this->sprite.setTextureRect(this->frame);
