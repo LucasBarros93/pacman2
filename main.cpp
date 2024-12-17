@@ -14,7 +14,7 @@ int main() {
 
     Menu menu;
     Map gameMap({10.f, 10.f});
-    ScoreManager scoreManager("scores.txt");
+    ScoreManager scoreManager("./assets/leaderboard/scores.txt");
 
     std::string playerName;
     Score playerScore(0);

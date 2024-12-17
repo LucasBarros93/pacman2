@@ -17,16 +17,15 @@ struct ScoreEntry {
 
 
 class ScoreManager {
-public:
-    ScoreManager(const std::string& filePath);
-    void saveScore(const std::string& playerName, int score);
-    std::vector<std::pair<std::string, int>> getScores() const;
-
-
-private:
-    std::string filePath;
-    std::vector<std::pair<std::string, int>> scores;
-    void loadScores();
+    private:
+        std::string filePath;
+        std::vector<std::pair<std::string, int>> scores;
+        void loadScores();
+    
+    public:
+        ScoreManager(const std::string& filePath);
+        void saveScore(const std::string& playerName, int score);
+        std::vector<std::pair<std::string, int>> getScores() const;
 };
 
 #endif
