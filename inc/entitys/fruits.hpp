@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <random>
+#include <memory>
 
 // ==========================
 // Classe base abstrata Fruit
