@@ -1,6 +1,7 @@
 #include "score.hpp"
 
-// Construtor da classe Score, inicializa o valor da pontuação (valor padrão = 0)
+// Construtor da classe Score
+// Inicializa o valor da pontuação (valor padrão = 0)
 Score::Score(int val = 0) : value(val) {}
 
 // Sobrecarga do operador "+" para somar pontos

@@ -1,5 +1,4 @@
 #include "entitys/fruits.hpp"
-#include <memory>
 
 // -----------------------------------
 // Função auxiliar para números aleatórios
