@@ -188,7 +188,7 @@ void Map::draw(sf::RenderWindow& window){
 }
 
 // Método para retornar os dados atuais do mapa
-const MapData& Map::getMapData() const {
+const MapData& Map::getMapData() const{
     return this->mapData;
 }
 
@@ -367,7 +367,7 @@ int Map::colision(){
 }
 
 // Método para retornar a quantidade de frutas restantes no mapa
-int Map::getFruitsRemaining() const {
+int Map::getFruitsRemaining() const{
     return fruits.size();
 }
 
