@@ -7,9 +7,7 @@ Pacman::Pacman(const std::string& texturePath, int fw, int fh, float fd)
      frameDuration(fd), currentFrameIndex(0){
     
     // Carrega a spritesheet
-    if(!this->texture.loadFromFile(texturePath))
-        throw std::runtime_error("Erro ao carregar spritesheet!");
-    
+    this->texture.loadFromFile(texturePath);    
     this->sprite.setTexture(this->texture);
 
     // Configura o primeiro frame da animação (direita)
@@ -138,11 +136,11 @@ const sf::Sprite Pacman::getSprite() const{
 }
 
 // Método para obter a posição atual do PacMan no mapa
-const sf::Vector2<int>& Pacman::getPosition() const {
+const sf::Vector2<int>& Pacman::getPosition() const{
     return this->pos;
 }
 
 // Método para obter a direção atual do PacMan
-const sf::Vector2<int>& Pacman::getDirection() const {
+const sf::Vector2<int>& Pacman::getDirection() const{
     return this->dir;
 }
