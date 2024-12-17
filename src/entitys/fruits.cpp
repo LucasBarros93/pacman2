@@ -123,18 +123,21 @@ void Bonus::randomize() {
     this->points = pointsOptions[textureIndex];
 }
 
+// Metodo pra retornar os pontos da fruta bonus
 int Bonus::getPoints() const {
     return this->points;
 }
 
-void Bonus::draw(sf::RenderWindow& window, const sf::Vector2f& offset) const {
+// Metodo pra desenhar a fruta bonus apenas se ela estiver ativa
+void Bonus::draw(sf::RenderWindow& window, const sf::Vector2f& offset) const{
     if(this->active) {
         sf::Sprite spriteCopy = this->sprite;
-        spriteCopy.setPosition((this->pos.x * 10) + offset.x, (this->pos.y * 10) + offset.y);
+        spriteCopy.setPosition((this->pos.x * 10) + offset.x, (this->pos.y * 10) + offset.y); // Novamente aqui da pra ver o offset sendo aplicado, alinhando tudo no centro da tela
         window.draw(spriteCopy);
     }
 }
 
+// Metodo pra voltar a fruta bonus pra inativa
 void Bonus::reset() {
     this->active = false;            // Desativa a fruta bônus
     this->points = 0;                // Reseta os pontos
@@ -142,12 +145,12 @@ void Bonus::reset() {
     this->respawnTimer.restart();    // Inicia o temporizador de respawn
 }
 
-
-
+// Metodo so pra retornar o status atual da fruta bonus: ativada/desativada
 bool Bonus::isActive() const {
     return this->active;
 }
 
+// Metodo pra retornar a posicao da fruta bonus no grid
 sf::Vector2<int> Bonus::getPosition() const {
     return this->pos;
 }
