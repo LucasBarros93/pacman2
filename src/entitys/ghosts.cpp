@@ -42,7 +42,15 @@ MapData Blinky::updateBehaviorNormal(MapData mapData, sf::Vector2<int>pacmanPos)
         return mapData;
     }
 
-    sf::Vector2<int> chosenDirection;
+    sf::Vector2<int> bestDirectionY;
+    sf::Vector2<int> bestDirectionX;
+
+    // Determina as direções ideais
+    if (this->pos.y < pacmanPos.y) bestDirectionY = {0, 1};   // Baixo
+    if (this->pos.y > pacmanPos.y) bestDirectionY = {0, -1};  // Cima
+
+    if (this->pos.x < pacmanPos.x) bestDirectionX = {1, 0};   // Direita
+    if (this->pos.x > pacmanPos.x) bestDirectionX = {-1, 0};  // Esquerda
 
     // Gera um número aleatório entre 0 e 99
     std::random_device rd;
@@ -50,22 +58,19 @@ MapData Blinky::updateBehaviorNormal(MapData mapData, sf::Vector2<int>pacmanPos)
     std::uniform_int_distribution<> dis(0, 99);
     int randomNumber = dis(gen);
 
+    sf::Vector2<int> chosenDirection = {0, 0};
+    
     if (randomNumber < this->dificult) { // Fantasma segue o Pac-Man com followChance%
-        sf::Vector2<int> bestDirection = {0, 0};
-        int minDistance = std::numeric_limits<int>::max();
+        // Verifica se a direção vertical está disponível
+        if (std::find(possibleDirections.begin(), possibleDirections.end(), bestDirectionY) != possibleDirections.end()) 
+            chosenDirection = bestDirectionY;
+    
+        // Caso contrário, usa a direção horizontal
+        else if (std::find(possibleDirections.begin(), possibleDirections.end(), bestDirectionX) != possibleDirections.end()) 
+            chosenDirection = bestDirectionX;
 
-        // Calcula a direção ideal (menor distância até o Pac-Man)
-        for (const auto& dir : possibleDirections) {
-            sf::Vector2<int> nextPos = this->pos + dir;
-            int distance = abs(pacmanPos.x - nextPos.x) + abs(pacmanPos.y - nextPos.y); // Distância Manhattan
-
-            if (distance < minDistance) {
-                minDistance = distance;
-                bestDirection = dir;
-            }
-        }
-        chosenDirection = bestDirection;
-    } else { // Fantasma escolhe uma direção aleatória
+    }
+    else { // Fantasma escolhe uma direção aleatória
         std::uniform_int_distribution<> randomDir(0, possibleDirections.size() - 1);
         chosenDirection = possibleDirections[randomDir(gen)];
     }
@@ -103,7 +108,7 @@ MapData Blinky::updateBehaviorNormal(MapData mapData, sf::Vector2<int>pacmanPos)
 
 // Construtor de Pinky que chama o construtor de Ghost
 Pinky::Pinky(const std::string& texturePath, int fw, int fh, float fd, int df)
-     : Ghost(texturePath, fw, fh, fd, df) {}
+    : Ghost(texturePath, fw, fh, fd, df) {}
 
 void Pinky::updateAnimationNormal(){
     int offsetY, offsetX;
@@ -119,7 +124,7 @@ void Pinky::updateAnimationNormal(){
     this->currentFrame.top = offsetY;
      
     this->sprite.setTextureRect(this->currentFrame);
- }
+}
 
 MapData Pinky::updateBehaviorNormal(MapData mapData, sf::Vector2<int>pacmanPos) {
         std::vector<sf::Vector2<int>> possibleDirections;
