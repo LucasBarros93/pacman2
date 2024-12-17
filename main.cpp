@@ -159,12 +159,14 @@ int main() {
                 playerScore += result>0? result : 0;
                 gameOver = result == -1? true : false;
                 gameMap.updateGhosts();
+                gameMap.updateBonusFruit(); // Atualiza fruta bônus
                 gameMap++;
                 elapsedTime = 0.0f;
             }
 
             if (gameMap.getFruitsRemaining() == 0) {
                 currentPhase++;
+                gameMap.setLevel(currentPhase); // atualiza o level no mapa, jogo vai ficar mais dificil
                 playerScore += 100 * currentPhase;
                 gameMap.loadFromFile("assets/maps/map.txt");
             }

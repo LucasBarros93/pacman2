@@ -45,20 +45,29 @@ class Bonus : public Fruit {
     private:
         sf::Sprite sprite;
         sf::Texture texture;
-        sf::Vector2<float> pos;
+        sf::Vector2<int> pos; // Posição no grid
         int points;
 
         sf::IntRect frame;
-        const int frameWidth; 
+        const int frameWidth;
         const int frameHeight;
 
-        void randomize(); // Aleatoriza a textura da fruta
+        bool active;          // Estado da fruta (ativa ou não)
+        sf::Clock visibilityTimer; // Temporizador para o tempo visível
+        sf::Clock respawnTimer;    // Temporizador para o tempo inativo
+
+        void randomize(); // Aleatoriza a textura e pontos da fruta
 
     public:
         Bonus(int fw, int fh);
-        void spawn();
+        void spawn(const std::vector<std::vector<char>>& mapData); // Adapta para respeitar o mapa
+        void update(const std::vector<std::vector<char>>& mapData);  // Atualiza o estado (ativa ou inativa)
         int getPoints() const override;
         void draw(sf::RenderWindow& window, const sf::Vector2f& offset) const override;
+        void reset();
+        bool isActive() const; // Verifica se está ativa
+        sf::Vector2<int> getPosition() const; // Posição no grid
 };
+
 
 #endif // FRUITS_HPP

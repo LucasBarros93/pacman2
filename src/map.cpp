@@ -1,11 +1,11 @@
 #include "map.hpp"
 
-Map::Map(const sf::Vector2<float>& tileSize) : count (1), tileSize(tileSize), 
+Map::Map(const sf::Vector2<float>& tileSize) : count (1), level(1), tileSize(tileSize), 
     pac("./assets/images/spritesheet.png", 16, 16, 0.2f),
     blinky("./assets/images/spritesheet.png", 16, 16, 0.2f, 50),
     pinky("./assets/images/spritesheet.png", 16, 16, 0.2f, 60),
     inky("./assets/images/spritesheet.png", 16, 16, 0.2f, 70),
-    clyde("./assets/images/spritesheet.png", 16, 16, 0.2f, 85) {
+    clyde("./assets/images/spritesheet.png", 16, 16, 0.2f, 85), bonusFruit(16,16){
 
     this->wall.setSize({this->tileSize.x*2, this->tileSize.y*2});
     this->wall.setFillColor(sf::Color::Blue);
@@ -162,6 +162,9 @@ void Map::draw(sf::RenderWindow& window) {
     for (const auto& fruitPair : fruits) {
         fruitPair.second->draw(window, this->mapOffset);
     }
+
+    //desenhar furtinhas bonus
+    bonusFruit.draw(window, this->mapOffset);
 }
 
 const MapData& Map::getMapData() const {
@@ -179,6 +182,15 @@ void Map::updatePacman(const sf::Vector2<int> direction) {
 }
 
 void Map::updateGhosts(){
+    // Ajusta a dificuldade com base no nível atual (currentPhase)
+    int dificuldadeAtual = std::min(50 + (this->level - 1) * 10, 99); // Dificuldade cresce com o level, limite 99
+    
+    // Define a dificuldade dos fantasmas
+    this->blinky.setDificult(dificuldadeAtual);
+    this->pinky.setDificult(std::max(dificuldadeAtual - 5, 50)); // Pinky um pouco mais fácil
+    this->inky.setDificult(std::max(dificuldadeAtual - 10, 50)); // Inky menos agressivo
+    this->clyde.setDificult(std::max(dificuldadeAtual - 15, 50)); // Clyde mais "aleatório"
+    
     this->blinky.updateAnimation();
     this->mapData = this->blinky.updateBehavior(this->mapData, 'B', this->pac.getPosition());
     this->pinky.updateAnimation();
@@ -204,7 +216,24 @@ void Map::updateGhosts(){
         if(this->clyde.getMode() == Ghost::OUTGAME)
             this->clyde.setMode(Ghost::SPAWN);
     }
+
+    // Atualiza a fruta bônus
+    this->bonusFruit.update(this->mapData);
 }
+
+// metodo pra pegar o level atual do jogador e poder alterar a dificuldade do jogo
+void Map::setLevel(int currentLevel){
+    this->level = currentLevel;
+}
+
+void Map::updateBonusFruit() {
+    // Spawna a fruta bônus se estiver inativa
+    if (!bonusFruit.isActive()) {
+        bonusFruit.spawn(mapData);
+    }
+    bonusFruit.update(this->mapData);
+}
+
 
 int Map::colision(){
     int pointsEarned = 0;
@@ -275,6 +304,12 @@ int Map::colision(){
         }
         return pointsFruit+pointsEarned;
     }
+
+    if (bonusFruit.isActive() && pac.getPosition() == bonusFruit.getPosition()) {
+        pointsEarned += bonusFruit.getPoints();
+        bonusFruit.reset(); // Reseta a fruta bônus
+    }
+
     return pointsEarned;
 }
 

@@ -13,11 +13,13 @@ class Map{
     private:
         MapData mapData;  // Representação do mapa
         int count;
+        int level; // pega o level que o jogador está atualemnte pra poder 
         sf::Vector2<float> tileSize;            // Tamanho de cada célula do mapa
         sf::Vector2f mapOffset; // Offset para centralizar o mapa na tela
         sf::RectangleShape wall;            // Sprite para paredes
         sf::CircleShape dot;      // Forma para os pontos
         
+
         Pacman pac;
         Blinky blinky;
         Pinky pinky;
@@ -26,6 +28,7 @@ class Map{
 
         // Vetores para armazenar frutas
         std::map<std::pair<int, int>, std::unique_ptr<Fruit>> fruits;
+        Bonus bonusFruit; // Fruta bônus
         
     public:
         Map(const sf::Vector2<float>& tileSize);
@@ -40,6 +43,8 @@ class Map{
         void updatePacman(const sf::Vector2<int> direction);
         void updateGhosts();
         int getFruitsRemaining() const;
+        void setLevel(int currentLevel);
+        void updateBonusFruit();
 
         int colision();
 
