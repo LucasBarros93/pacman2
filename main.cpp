@@ -136,7 +136,7 @@ int main() {
         window.clear(sf::Color(10, 10, 50)); // Fundo azul escuro em todas as telas
 
         if (enteringName) {
-            inputText.setString("Digite seu nome: " + playerName);
+            inputText.setString("Enter your name: " + playerName);
             window.draw(inputText);
         } else if (gameOver) {
             window.draw(gameOverSprite); // Desenha a imagem de Game Over

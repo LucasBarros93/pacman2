@@ -55,7 +55,7 @@ Menu::Menu() : selectedOption(0), currentState(MAIN_MENU){
 
     // Configuração do título "Regras"
     rulesTitle.setFont(font);
-    rulesTitle.setString("Regras");
+    rulesTitle.setString("Rules");
     rulesTitle.setCharacterSize(30);
     rulesTitle.setFillColor(sf::Color::Yellow);
     rulesTitle.setStyle(sf::Text::Bold);
@@ -63,7 +63,7 @@ Menu::Menu() : selectedOption(0), currentState(MAIN_MENU){
 
     // Configuração do título "Quadro de Líderes"
     leaderboardTitle.setFont(font);
-    leaderboardTitle.setString("Quadro de Lideres");
+    leaderboardTitle.setString("Leaderboard");
     leaderboardTitle.setCharacterSize(30);
     leaderboardTitle.setFillColor(sf::Color::Yellow);
     leaderboardTitle.setStyle(sf::Text::Bold);
@@ -71,20 +71,20 @@ Menu::Menu() : selectedOption(0), currentState(MAIN_MENU){
 
     // Configuração do texto de regras
     rulesText.setFont(font);
-    rulesText.setString("Use as setas para mover\nComa as frutas para pontuar\nEvite os fantasmas!");
+    rulesText.setString("Use the arrow keys to move.\nEat the fruits to score points.\nAvoid the ghosts!");
     rulesText.setCharacterSize(20);
     rulesText.setFillColor(sf::Color::White);
     rulesText.setPosition(50, 250);
 
     // Botão voltar
     backButton.setFont(font);
-    backButton.setString("Pressione Enter para Voltar");
+    backButton.setString("Press Enter to Return");
     backButton.setCharacterSize(30);
     backButton.setFillColor(sf::Color::Yellow);
     backButton.setPosition(50, 500);
 
     // Opções do menu principal
-    std::vector<std::string> optionTexts = {"Jogar", "Regras", "Quadro de Lideres", "Sair"};
+    std::vector<std::string> optionTexts = {"      Play", "     Rules", "Leaderboard", "       Quit"};
     for (size_t i = 0; i < optionTexts.size(); i++) {
         sf::Text text;
         initMenuText(text, optionTexts[i], 300, 300 + i * 100);
@@ -93,7 +93,7 @@ Menu::Menu() : selectedOption(0), currentState(MAIN_MENU){
 
     // Texto para as regras
     rulesText.setFont(font);
-    rulesText.setString("- Use as setas para mover\n- Pontue comendo as frutas (pontos)\n- Elimine momentaneamente os fantasmas quando comer a fruta especial\n- Pontue o maximo possivel para entrar no quadro de lideres!");
+    rulesText.setString("-Use the arrow keys to move.\n- Score points by eating the fruits (dots).\n- Temporarily eliminate the ghosts when you eat the special fruit.\n- Score as many points as possible to enter the leaderboard!");
     rulesText.setCharacterSize(15);
     rulesText.setFillColor(sf::Color::White);
     rulesText.setPosition(50, 400);
