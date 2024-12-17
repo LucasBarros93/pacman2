@@ -10,10 +10,11 @@ int main() {
 
     sf::RenderWindow window(sf::VideoMode(800, 800), "Pac-Man");
 
+    int result;
+
     Menu menu;
     Map gameMap({10.f, 10.f});
-    ScoreManager scoreManager("scores.txt");
-    int result;
+    ScoreManager scoreManager("./assets/leaderboard/scores.txt");
 
     std::string playerName;
     Score playerScore(0);
@@ -56,18 +57,22 @@ int main() {
     gameOverText.setFillColor(sf::Color::Yellow);
     gameOverText.setString("Pressione Enter para voltar ao menu");
     gameOverText.setPosition(200, 650);
+    // Ajusta a posição do scoreText e phaseText de acordo com o tamanho da janela
+    sf::Vector2u winSize = window.getSize(); 
+    scoreText.setPosition( (winSize.x * 0.125f), (winSize.y * 0.875f) );   // Por exemplo, 12.5% da largura, 87.5% da altura
+    phaseText.setPosition( (winSize.x * 0.5f),   (winSize.y * 0.875f) );   // 50% da largura, 87.5% da altura
 
     scoreText.setFont(font);
     scoreText.setCharacterSize(24);
     scoreText.setFillColor(sf::Color::Yellow);
     scoreText.setStyle(sf::Text::Bold);
-    scoreText.setPosition(100.f, 700.f);
+    //scoreText.setPosition(100.f, 700.f);
 
     phaseText.setFont(font);
     phaseText.setCharacterSize(24);
     phaseText.setFillColor(sf::Color::Yellow);
     phaseText.setStyle(sf::Text::Bold);
-    phaseText.setPosition(400.f, 700.f);
+    //phaseText.setPosition(400.f, 700.f);
 
     sf::Clock clock;
     float updateTime = 0.1f, elapsedTime = 0.0f;
@@ -87,7 +92,13 @@ int main() {
                 else if (option == 1)
                     menu.setState(RULES_SCREEN);
                 else if (option == 2) {
-                    menu.setLeaderboard(scoreManager.getScores());
+                    // Converte o vetor de pares para ScoreEntry antes de enviar
+                    auto scores = scoreManager.getScores();
+                    std::vector<ScoreEntry> leaderboard;
+                    for (const auto& score : scores) {
+                        leaderboard.emplace_back(score.first, score.second);
+                    }
+                    menu.setLeaderboard(leaderboard); 
                     menu.setState(LEADERBOARD_SCREEN);
                 }
                 else if (option == 3) 
@@ -110,6 +121,7 @@ int main() {
             } else if (gameOver) {
                 if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Enter) {
                     inGame = false;
+                    scoreManager.saveScore(playerName, playerScore.getValue());  // Salva a pontuação
                     enteringName = false;
                     gameOver = false;
                     playerName.clear();
@@ -124,7 +136,7 @@ int main() {
         window.clear(sf::Color(10, 10, 50)); // Fundo azul escuro em todas as telas
 
         if (enteringName) {
-            inputText.setString("Digite seu nome: " + playerName);
+            inputText.setString("Enter your name: " + playerName);
             window.draw(inputText);
         } else if (gameOver) {
             window.draw(gameOverSprite); // Desenha a imagem de Game Over
@@ -160,7 +172,7 @@ int main() {
             gameMap.draw(window);
 
             scoreText.setString("Score: " + std::to_string(playerScore.getValue()));
-            phaseText.setString("Phase: " + std::to_string(currentPhase));
+            phaseText.setString("Level: " + std::to_string(currentPhase));
             window.draw(scoreText);
             window.draw(phaseText);
         }

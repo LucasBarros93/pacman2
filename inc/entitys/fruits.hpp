@@ -11,7 +11,7 @@ class Fruit {
         virtual ~Fruit() = default;
 
         virtual int getPoints() const = 0; // Pontos da fruta
-        virtual void draw(sf::RenderWindow& window) const = 0; // Desenha a fruta
+        virtual void draw(sf::RenderWindow& window, const sf::Vector2f& offset) const = 0; // Desenha a fruta
 };
 
 // Classe Dot
@@ -24,7 +24,7 @@ class Dot : public Fruit {
         Dot() : pos(0, 0), points(10) {};
         Dot(sf::Vector2<int> position);
         int getPoints() const override;
-        void draw(sf::RenderWindow& window) const override;
+        void draw(sf::RenderWindow& window, const sf::Vector2f& offset) const override;
 };
 
 // Classe Energizer
@@ -37,7 +37,7 @@ class Energizer : public Fruit {
         Energizer() : pos(0, 0), points(50) {};
         Energizer(sf::Vector2<int> position);
         int getPoints() const override;
-        void draw(sf::RenderWindow& window) const override;
+        void draw(sf::RenderWindow& window, const sf::Vector2f& offset) const override;
 };
 
 // Classe Bonus
@@ -58,7 +58,7 @@ class Bonus : public Fruit {
         Bonus(int fw, int fh);
         void spawn();
         int getPoints() const override;
-        void draw(sf::RenderWindow& window) const override;
+        void draw(sf::RenderWindow& window, const sf::Vector2f& offset) const override;
 };
 
 #endif // FRUITS_HPP

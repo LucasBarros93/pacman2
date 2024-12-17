@@ -17,10 +17,10 @@ int Dot::getPoints() const {
     return this->points;
 }
 
-void Dot::draw(sf::RenderWindow& window) const {
+void Dot::draw(sf::RenderWindow& window, const sf::Vector2f& offset) const {
     sf::CircleShape dot(2.0f);
     dot.setFillColor(sf::Color(184, 197, 201));
-    dot.setPosition((this->pos.x * 10) + 10, (this->pos.y * 10 )+10);
+    dot.setPosition(((this->pos.x * 10) + 10) + offset.x, ((this->pos.y * 10 )+10) + offset.y);
     window.draw(dot);
 }
 
@@ -32,10 +32,10 @@ int Energizer::getPoints() const {
     return this->points;
 }
 
-void Energizer::draw(sf::RenderWindow& window) const {
+void Energizer::draw(sf::RenderWindow& window, const sf::Vector2f& offset) const {
     sf::CircleShape energizer(4.0f);
     energizer.setFillColor(sf::Color(184, 197, 201));
-    energizer.setPosition((this->pos.x * 10) + 10, (this->pos.y * 10 )+10);
+    energizer.setPosition(((this->pos.x * 10) + 10) + offset.x, ((this->pos.y * 10 )+10) + offset.y);
     window.draw(energizer);
 }
 
@@ -75,6 +75,11 @@ int Bonus::getPoints() const {
     return this->points;
 }
 
-void Bonus::draw(sf::RenderWindow& window) const {
-    window.draw(this->sprite);
+void Bonus::draw(sf::RenderWindow& window, const sf::Vector2f& offset) const {
+    // Cria uma cópia do sprite do Bonus
+    sf::Sprite spriteCopy = this->sprite;
+    // Aplica o offset à posição
+    spriteCopy.setPosition(spriteCopy.getPosition() + offset);
+    window.draw(spriteCopy);
 }
+

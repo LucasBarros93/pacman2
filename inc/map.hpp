@@ -14,7 +14,7 @@ class Map{
         MapData mapData;  // Representação do mapa
         int count;
         sf::Vector2<float> tileSize;            // Tamanho de cada célula do mapa
-
+        sf::Vector2f mapOffset; // Offset para centralizar o mapa na tela
         sf::RectangleShape wall;            // Sprite para paredes
         sf::CircleShape dot;      // Forma para os pontos
         

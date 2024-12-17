@@ -9,6 +9,8 @@ Map::Map(const sf::Vector2<float>& tileSize) : count (1), tileSize(tileSize),
 
     this->wall.setSize({this->tileSize.x*2, this->tileSize.y*2});
     this->wall.setFillColor(sf::Color::Blue);
+    // Inicializa mapOffset em zero
+    this->mapOffset = sf::Vector2f(0.f, 0.f);
 }
 
 bool Map::loadFromFile(const std::string& filePath) {
@@ -44,22 +46,37 @@ bool Map::loadFromFile(const std::string& filePath) {
         }
     }
 
+    // Calcular o tamanho total do mapa em pixels
+    float mapWidthPixels = mapData[0].size() * this->tileSize.x;
+    float mapHeightPixels = mapData.size() * this->tileSize.y;
+
+    // Calcula o offset para centralizar o mapa na janela 800x800
+    float offsetX = (800.f - mapWidthPixels) / 2.f;
+    float offsetY = (800.f - mapHeightPixels) / 2.f;
+    if (offsetX < 0) offsetX = 0; // Caso o mapa seja maior que a janela, não deslocar para negativo
+    if (offsetY < 0) offsetY = 0;
+
+    this->mapOffset = sf::Vector2f(offsetX, offsetY);
+
+
     return true;
 }
 
 void Map::reset() {
-    // Recarrega o mapa do arquivo original
+    // Recarrega o mapa
     this->loadFromFile("assets/maps/map.txt");
 
-    // Reinicializa o Pac-Man
+    // Reseta Pac-Man
     this->pac.reset();
 
-    // Reinicializa os fantasmas em suas posições iniciais e modos
-    this->blinky.reset({27, 22}, Ghost::OUTGAME);
-    this->pinky.reset({27, 22}, Ghost::OUTGAME);
-    this->inky.reset({27, 22}, Ghost::OUTGAME);
-    this->clyde.reset({27, 22}, Ghost::OUTGAME);
+    // Reseta fantasmas (posições e modos iniciais)
+    this->blinky.reset({27, 22});  // Posição inicial
+    this->pinky.reset({29, 22});
+    this->inky.reset({25, 22});
+    this->clyde.reset({31, 22});
 
+    // Limpa frutas
+    this->fruits.clear();
     this->count=1;
 }
 
@@ -76,7 +93,7 @@ void Map::draw(sf::RenderWindow& window) {
                     mapData[y][x+1] == '#' && 
                     mapData[y+1][x+1] == '#') {
 
-                        this->wall.setPosition(position);
+                        this->wall.setPosition(position + this->mapOffset);
                         window.draw(this->wall);
                 }
             }
@@ -87,8 +104,13 @@ void Map::draw(sf::RenderWindow& window) {
                 mapData[y+1][x+1] == 'P') {
 
                     this->pac.setPosition({static_cast<int>(x), static_cast<int>(y)}, this->tileSize);
-                    window.draw(this->pac.getSprite());
-                }
+                    // Cria uma cópia do sprite do Pac-Man, ajusta posição, depois desenha
+                    sf::Sprite pacSprite = this->pac.getSprite();
+                    pacSprite.setPosition(pacSprite.getPosition() + this->mapOffset);
+                    window.draw(pacSprite);
+
+
+            }
             
             if (mapData[y][x] == 'B' &&
                 mapData[y+1][x] == 'B' && 
@@ -96,8 +118,10 @@ void Map::draw(sf::RenderWindow& window) {
                 mapData[y+1][x+1] == 'B') {
 
                     this->blinky.setPosition({static_cast<int>(x), static_cast<int>(y)},  this->tileSize);
-                    window.draw(this->blinky.getSprite());
-                }
+                    sf::Sprite blinkySprite = this->blinky.getSprite();
+                    blinkySprite.setPosition(blinkySprite.getPosition() + this->mapOffset);
+                    window.draw(blinkySprite);
+            }
             
             if (mapData[y][x] == 'R' &&
                 mapData[y+1][x] == 'R' && 
@@ -105,7 +129,9 @@ void Map::draw(sf::RenderWindow& window) {
                 mapData[y+1][x+1] == 'R') {
 
                     this->pinky.setPosition({static_cast<int>(x), static_cast<int>(y)},  this->tileSize);
-                    window.draw(this->pinky.getSprite());
+                    sf::Sprite pinkySprite = this->pinky.getSprite();
+                    pinkySprite.setPosition(pinkySprite.getPosition() + this->mapOffset);
+                    window.draw(pinkySprite);
                 }
 
             if (mapData[y][x] == 'I' &&
@@ -114,7 +140,9 @@ void Map::draw(sf::RenderWindow& window) {
                 mapData[y+1][x+1] == 'I') {
 
                     this->inky.setPosition({static_cast<int>(x), static_cast<int>(y)},  this->tileSize);
-                    window.draw(this->inky.getSprite());
+                    sf::Sprite inkySprite = this->inky.getSprite();
+                    inkySprite.setPosition(inkySprite.getPosition() + this->mapOffset);
+                    window.draw(inkySprite);
                 }
 
             if (mapData[y][x] == 'C' &&
@@ -123,14 +151,16 @@ void Map::draw(sf::RenderWindow& window) {
                 mapData[y+1][x+1] == 'C') {
 
                     this->clyde.setPosition({static_cast<int>(x), static_cast<int>(y)},  this->tileSize);
-                    window.draw(this->clyde.getSprite());
+                    sf::Sprite clydeSprite = this->clyde.getSprite();
+                    clydeSprite.setPosition(clydeSprite.getPosition() + this->mapOffset);
+                    window.draw(clydeSprite);
                 }
         }
     }
 
     // Desenhar frutas (dots e energizers)
     for (const auto& fruitPair : fruits) {
-        fruitPair.second->draw(window);
+        fruitPair.second->draw(window, this->mapOffset);
     }
 }
 

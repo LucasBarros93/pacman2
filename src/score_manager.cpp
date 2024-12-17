@@ -1,4 +1,7 @@
 #include "score_manager.hpp"
+#include <fstream>
+#include <iostream>
+#include <algorithm>
 
 ScoreManager::ScoreManager(const std::string& filePath) : filePath(filePath) {
     loadScores();
@@ -6,44 +9,49 @@ ScoreManager::ScoreManager(const std::string& filePath) : filePath(filePath) {
 
 void ScoreManager::loadScores() {
     scores.clear();
-    std::ifstream file(filePath);
+    std::ifstream file(this->filePath);
     if (!file.is_open()) {
-        std::cerr << "Erro ao abrir o arquivo de pontuações: " << filePath << std::endl;
+        std::cerr << "Erro ao abrir o arquivo de pontuações: " << this->filePath << std::endl;
         return;
     }
 
-    std::string line;
-    while (std::getline(file, line)) {
-        std::istringstream stream(line);
-        ScoreEntry entry;
-        stream >> entry.name >> entry.score;
-        scores.push_back(entry);
+    std::string name;
+    int score;
+    while (file >> name >> score) {
+        scores.emplace_back(name, score);
     }
 
     file.close();
-    std::sort(scores.begin(), scores.end());
+    std::sort(scores.begin(), scores.end(), [](const auto& a, const auto& b) {
+        return a.second > b.second;  // Ordena em ordem decrescente de pontuação
+    });
 }
 
-void ScoreManager::saveScores() {
-    std::ofstream file(filePath, std::ios::trunc);
+void ScoreManager::saveScore(const std::string& playerName, int score) {
+    scores.emplace_back(playerName, score);
+
+    // Ordena as pontuações em ordem decrescente
+    std::sort(scores.begin(), scores.end(), [](const auto& a, const auto& b) {
+        return a.second > b.second;
+    });
+
+    // Mantém apenas os 5 melhores scores (ajuste conforme necessário)
+    if (scores.size() > 5) {
+        scores.resize(5);
+    }
+
+    std::ofstream file(this->filePath);
     if (!file.is_open()) {
-        std::cerr << "Erro ao salvar o arquivo de pontuações: " << filePath << std::endl;
+        std::cerr << "Erro ao abrir o arquivo de pontuações para escrita!" << std::endl;
         return;
     }
 
-    for (size_t i = 0; i < std::min(scores.size(), static_cast<size_t>(5)); ++i) {
-        file << scores[i].name << " " << scores[i].score << std::endl;
+    for (const auto& [name, score] : scores) {
+        file << name << " " << score << "\n";
     }
-
     file.close();
 }
 
-void ScoreManager::addScore(const std::string& name, int score) {
-    scores.push_back({name, score});
-    std::sort(scores.begin(), scores.end());
-    saveScores();
-}
-
-const std::vector<ScoreEntry>& ScoreManager::getScores() const {
-    return scores;
+std::vector<std::pair<std::string, int>> ScoreManager::getScores() const {
+    return scores; // Retorna diretamente a lista de scores
 }

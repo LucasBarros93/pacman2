@@ -23,7 +23,7 @@ private:
     sf::Text rulesTitle;          // Título para a tela de regras
     sf::Text leaderboardTitle;    // Título para o quadro de líderes
     sf::Text rulesText; // Texto para as regras
-    sf::Text leaderboardText; // Texto para o quadro de líderes
+    std::vector<sf::Text> leaderboardText; // Texto para o quadro de líderes
     sf::Text backButton; // Botão de voltar ao menu principal
     
     // Texturas e sprites para diferentes seções
