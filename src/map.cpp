@@ -75,8 +75,6 @@ void Map::reset() {
     this->inky.reset({25, 22});
     this->clyde.reset({31, 22});
 
-    // Limpa frutas
-    this->fruits.clear();
     this->count=1;
 }
 
@@ -230,7 +228,6 @@ void Map::updateBonusFruit() {
     bonusFruit.update(this->mapData);
 }
 
-
 int Map::colision(){
     int pointsEarned = 0;
 
@@ -334,11 +331,3 @@ int Map::getFruitsRemaining() const {
     return fruits.size();
 }
 
-void Map::resetGhosts() {
-    this->blinky.reset({27, 22});
-    this->pinky.reset({29, 22});
-    this->inky.reset({25, 22});
-    this->clyde.reset({31, 22});
-
-    this->count = 1; // ou 0, conforme sua lógica
-}

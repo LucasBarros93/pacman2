@@ -47,7 +47,6 @@ class Map{
         void updateBonusFruit();
 
         int colision();
-        void resetGhosts();
 
 };
 

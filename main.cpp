@@ -168,8 +168,7 @@ int main() {
                 currentPhase++;
                 gameMap.setLevel(currentPhase); // atualiza o level no mapa, jogo vai ficar mais dificil
                 playerScore += 100 * currentPhase;
-                gameMap.loadFromFile("assets/maps/map.txt");
-                gameMap.resetGhosts(); // resetar os fantasmas e suas contagens para sairem de suas "casas"
+                gameMap.reset(); // resetar os fantasmas e suas contagens para sairem de suas "casas"
             }
 
             gameMap.draw(window);
