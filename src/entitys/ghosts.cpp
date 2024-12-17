@@ -724,3 +724,4 @@ MapData Clyde::updateBehaviorNormal(MapData mapData, sf::Vector2<int>pacmanPos) 
     return mapData;
 }
 
+//teste maroto
