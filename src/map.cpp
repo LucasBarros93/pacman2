@@ -234,7 +234,16 @@ void Map::updateBonusFruit() {
 int Map::colision(){
     int pointsEarned = 0;
 
-    if(this->pac.getPosition() == this->blinky.getPosition()){
+    sf::Vector2<int> aux1 = {this->pac.getPosition().x+1, this->pac.getPosition().y};
+    sf::Vector2<int> aux2 = {this->pac.getPosition().x, this->pac.getPosition().y+1};
+    sf::Vector2<int> aux3 = {this->pac.getPosition().x, this->pac.getPosition().y-1};
+    sf::Vector2<int> aux4 = {this->pac.getPosition().x-1, this->pac.getPosition().y};
+
+    if(this->pac.getPosition() == this->blinky.getPosition() ||
+        aux1 == this->blinky.getPosition() ||
+        aux2 == this->blinky.getPosition() ||
+        aux3 == this->blinky.getPosition() ||
+        aux4 == this->blinky.getPosition()){
         if(this->blinky.getMode() == Ghost::Mode::POWERLESS){
             this->mapData = this->blinky.kill(this->mapData, 'B');
             pointsEarned += 400;   
@@ -243,7 +252,11 @@ int Map::colision(){
         else if(this->blinky.getMode() == Ghost::Mode::NORMAL)
             return -1;
     }
-    if(this->pac.getPosition() == this->pinky.getPosition()){
+    if(this->pac.getPosition() == this->pinky.getPosition() ||
+        aux1 == this->pinky.getPosition() ||
+        aux2 == this->pinky.getPosition() ||
+        aux3 == this->pinky.getPosition() ||
+        aux4 == this->pinky.getPosition()){
         if(this->pinky.getMode() == Ghost::Mode::POWERLESS){
             this->mapData = this->pinky.kill(this->mapData, 'R');
             pointsEarned += 400;
@@ -252,7 +265,11 @@ int Map::colision(){
         else if(this->pinky.getMode() == Ghost::Mode::NORMAL)
             return -1;
     }
-    if(this->pac.getPosition() == this->inky.getPosition()){
+    if(this->pac.getPosition() == this->inky.getPosition() ||
+        aux1 == this->inky.getPosition() ||
+        aux2 == this->inky.getPosition() ||
+        aux3 == this->inky.getPosition() ||
+        aux4 == this->inky.getPosition()){
         if(this->inky.getMode() == Ghost::Mode::POWERLESS){
             this->mapData = this->inky.kill(this->mapData, 'I');
             pointsEarned += 400;
@@ -261,7 +278,11 @@ int Map::colision(){
         else if(this->inky.getMode() == Ghost::Mode::NORMAL)
             return -1;
     }
-    if(this->pac.getPosition() == this->clyde.getPosition()){
+    if(this->pac.getPosition() == this->clyde.getPosition() ||
+        aux1 == this->clyde.getPosition() ||
+        aux2 == this->clyde.getPosition() ||
+        aux3 == this->clyde.getPosition() ||
+        aux4 == this->clyde.getPosition()){
         if(this->clyde.getMode() == Ghost::Mode::POWERLESS){
             this->mapData = this->clyde.kill(this->mapData, 'C');
             pointsEarned += 400;
