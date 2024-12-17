@@ -77,8 +77,8 @@ Menu::Menu() : selectedOption(0), currentState(MAIN_MENU){
     rulesText.setFont(font);
     rulesText.setString("-Use the arrow keys to move.\n"
         "-Eat the fruits to score points.\n"
-        "-Avoid the ghosts!"
-        "-Score as many points as possible to enter the leaderboard"
+        "-Avoid the ghosts!\n"
+        "-Score as many points as possible to enter the leaderboard\n"
         "-Temporarily eliminate the ghosts when you eat the special fruit.\n");
     rulesText.setCharacterSize(20);
     rulesText.setFillColor(sf::Color::White);
