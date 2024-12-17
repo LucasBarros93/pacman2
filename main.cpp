@@ -1,13 +1,10 @@
 #include <SFML/Graphics.hpp>
-#include <locale>
 #include "menu.hpp"
 #include "map.hpp"
 #include "score_manager.hpp"
 #include "score.hpp"
 
-int main() {
-    // Configura o suporte a caracteres especiais, como acentuações
-    setlocale(LC_ALL, "");
+int main(){
 
     // Cria uma janela com resolução 800x800 e título "PacMan"
     sf::RenderWindow window(sf::VideoMode(800, 800), "PacMan");
@@ -29,15 +26,11 @@ int main() {
 
     // Carrega a fonte
     sf::Font font;
-    if (!font.loadFromFile("assets/fonts/qager.ttf")) {
-        throw std::runtime_error("Erro ao carregar a fonte!");
-    }
+    font.loadFromFile("assets/fonts/qager.ttf");
 
     // Carrega a imagem de Game Over
     sf::Texture gameOverTexture;
-    if (!gameOverTexture.loadFromFile("assets/images/gameover.png")) {
-        throw std::runtime_error("Erro ao carregar a imagem de Game Over!");
-    }
+    gameOverTexture.loadFromFile("assets/images/gameover.png");
     sf::Sprite gameOverSprite;
     gameOverSprite.setTexture(gameOverTexture);
 
@@ -47,8 +40,8 @@ int main() {
     gameOverSprite.setScale(scaleX, scaleY);
     gameOverSprite.setPosition(
         // Centraliza
-        400 - (gameOverTexture.getSize().x * scaleX) / 2,
-        400 - (gameOverTexture.getSize().y * scaleY) / 2
+        390 - (gameOverTexture.getSize().x * scaleX)/ 2,
+        400 - (gameOverTexture.getSize().y * scaleY)/ 2
     );
 
     // Texto de entrada do jogador
@@ -63,7 +56,7 @@ int main() {
     gameOverText.setCharacterSize(30);
     gameOverText.setFillColor(sf::Color::Yellow);
     gameOverText.setString("Pressione Enter para voltar ao menu");
-    gameOverText.setPosition(200, 650);
+    gameOverText.setPosition(120, 650);
 
     // Captura o tamanho atual da janela
     sf::Vector2u winSize = window.getSize(); 
@@ -73,40 +66,40 @@ int main() {
     scoreText.setCharacterSize(24);
     scoreText.setFillColor(sf::Color::Yellow);
     scoreText.setStyle(sf::Text::Bold);
-    scoreText.setPosition( (winSize.x * 0.125f), (winSize.y * 0.875f) );   // Por exemplo, 12.5% da largura, 87.5% da altura
+    scoreText.setPosition( (winSize.x * 0.125f), (winSize.y * 0.875f));   // Por exemplo, 12.5% da largura, 87.5% da altura
 
     // Configuração do texto de fase atual (Phase)
     phaseText.setFont(font);
     phaseText.setCharacterSize(24);
     phaseText.setFillColor(sf::Color::Yellow);
     phaseText.setStyle(sf::Text::Bold);
-    phaseText.setPosition( (winSize.x * 0.5f),   (winSize.y * 0.875f) );   // 50% da largura, 87.5% da altura
+    phaseText.setPosition( (winSize.x * 0.5f),   (winSize.y * 0.875f));   // 50% da largura, 87.5% da altura
 
     // Relógio para controlar o tempo de atualização do jogo
     sf::Clock clock;
     float updateTime = 0.1f; // Intervalo de atualização em segundos
     float elapsedTime = 0.0f; // Tempo acumulado
 
-    while (window.isOpen()) {
+    while (window.isOpen()){
         sf::Event event;
-        while (window.pollEvent(event)) {
+        while (window.pollEvent(event)){
             // Fecha a janela quando o evento de fechar é acionado
-            if (event.type == sf::Event::Closed)
+            if(event.type == sf::Event::Closed)
                 window.close();
 
             // Menu principal: trata a entrada do jogador
-            if (!inGame && !enteringName && !gameOver) {
+            if(!inGame && !enteringName && !gameOver){
                 int option = menu.handleInput(event); // Captura a opção selecionada no menu
 
-                if (option == 0) {// Opção "Iniciar Jogo" selecionada
+                if(option == 0){// Opção "Iniciar Jogo" selecionada
                     enteringName = true; 
                     playerName.clear(); // Limpa o nome do jogador
                 }
 
-                else if (option == 1) // Opção "Regras do Jogo"
+                else if(option == 1)// Opção "Regras do Jogo"
                     menu.setState(RULES_SCREEN);
                 
-                else if (option == 2) { // Opção "Placar"
+                else if(option == 2){ // Opção "Placar"
                     auto scores = scoreManager.getScores();
                     std::vector<ScoreEntry> leaderboard;
 
@@ -118,18 +111,18 @@ int main() {
                     menu.setState(LEADERBOARD_SCREEN);
                 }
 
-                else if (option == 3) // Opção "Sair do Jogo"
+                else if(option == 3)// Opção "Sair do Jogo"
                     window.close();
             }
 
             // Entrada do nome do jogador
-            else if (enteringName && event.type == sf::Event::TextEntered) {
+            else if(enteringName && event.type == sf::Event::TextEntered){
                 
-                if (event.text.unicode == '\b' && !playerName.empty())
+                if(event.text.unicode == '\b' && !playerName.empty())
                     playerName.pop_back(); // Remove o último caractere
 
                 // Enter pressionado, inicia o jogo
-                else if (event.text.unicode == '\r' && !playerName.empty()) {
+                else if(event.text.unicode == '\r' && !playerName.empty()){
                     enteringName = false;
                     inGame = true;
                     playerScore = 0; // Reseta o score
@@ -138,14 +131,14 @@ int main() {
 
                 }
                 // Digitando nome do jogador
-                else if (event.text.unicode < 128 && playerName.size() < 15)
+                else if(event.text.unicode < 128 && playerName.size()< 15)
                     playerName += static_cast<char>(event.text.unicode); // Adiciona o caractere digitado
                 
             } 
 
             // Game Over
-            else if (gameOver) {
-                if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Enter) {
+            else if(gameOver){
+                if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Enter){
                     // Reseta o jogo ao pressionar Enter na tela de Game Over
                     inGame = false;
                     scoreManager.saveScore(playerName, playerScore.getValue());  // Salva a pontuação
@@ -164,33 +157,33 @@ int main() {
         window.clear(sf::Color(10, 10, 50));
 
         // Tela de entrada do nome do jogador
-        if (enteringName) {
+        if(enteringName){
             inputText.setString("Enter your name: " + playerName);
             window.draw(inputText);
         } 
         // Tela de Game Over
-        else if (gameOver) {
+        else if(gameOver){
             window.draw(gameOverSprite); // Desenha a imagem de Game Over
             window.draw(gameOverText);  // Texto de Game Over
         } 
         // Menu principal
-        else if (!inGame) {
+        else if(!inGame){
             menu.draw(window); // Desenha o menu
         } 
         // Lógica do jogo em execução
-        else {
+        else{
             float deltaTime = clock.restart().asSeconds(); // Tempo decorrido desde o último frame
             elapsedTime += deltaTime;
 
             // Atualiza o jogo em intervalos fixos
-            if (elapsedTime >= updateTime) {
+            if(elapsedTime >= updateTime){
                 sf::Vector2<int> direction(0, 0);
 
                 // Captura a direção do movimento com base nas teclas pressionadas
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) direction.y = -1;
-                else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) direction.y = 1;
-                else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) direction.x = -1;
-                else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) direction.x = 1;
+                if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))direction.y = -1;
+                else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))direction.y = 1;
+                else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))direction.x = -1;
+                else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))direction.x = 1;
 
                 // Atualiza a posição do PacMan
                 gameMap.updatePacman(direction);
@@ -208,7 +201,7 @@ int main() {
             }
 
             // Verifica se todas as frutas foram coletadas para avançar de fase
-            if (gameMap.getFruitsRemaining() == 0) {
+            if(gameMap.getFruitsRemaining()== 0){
                 currentLvl++;
                 gameMap.setLevel(currentLvl); // Atualiza o level no mapa, jogo vai ficar mais dificil
                 playerScore += 100 * currentLvl; // Bonus de pontuação ao mudar de fase

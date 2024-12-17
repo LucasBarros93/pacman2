@@ -82,14 +82,14 @@ Menu::Menu() : selectedOption(0), currentState(MAIN_MENU){
         "-Temporarily eliminate the ghosts when you eat the special fruit.\n");
     rulesText.setCharacterSize(20);
     rulesText.setFillColor(sf::Color::White);
-    rulesText.setPosition(50, 250);
+    rulesText.setPosition(50, 380);
 
     // Botão voltar
     backButton.setFont(font);
     backButton.setString("Press Enter to Return");
     backButton.setCharacterSize(30);
     backButton.setFillColor(sf::Color::Yellow);
-    backButton.setPosition(50, 500);
+    backButton.setPosition(50, 550);
 
     // Opções do menu principal
     std::vector<std::string> optionTexts = {"      Play", "     Rules", "Leaderboard", "       Quit"};
