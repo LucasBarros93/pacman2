@@ -15,7 +15,7 @@
 struct ScoreEntry{
     std::string name; // Nome do jogador
     int score; // Pontuacao do jogador
-    ScoreEntry(const std::string& name, int score) : name(name), score(score) {} // Construtor q so inicia o nome e o score
+    ScoreEntry(const std::string& name, int score) : name(name), score(score){} // Construtor q so inicia o nome e o score
 };
 
 // =====================================
