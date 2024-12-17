@@ -20,11 +20,11 @@ Map::Map(const sf::Vector2<float>& tileSize)
 }
 
 // Método para carregar o mapa a partir de um arquivo de texto
-bool Map::loadFromFile(const std::string& filePath) {
+bool Map::loadFromFile(const std::string& filePath){
     std::ifstream file(filePath); // Abre o arquivo em modo de leitura
 
     // Verifica se o arquivo foi aberto corretamente
-    if (!file.is_open()) {
+    if(!file.is_open()){
         std::cerr << "Erro ao abrir o arquivo do mapa: " << filePath << std::endl;
         return false;
     }
@@ -33,25 +33,25 @@ bool Map::loadFromFile(const std::string& filePath) {
     std::string line;
 
     // Lê cada linha do arquivo e armazena no vetor de dados do mapa
-    while (std::getline(file, line)){
+    while(std::getline(file, line)){
         std::vector<char> data; // Vetor temporário para armazenar os caracteres da linha
         std::copy(line.begin(), line.end(), std::back_inserter(data));
         mapData.push_back(data); // Adiciona a linha processada ao vetor principal
     }
 
     // Processa o mapa carregado para identificar frutas e energizadores
-    for (size_t y = 0; y < mapData.size(); y++) {
-        for (size_t x = 0; x < mapData[y].size(); x++) {
+    for(size_t y = 0; y < mapData.size(); y++){
+        for(size_t x = 0; x < mapData[y].size(); x++){
 
             bool isFullTile = (x%2 == 0 && y%2 ==0)? true : false; // Tiles inteiros são processados
             
-            if (isFullTile) {
+            if(isFullTile){
                 std::pair<int, int> position = {static_cast<int>(x), static_cast<int>(y)};
 
-                if (mapData[y][x] == '.' || mapData[y][x+1] == '.') {  // Ponto simples
+                if(mapData[y][x] == '.' || mapData[y][x+1] == '.'){  // Ponto simples
                     fruits.emplace(position, std::make_unique<Dot>(sf::Vector2<int>(x, y)));
                 }
-                else if (mapData[y][x] == 'o' || mapData[y][x+1] == 'o') {  // Energizer
+                else if(mapData[y][x] == 'o' || mapData[y][x+1] == 'o'){  // Energizer
                     fruits.emplace(position, std::make_unique<Energizer>(sf::Vector2<int>(x, y)));
                 }
             }
@@ -67,8 +67,8 @@ bool Map::loadFromFile(const std::string& filePath) {
     float offsetY = (800.f - mapHeightPixels) / 2.f;
     
     // Caso o mapa seja maior que a janela, não deslocar para negativo
-    if (offsetX < 0) offsetX = 0;
-    if (offsetY < 0) offsetY = 0;
+    if(offsetX < 0) offsetX = 0;
+    if(offsetY < 0) offsetY = 0;
 
     this->mapOffset = sf::Vector2f(offsetX, offsetY); // Armazena o deslocamento calculado
 
@@ -76,7 +76,7 @@ bool Map::loadFromFile(const std::string& filePath) {
 }
 
 // Método para resetar o estado do mapa
-void Map::reset() {
+void Map::reset(){
     // Recarrega o mapa
     this->loadFromFile("assets/maps/map.txt");
 
@@ -94,32 +94,32 @@ void Map::reset() {
 }
 
 // Método responsável por desenhar o mapa e os elementos visuais na janela
-void Map::draw(sf::RenderWindow& window) {
+void Map::draw(sf::RenderWindow& window){
     // Variavel de controle
     bool isFullTile;
 
     // Itera sobre todas as linhas e colunas do mapa
-    for (size_t y = 0; y < mapData.size(); y++) {
-        for (size_t x = 0; x < mapData[y].size(); x++) {
+    for(size_t y = 0; y < mapData.size(); y++){
+        for(size_t x = 0; x < mapData[y].size(); x++){
             sf::Vector2<float> position(x * this->tileSize.x, y * this->tileSize.y);
             isFullTile = (x%2 == 0 && y%2 ==0)? true : false;
 
             // Desenha as paredes do mapa (caracter '#') [somente se for FullTile]
-            if (isFullTile) {
-                if (mapData[y][x] == '#' &&
+            if(isFullTile){
+                if(mapData[y][x] == '#' &&
                     mapData[y+1][x] == '#' && 
                     mapData[y][x+1] == '#' && 
-                    mapData[y+1][x+1] == '#') {
+                    mapData[y+1][x+1] == '#'){
 
                         this->wall.setPosition(position + this->mapOffset);
                         window.draw(this->wall);
                 }
             }
             // Desenha o Pac-Man ('P') no mapa
-            if (mapData[y][x] == 'P' &&
+            if(mapData[y][x] == 'P' &&
                 mapData[y+1][x] == 'P' && 
                 mapData[y][x+1] == 'P' && 
-                mapData[y+1][x+1] == 'P') {
+                mapData[y+1][x+1] == 'P'){
 
                     this->pac.setPosition({static_cast<int>(x), static_cast<int>(y)}, this->tileSize);
                     // Cria uma cópia do sprite, ajusta posição, depois desenha
@@ -128,10 +128,10 @@ void Map::draw(sf::RenderWindow& window) {
                     window.draw(pacSprite);
             }
             // Desenha o fantasma Blinky ('B')
-            if (mapData[y][x] == 'B' &&
+            if(mapData[y][x] == 'B' &&
                 mapData[y+1][x] == 'B' && 
                 mapData[y][x+1] == 'B' && 
-                mapData[y+1][x+1] == 'B') {
+                mapData[y+1][x+1] == 'B'){
 
                     this->blinky.setPosition({static_cast<int>(x), static_cast<int>(y)},  this->tileSize);
                     // Cria uma cópia do sprite, ajusta posição, depois desenha
@@ -140,10 +140,10 @@ void Map::draw(sf::RenderWindow& window) {
                     window.draw(blinkySprite);
             }
             // Desenha o fantasma Pinky ('R')
-            if (mapData[y][x] == 'R' &&
+            if(mapData[y][x] == 'R' &&
                 mapData[y+1][x] == 'R' && 
                 mapData[y][x+1] == 'R' && 
-                mapData[y+1][x+1] == 'R') {
+                mapData[y+1][x+1] == 'R'){
 
                     this->pinky.setPosition({static_cast<int>(x), static_cast<int>(y)},  this->tileSize);
                     // Cria uma cópia do sprite, ajusta posição, depois desenha
@@ -152,10 +152,10 @@ void Map::draw(sf::RenderWindow& window) {
                     window.draw(pinkySprite);
                 }
             // Desenha o fantasma Inky ('I')
-            if (mapData[y][x] == 'I' &&
+            if(mapData[y][x] == 'I' &&
                 mapData[y+1][x] == 'I' && 
                 mapData[y][x+1] == 'I' && 
-                mapData[y+1][x+1] == 'I') {
+                mapData[y+1][x+1] == 'I'){
 
                     this->inky.setPosition({static_cast<int>(x), static_cast<int>(y)},  this->tileSize);
                     // Cria uma cópia do sprite, ajusta posição, depois desenha
@@ -164,10 +164,10 @@ void Map::draw(sf::RenderWindow& window) {
                     window.draw(inkySprite);
                 }
             // Desenha o fantasma Clyde ('C')
-            if (mapData[y][x] == 'C' &&
+            if(mapData[y][x] == 'C' &&
                 mapData[y+1][x] == 'C' && 
                 mapData[y][x+1] == 'C' && 
-                mapData[y+1][x+1] == 'C') {
+                mapData[y+1][x+1] == 'C'){
 
                     this->clyde.setPosition({static_cast<int>(x), static_cast<int>(y)},  this->tileSize);
                     // Cria uma cópia do sprite, ajusta posição, depois desenha
@@ -179,7 +179,7 @@ void Map::draw(sf::RenderWindow& window) {
     }
 
     // Desenha frutas (dots e energizers)
-    for (const auto& fruitPair : fruits) {
+    for(const auto& fruitPair : fruits){
         fruitPair.second->draw(window, this->mapOffset);
     }
 
@@ -198,7 +198,7 @@ void Map::operator++(int){
 }
 
 // Atualiza a posição e animação do PacMan com base na direção
-void Map::updatePacman(const sf::Vector2<int> direction) {
+void Map::updatePacman(const sf::Vector2<int> direction){
     this->pac.updateAnimation(); // Atualiza a animação do Pac-Man
     this->mapData = this->pac.update(this->mapData, direction); // Atualiza o mapa com a nova posição do PacMan
 }
@@ -252,7 +252,7 @@ void Map::setLevel(int currentLevel){
 }
 
 // Atualiza a fruta bônus no mapa
-void Map::updateBonusFruit() {
+void Map::updateBonusFruit(){
     bonusFruit.update(this->mapData);
 }
 
@@ -328,7 +328,7 @@ int Map::colision(){
 
     // Verifica se PacMan coletou uma fruta (dot ou energizer)
     auto it = this->fruits.find({pac.getPosition().x, pac.getPosition().y});
-    if (it != this->fruits.end()) {
+    if(it != this->fruits.end()){
         int pointsFruit = it->second->getPoints(); // Pontos da fruta
         this->fruits.erase(it); // Remove a fruta
 
@@ -358,7 +358,7 @@ int Map::colision(){
     }
 
     // Colisão com a fruta bônus
-    if (bonusFruit.isActive() && pac.getPosition() == bonusFruit.getPosition()) {
+    if(bonusFruit.isActive() && pac.getPosition() == bonusFruit.getPosition()){
         pointsEarned += bonusFruit.getPoints();
         bonusFruit.reset(); // Reseta a fruta bônus
     }

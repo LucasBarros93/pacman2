@@ -11,7 +11,7 @@ Menu::Menu() : selectedOption(0), currentState(MAIN_MENU){
     leaderboardText.clear(); // Limpa o vetor antes de adicionar novos elementos
     
     // Adiciona 5 textos padrão ao vetor como placeholders
-    for (int i = 0; i < 5; ++i) {
+    for(int i = 0; i < 5; ++i){
         sf::Text text;
         text.setFont(font);
         text.setCharacterSize(20);
@@ -93,7 +93,7 @@ Menu::Menu() : selectedOption(0), currentState(MAIN_MENU){
 
     // Opções do menu principal
     std::vector<std::string> optionTexts = {"      Play", "     Rules", "Leaderboard", "       Quit"};
-    for (size_t i = 0; i < optionTexts.size(); i++) {
+    for(size_t i = 0; i < optionTexts.size(); i++){
         sf::Text text;
         initMenuText(text, optionTexts[i], 300, 300 + i * 100);
         options.push_back(text);
@@ -101,10 +101,10 @@ Menu::Menu() : selectedOption(0), currentState(MAIN_MENU){
 }
 
 // Método para configurar o quadro de líderes
-void Menu::setLeaderboard(const std::vector<ScoreEntry>& scores) {
+void Menu::setLeaderboard(const std::vector<ScoreEntry>& scores){
     leaderboardText.clear(); // Limpa o vetor existente de textos do leaderboard
 
-    for (size_t i = 0; i < scores.size(); ++i) {
+    for(size_t i = 0; i < scores.size(); ++i){
         sf::Text text;
         text.setFont(font); // Define a fonte do texto
         text.setCharacterSize(20); // Tamanho da fonte
@@ -122,7 +122,7 @@ void Menu::setLeaderboard(const std::vector<ScoreEntry>& scores) {
 }
 
 // Método auxiliar para inicializar os textos do menu
-void Menu::initMenuText(sf::Text& text, const std::string& str, float x, float y) {
+void Menu::initMenuText(sf::Text& text, const std::string& str, float x, float y){
     text.setFont(font); // Define a fonte do texto
     text.setString(str); // Define o conteúdo da string
     text.setCharacterSize(40); // Tamanho da fonte
@@ -131,22 +131,22 @@ void Menu::initMenuText(sf::Text& text, const std::string& str, float x, float y
 }
 
 // Método para desenhar os elementos da interface
-void Menu::draw(sf::RenderWindow& window) {
+void Menu::draw(sf::RenderWindow& window){
     window.clear(sf::Color(10, 10, 50)); // Fundo azul escuro
 
     // Tela do Menu Principal
-    if (this->currentState == MAIN_MENU) {
+    if(this->currentState == MAIN_MENU){
         window.draw(backgroundSpriteMain); // Desenha a imagem de fundo do menu
 
         // Desenha as opções do menu e destaca a opção selecionada
-        for (size_t i = 0; i < options.size(); i++) {
+        for(size_t i = 0; i < options.size(); i++){
             options[i].setFillColor(static_cast<int>(i) == selectedOption ? sf::Color::Red : sf::Color::White);
             window.draw(options[i]);
         }
     } 
     
     // Tela de Regras
-    else if (this->currentState == RULES_SCREEN) {
+    else if(this->currentState == RULES_SCREEN){
         window.draw(backgroundSpriteRules); // Desenha o fundo da tela de regras
         window.draw(rulesTitle); // Desenha o título "Rules"
         window.draw(rulesText);  // Desenha as instruções
@@ -154,12 +154,12 @@ void Menu::draw(sf::RenderWindow& window) {
     } 
     
     // Tela do Quadro de Líderes
-    else if (this->currentState == LEADERBOARD_SCREEN) {
+    else if(this->currentState == LEADERBOARD_SCREEN){
         window.draw(backgroundSpriteLeaderboard);// Desenha o fundo da tela de líderes
         window.draw(leaderboardTitle); // Desenha o título "Leaderboard"
 
          // Desenha cada linha do quadro
-        for (const auto& text : leaderboardText)
+        for(const auto& text : leaderboardText)
             window.draw(text);
         
         window.draw(backButton); // Desenha o botão "Voltar"
@@ -167,31 +167,31 @@ void Menu::draw(sf::RenderWindow& window) {
 }
 
 // Método para atualizar a opção selecionada no menu
-void Menu::updateSelection(int direction) {
+void Menu::updateSelection(int direction){
     // Ajusta a opção selecionada ao pressionar as setas para cima/baixo
     selectedOption = (selectedOption + direction + options.size()) % options.size();
 }
 
 // Método para lidar com as entradas do teclado
-int Menu::handleInput(const sf::Event& event) {
-    if (event.type == sf::Event::KeyPressed) {
+int Menu::handleInput(const sf::Event& event){
+    if(event.type == sf::Event::KeyPressed){
         
         // Se estiver no menu principal
-        if (this->currentState == MAIN_MENU) {
-            if (event.key.code == sf::Keyboard::Up) 
+        if(this->currentState == MAIN_MENU){
+            if(event.key.code == sf::Keyboard::Up) 
                 updateSelection(-1); // Move a seleção para cima
 
-            else if (event.key.code == sf::Keyboard::Down) 
+            else if(event.key.code == sf::Keyboard::Down) 
                 updateSelection(1); // Move a seleção para baixo
             
-            else if (event.key.code == sf::Keyboard::Enter)
+            else if(event.key.code == sf::Keyboard::Enter)
                 return selectedOption; // Retorna a opção selecionada
             
         } 
 
         // Se estiver em outra tela (Regras ou Leaderboard)
-        else {
-            if (event.key.code == sf::Keyboard::Enter) 
+        else{
+            if(event.key.code == sf::Keyboard::Enter) 
                 this->currentState = MAIN_MENU; // Voltar ao menu principal
         }
     }
@@ -199,6 +199,6 @@ int Menu::handleInput(const sf::Event& event) {
 }
 
 // Método para definir o estado atual do menu
-void Menu::setState(MenuState state) {
+void Menu::setState(MenuState state){
     this->currentState = state;
 }

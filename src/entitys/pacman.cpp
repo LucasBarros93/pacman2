@@ -7,7 +7,7 @@ Pacman::Pacman(const std::string& texturePath, int fw, int fh, float fd)
      frameDuration(fd), currentFrameIndex(0){
     
     // Carrega a spritesheet
-    if (!this->texture.loadFromFile(texturePath))
+    if(!this->texture.loadFromFile(texturePath))
         throw std::runtime_error("Erro ao carregar spritesheet!");
     
     this->sprite.setTexture(this->texture);
@@ -20,18 +20,18 @@ Pacman::Pacman(const std::string& texturePath, int fw, int fh, float fd)
 }
 
 // Define a direção atual do PacMan
-void Pacman::setDirection(const sf::Vector2<int>& direction) {
+void Pacman::setDirection(const sf::Vector2<int>& direction){
     this->dir = direction;
     int auxDir;
 
     // Determina a linha da spritesheet com base na direção
-    if (this->dir.x == 1) // Direita
+    if(this->dir.x == 1) // Direita
         auxDir = 0;
-    else if (this->dir.x == -1) // Esquerda
+    else if(this->dir.x == -1) // Esquerda
         auxDir = 1;
-    else if (this->dir.y == 1) // Baixo
+    else if(this->dir.y == 1) // Baixo
         auxDir = 3;
-    else if (this->dir.y == -1) // Cima
+    else if(this->dir.y == -1) // Cima
         auxDir = 2;
 
     this->currentFrame.top = auxDir * frameHeight; // Atualiza a linha
@@ -42,14 +42,14 @@ void Pacman::setDirection(const sf::Vector2<int>& direction) {
 }
 
 // Atualiza a animação do PacMan
-void Pacman::updateAnimation() {
+void Pacman::updateAnimation(){
     // Se parado
-    if (this->dir == sf::Vector2<int>(0, 0)) {
+    if(this->dir == sf::Vector2<int>(0, 0)){
         this->currentFrame.left = 2 * this->frameWidth; // Terceiro frame (boca fechada)
         this->currentFrame.top = 0; // Primeira linha
     }
     // Se andando
-    else if (this->animationClock.getElapsedTime().asSeconds() > this->frameDuration) {
+    else if(this->animationClock.getElapsedTime().asSeconds() > this->frameDuration){
         this->animationClock.restart();
 
         // Avança para o próximo frame
@@ -62,7 +62,7 @@ void Pacman::updateAnimation() {
 }
 
 // Define a posição do PacMan na tela
-void Pacman::setPosition(const sf::Vector2<int>& position, const sf::Vector2<float>& tileSize) {
+void Pacman::setPosition(const sf::Vector2<int>& position, const sf::Vector2<float>& tileSize){
     this->pos = position;
 
     // Ajusta a posição do sprite usando os tamanhos dos tiles
@@ -70,28 +70,28 @@ void Pacman::setPosition(const sf::Vector2<int>& position, const sf::Vector2<flo
 }
 
 // Atualiza o mapa com a nova posição do PacMan
-MapData Pacman::update(MapData mapData, const sf::Vector2<int> direction) {
+MapData Pacman::update(MapData mapData, const sf::Vector2<int> direction){
     std::vector<sf::Vector2<int>> possibleDirections;
 
     // Verifica direções válidas (cima, baixo, direita, esquerda)
-    if (mapData[this->pos.y + 2][this->pos.x] != '#' && mapData[this->pos.y + 2][this->pos.x + 1] != '#')
+    if(mapData[this->pos.y + 2][this->pos.x] != '#' && mapData[this->pos.y + 2][this->pos.x + 1] != '#')
         possibleDirections.push_back({0, 1});  // Baixo
 
-    if (mapData[this->pos.y - 1][this->pos.x] != '#' && mapData[this->pos.y - 1][this->pos.x + 1] != '#')
+    if(mapData[this->pos.y - 1][this->pos.x] != '#' && mapData[this->pos.y - 1][this->pos.x + 1] != '#')
         possibleDirections.push_back({0, -1});  // Cima
 
-    if (mapData[this->pos.y][this->pos.x + 2] != '#' && mapData[this->pos.y + 1][this->pos.x + 2] != '#')
+    if(mapData[this->pos.y][this->pos.x + 2] != '#' && mapData[this->pos.y + 1][this->pos.x + 2] != '#')
         possibleDirections.push_back({1, 0});  // Direita
 
-    if (mapData[this->pos.y][this->pos.x - 1] != '#' && mapData[this->pos.y + 1][this->pos.x - 1] != '#')
+    if(mapData[this->pos.y][this->pos.x - 1] != '#' && mapData[this->pos.y + 1][this->pos.x - 1] != '#')
         possibleDirections.push_back({-1, 0});  // Esquerda
 
     // Verifica se a direção solicitada é válida
-    if (std::find(possibleDirections.begin(), possibleDirections.end(), direction) != possibleDirections.end())
+    if(std::find(possibleDirections.begin(), possibleDirections.end(), direction) != possibleDirections.end())
         this->setDirection(direction);  // Atualiza a direção
     
     // Se a direção atual não for válida, PacMan para
-    if (std::find(possibleDirections.begin(), possibleDirections.end(), this->dir) == possibleDirections.end())
+    if(std::find(possibleDirections.begin(), possibleDirections.end(), this->dir) == possibleDirections.end())
         this->dir = {0,0};  // Atualiza a direção
     
 
@@ -105,10 +105,10 @@ MapData Pacman::update(MapData mapData, const sf::Vector2<int> direction) {
     this->pos += this->dir;
 
     // Trata teleportação nas bordas horizontais
-    if (this->pos.x == -1)
+    if(this->pos.x == -1)
         this->pos.x = mapData[0].size() - 2; // Teleporta para a borda direita
     
-    else if (this->pos.x == static_cast<int>(mapData[0].size()) - 1)
+    else if(this->pos.x == static_cast<int>(mapData[0].size()) - 1)
         this->pos.x = 0; // Teleporta para a borda esquerda
 
     // Atualiza o mapa com a nova posição do PacMan
@@ -121,7 +121,7 @@ MapData Pacman::update(MapData mapData, const sf::Vector2<int> direction) {
 }
 
 // Método para resetar o estado do PacMan para o inicial
-void Pacman::reset() {
+void Pacman::reset(){
     this->pos = {27, 46}; // Posição inicial
     this->dir = {0, 0}; // Direção inicial
 
