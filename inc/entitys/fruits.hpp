@@ -27,7 +27,7 @@ class Dot : public Fruit{
         int points; // Pontos que o jogador ganha quando pega a fruta
 
     public:
-        Dot() : pos(0, 0), points(10) {}; // Construtor padrao com valor inicial
+        Dot() : pos(0, 0), points(10){}; // Construtor padrao com valor inicial
         Dot(sf::Vector2<int> position); // Construtor que inicia a posicao
         int getPoints() const override; // Retorna os pontos da fruta
         void draw(sf::RenderWindow& window, const sf::Vector2f& offset) const override; // Desenha a fruta
@@ -43,7 +43,7 @@ class Energizer : public Fruit{
         int points; // Pontos que o jogador ganha quando pega a fruta
 
     public:
-        Energizer() : pos(0, 0), points(50) {}; // Construtor padrao com valor inicial
+        Energizer() : pos(0, 0), points(50){}; // Construtor padrao com valor inicial
         Energizer(sf::Vector2<int> position); // Construtor que inicia a posicao
         int getPoints() const override; // Retorna os pontos da fruta
         void draw(sf::RenderWindow& window, const sf::Vector2f& offset) const override; // Desenha a fruta

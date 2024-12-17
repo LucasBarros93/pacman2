@@ -11,7 +11,7 @@ int getRandomNumber(int min, int max){
 
 // ===================================
 // IMplementacao da classe Dot
-Dot::Dot(sf::Vector2<int> position) : pos(position), points(10) {} // Construtor que inicializa posicao e pontos da fruta
+Dot::Dot(sf::Vector2<int> position) : pos(position), points(10){} // Construtor que inicializa posicao e pontos da fruta
 
 // Aqui retorna os pontos do ponto (dot)
 int Dot::getPoints() const{
@@ -28,7 +28,7 @@ void Dot::draw(sf::RenderWindow& window, const sf::Vector2f& offset) const{
 
 // ===================================
 // Implementacao da classe Energizer
-Energizer::Energizer(sf::Vector2<int> position) : pos(position), points(50) {} // Construtor que inicializa posicao e pontos da fruta
+Energizer::Energizer(sf::Vector2<int> position) : pos(position), points(50){} // Construtor que inicializa posicao e pontos da fruta
 
 // Metodo de retornar os pontos do energizer
 int Energizer::getPoints() const {
@@ -52,7 +52,7 @@ Bonus::Bonus(int fw, int fh)
 } // Construtor que inicializa o tamanho so sprite e tambem define a fruta bonus como inativa
 
 // Metodo q procura uma posicao livre no mapa pra poder colocar a fruta bonus aleatoriamente
-void Bonus::spawn(const std::vector<std::vector<char>>& mapData) {
+void Bonus::spawn(const std::vector<std::vector<char>>& mapData){
     // Verifica se a fruta bonus ja esta ativa
     if(this->active){
       return;  
@@ -62,7 +62,7 @@ void Bonus::spawn(const std::vector<std::vector<char>>& mapData) {
     std::vector<sf::Vector2<int>> emptyPositions;
     for(size_t y = 0; y < mapData.size(); y+=2){
         for(size_t x = 0; x < mapData[y].size(); x+=2){
-            if(mapData[y][x] == ' ') {
+            if(mapData[y][x] == ' '){
                 emptyPositions.push_back({static_cast<int>(x), static_cast<int>(y)});
             }
         }
@@ -102,7 +102,7 @@ void Bonus::update(const std::vector<std::vector<char>>& mapData){
 
 
 // Metodo pra deixar o peso e a textura da fruta aleatorios
-void Bonus::randomize() {
+void Bonus::randomize(){
     const int pointsOptions[8] = {100, 300, 500, 700, 1000, 2000, 3000, 5000}; // Possibilidades de pontos que a frut pode dar pro pacman caso ele a pegue
     std::vector<int> weights = {40, 20, 15, 10, 7, 5, 2, 1}; // peso pra cada valor possivel de pontuacao (maior peso -> maior probabilidade)
 
@@ -130,7 +130,7 @@ int Bonus::getPoints() const {
 
 // Metodo pra desenhar a fruta bonus apenas se ela estiver ativa
 void Bonus::draw(sf::RenderWindow& window, const sf::Vector2f& offset) const{
-    if(this->active) {
+    if(this->active){
         sf::Sprite spriteCopy = this->sprite;
         spriteCopy.setPosition((this->pos.x * 10) + offset.x, (this->pos.y * 10) + offset.y); // Novamente aqui da pra ver o offset sendo aplicado, alinhando tudo no centro da tela
         window.draw(spriteCopy);
@@ -138,7 +138,7 @@ void Bonus::draw(sf::RenderWindow& window, const sf::Vector2f& offset) const{
 }
 
 // Metodo pra voltar a fruta bonus pra inativa
-void Bonus::reset() {
+void Bonus::reset(){
     this->active = false;            // Desativa a fruta bônus
     this->points = 0;                // Reseta os pontos
     this->pos = {0, 0};              // Reseta a posição
