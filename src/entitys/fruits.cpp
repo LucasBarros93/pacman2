@@ -1,7 +1,7 @@
 #include "entitys/fruits.hpp"
 
 // -----------------------------------
-// Função auxiliar para números aleatórios
+// Funcao auxiliar para numeros aleatorios
 int getRandomNumber(int min, int max){
     static std::random_device rd;
     static std::mt19937 mt(rd());
@@ -31,12 +31,12 @@ void Dot::draw(sf::RenderWindow& window, const sf::Vector2f& offset) const{
 Energizer::Energizer(sf::Vector2<int> position) : pos(position), points(50){} // Construtor que inicializa posicao e pontos da fruta
 
 // Metodo de retornar os pontos do energizer
-int Energizer::getPoints() const {
+int Energizer::getPoints() const{
     return this->points;
 }
 
 // Metodo pra desenhar o energizer como um ponto maior, bolinha branca maior que o Dot
-void Energizer::draw(sf::RenderWindow& window, const sf::Vector2f& offset) const {
+void Energizer::draw(sf::RenderWindow& window, const sf::Vector2f& offset) const{
     sf::CircleShape energizer(4.0f);
     energizer.setFillColor(sf::Color(184, 197, 201));
     energizer.setPosition(((this->pos.x * 10) + 10) + offset.x, ((this->pos.y * 10 )+10) + offset.y);
@@ -124,7 +124,7 @@ void Bonus::randomize(){
 }
 
 // Metodo pra retornar os pontos da fruta bonus
-int Bonus::getPoints() const {
+int Bonus::getPoints() const{
     return this->points;
 }
 
@@ -141,17 +141,17 @@ void Bonus::draw(sf::RenderWindow& window, const sf::Vector2f& offset) const{
 void Bonus::reset(){
     this->active = false;            // Desativa a fruta bônus
     this->points = 0;                // Reseta os pontos
-    this->pos = {0, 0};              // Reseta a posição
+    this->pos ={0, 0};              // Reseta a posição
     this->respawnTimer.restart();    // Inicia o temporizador de respawn
 }
 
 // Metodo so pra retornar o status atual da fruta bonus: ativada/desativada
-bool Bonus::isActive() const {
+bool Bonus::isActive() const{
     return this->active;
 }
 
 // Metodo pra retornar a posicao da fruta bonus no grid
-sf::Vector2<int> Bonus::getPosition() const {
+sf::Vector2<int> Bonus::getPosition() const{
     return this->pos;
 }
 
