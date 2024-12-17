@@ -9,7 +9,7 @@
 typedef std::vector<std::vector <char>> MapData;
 
 class Ghost {
-    public: enum Mode { NORMAL, POWERLESS, DEAD, SPAWN };
+    public: enum Mode { NORMAL, POWERLESS, DEAD, SPAWN, OUTGAME };
     protected:
         sf::Sprite sprite;          // Sprite do fantasma
         sf::Texture texture;        // Textura do fantasma
@@ -42,8 +42,7 @@ class Ghost {
         // Atualiza a animação e comportamento com base no estado
         void updateAnimation();
         MapData updateBehavior(MapData mapData, char self, sf::Vector2<int>pacmanPos);
-        void reset(const sf::Vector2<int>& position);// reseta dps que da gameover
- 
+        void reset(const sf::Vector2<int>& position); // reseta dps que da gameover
 
         MapData kill(MapData mapData, char self);
 
@@ -51,6 +50,7 @@ class Ghost {
         void setPosition(const sf::Vector2<int>& position, const sf::Vector2<float>& tileSize);    // Define a posição
         void setMode(Mode mode);                               // Define o modo atual
         void setDificult(int df);
+        void setCount(int i);
 
         const sf::Sprite getSprite() const;                    // Retorna o sprite
         const sf::Vector2<int>& getPosition() const;           // Retorna a posição

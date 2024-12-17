@@ -1,6 +1,6 @@
 #include "map.hpp"
 
-Map::Map(const sf::Vector2<float>& tileSize) : tileSize(tileSize), 
+Map::Map(const sf::Vector2<float>& tileSize) : count (1), tileSize(tileSize), 
     pac("./assets/images/spritesheet.png", 16, 16, 0.2f),
     blinky("./assets/images/spritesheet.png", 16, 16, 0.2f, 50),
     pinky("./assets/images/spritesheet.png", 16, 16, 0.2f, 60),
@@ -77,6 +77,7 @@ void Map::reset() {
 
     // Limpa frutas
     this->fruits.clear();
+    this->count=1;
 }
 
 void Map::draw(sf::RenderWindow& window) {
@@ -167,54 +168,114 @@ const MapData& Map::getMapData() const {
     return this->mapData;
 }
 
-int Map::updatePacman(const sf::Vector2<int> direction) {
-    int pointsEarned = 0;
+void Map::operator++(int){
+    this->count++;
+}
 
+void Map::updatePacman(const sf::Vector2<int> direction) {
     // Atualiza a posição do Pac-Man
     this->pac.updateAnimation();
     this->mapData = this->pac.update(this->mapData, direction);
-
-    // Verifica se o Pac-Man coletou uma fruta
-    auto it = this->fruits.find({pac.getPosition().x, pac.getPosition().y});
-    if (it != this->fruits.end()) {
-        pointsEarned = it->second->getPoints(); // Pontos da fruta
-        this->fruits.erase(it); // Remove a fruta
-    }
-
-    return pointsEarned;
 }
 
 void Map::updateGhosts(){
     this->blinky.updateAnimation();
-    // this->mapData = this->blinky.updateBehavior(this->mapData, 'B', this->pac.getPosition());
+    this->mapData = this->blinky.updateBehavior(this->mapData, 'B', this->pac.getPosition());
     this->pinky.updateAnimation();
-    // this->mapData = this->pinky.updateBehavior(this->mapData, 'R', this->pac.getPosition());
+    this->mapData = this->pinky.updateBehavior(this->mapData, 'R', this->pac.getPosition());
     this->inky.updateAnimation();
-    // this->mapData = this->inky.updateBehavior(this->mapData, 'I', this->pac.getPosition());
+    this->mapData = this->inky.updateBehavior(this->mapData, 'I', this->pac.getPosition());
     this->clyde.updateAnimation();
-    // this->mapData = this->clyde.updateBehavior(this->mapData, 'C', this->pac.getPosition());
+    this->mapData = this->clyde.updateBehavior(this->mapData, 'C', this->pac.getPosition());
+
+    if(this->count%50 == 0){
+        if(this->blinky.getMode() == Ghost::OUTGAME)
+            this->blinky.setMode(Ghost::SPAWN);
+    }
+    if(this->count%80 == 0){
+        if(this->pinky.getMode() == Ghost::OUTGAME)
+            this->pinky.setMode(Ghost::SPAWN);
+    }
+    if(this->count%110 == 0){
+        if(this->inky.getMode() == Ghost::OUTGAME)
+            this->inky.setMode(Ghost::SPAWN);
+    }
+    if(this->count%130 == 0){
+        if(this->clyde.getMode() == Ghost::OUTGAME)
+            this->clyde.setMode(Ghost::SPAWN);
+    }
 }
 
-bool Map::colision(){
-    if(this->pac.getPosition() == this->clyde.getPosition()){
-        if(this->clyde.getMode() == Ghost::Mode::POWERLESS){
-            this->mapData = this->clyde.kill(this->mapData, 'C');
-            return false;
+int Map::colision(){
+    int pointsEarned = 0;
+
+    if(this->pac.getPosition() == this->blinky.getPosition()){
+        if(this->blinky.getMode() == Ghost::Mode::POWERLESS){
+            this->mapData = this->blinky.kill(this->mapData, 'B');
+            pointsEarned += 400;   
         }
-        else if(this->clyde.getMode() == Ghost::Mode::NORMAL){
-            return true;
+
+        else if(this->blinky.getMode() == Ghost::Mode::NORMAL)
+            return -1;
+    }
+    if(this->pac.getPosition() == this->pinky.getPosition()){
+        if(this->pinky.getMode() == Ghost::Mode::POWERLESS){
+            this->mapData = this->pinky.kill(this->mapData, 'R');
+            pointsEarned += 400;
         }
+        
+        else if(this->pinky.getMode() == Ghost::Mode::NORMAL)
+            return -1;
     }
     if(this->pac.getPosition() == this->inky.getPosition()){
         if(this->inky.getMode() == Ghost::Mode::POWERLESS){
             this->mapData = this->inky.kill(this->mapData, 'I');
-            return false;
+            pointsEarned += 400;
         }
-        else if(this->inky.getMode() == Ghost::Mode::NORMAL){
-            return true;
-        }
+
+        else if(this->inky.getMode() == Ghost::Mode::NORMAL)
+            return -1;
     }
-    return false;
+    if(this->pac.getPosition() == this->clyde.getPosition()){
+        if(this->clyde.getMode() == Ghost::Mode::POWERLESS){
+            this->mapData = this->clyde.kill(this->mapData, 'C');
+            pointsEarned += 400;
+        }
+
+        else if(this->clyde.getMode() == Ghost::Mode::NORMAL)
+            return -1;
+    }
+
+    // Verifica se o Pac-Man coletou uma fruta
+    auto it = this->fruits.find({pac.getPosition().x, pac.getPosition().y});
+    if (it != this->fruits.end()) {
+        int pointsFruit = it->second->getPoints(); // Pontos da fruta
+        this->fruits.erase(it); // Remove a fruta
+
+        if(pointsFruit== 50){
+            if(this->blinky.getMode() == Ghost::NORMAL){
+                this->blinky.setMode(Ghost::POWERLESS);
+                this->blinky.setCount(0);
+            }
+
+            if(this->pinky.getMode() == Ghost::NORMAL){
+                this->pinky.setMode(Ghost::POWERLESS);
+                this->pinky.setCount(0);
+            }
+
+            if(this->inky.getMode() == Ghost::NORMAL){
+                this->inky.setMode(Ghost::POWERLESS);
+                this->inky.setCount(0);
+            }
+
+            if(this->clyde.getMode() == Ghost::NORMAL){
+                this->clyde.setMode(Ghost::POWERLESS);
+                this->clyde.setCount(0);
+            }
+        }
+        return pointsFruit+pointsEarned;
+    }
+    return pointsEarned;
 }
 
 int Map::getFruitsRemaining() const {

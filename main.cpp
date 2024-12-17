@@ -10,6 +10,7 @@ int main() {
 
     sf::RenderWindow window(sf::VideoMode(800, 800), "Pac-Man");
 
+    int result;
 
     Menu menu;
     Map gameMap({10.f, 10.f});
@@ -153,9 +154,12 @@ int main() {
                 else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) direction.x = -1;
                 else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) direction.x = 1;
 
-                playerScore += gameMap.updatePacman(direction);
-                gameOver = gameMap.colision();
+                gameMap.updatePacman(direction);
+                result = gameMap.colision();
+                playerScore += result>0? result : 0;
+                gameOver = result == -1? true : false;
                 gameMap.updateGhosts();
+                gameMap++;
                 elapsedTime = 0.0f;
             }
 
@@ -168,7 +172,7 @@ int main() {
             gameMap.draw(window);
 
             scoreText.setString("Score: " + std::to_string(playerScore.getValue()));
-            phaseText.setString("Phase: " + std::to_string(currentPhase));
+            phaseText.setString("Level: " + std::to_string(currentPhase));
             window.draw(scoreText);
             window.draw(phaseText);
         }
