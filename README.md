@@ -128,7 +128,7 @@ This project was designed with **modularity** and **object-oriented principles**
 
 ## 👥 Contributors
 
-* [Lucas Barros](https://github.com/lucasbarros01)
+* [Lucas Barros](https://github.com/LucasBarros93)
 * [André Borba](https://github.com/AndreBorba)
 
 ---
