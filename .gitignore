@@ -1,4 +1,3 @@
-**/.vscode
 **/bin/*
 **/obj/*
-./assets/leaderboard/scores.txt
+compile_commands.json
