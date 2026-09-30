@@ -43,7 +43,7 @@ void Game::run() {
 
         window.clear();
 
-        renderer.render(pacman);
+        renderer.renderPacman(pacman);
 
         window.display();
     }

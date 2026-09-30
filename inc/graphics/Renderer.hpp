@@ -7,11 +7,12 @@
 class Renderer {
   private:
     sf::RenderWindow &window;
+    sf::Texture spritesheet;
 
   public:
     Renderer(sf::RenderWindow &window);
 
-    void render(const Pacman &pacman);
+    void renderPacman(const Pacman &pacman);
 };
 
 #endif
