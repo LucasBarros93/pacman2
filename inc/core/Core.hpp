@@ -1,9 +1,9 @@
 #ifndef CORE_HPP
 #define CORE_HPP
 
-#include <bits/stdc++.h>
+#include <utility>
 
-typedef std::pair<float, float> Position;
+using Position = std::pair<float, float>;
 
 enum class Direction { Up, Down, Left, Right, Neutral };
 
@@ -14,8 +14,8 @@ enum class CellType {
     PowerPellet,
 };
 
-typedef struct cell {
+struct Cell {
     CellType cellType;
-} Cell;
+};
 
 #endif

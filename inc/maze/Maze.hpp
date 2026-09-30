@@ -9,7 +9,7 @@ class Maze {
     std::vector<std::vector<Cell>> grid;
 
   public:
-    Maze(const std::string &filepath);
+    Maze();
 
     bool isWalkable(const Position position) const;
     Cell &getCell(const Position position) const;

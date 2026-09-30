@@ -5,7 +5,8 @@
 
 class Pacman : public Entity {
   public:
-    Position nextPosition();
+    Pacman();
+    void update(const Maze &maze, float deltaTime) override;
 };
 
 #endif

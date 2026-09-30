@@ -11,7 +11,10 @@ class Entity {
     float speed;
 
   public:
-    virtual void update(const Maze &maze);
+    Entity(Position position, Direction direction, float speed);
+    virtual void update(const Maze &maze, float deltaTime) = 0;
+    Position getPosition() const;
+    void setDirection(Direction newDirection);
 };
 
 #endif
