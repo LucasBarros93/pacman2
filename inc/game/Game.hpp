@@ -2,8 +2,8 @@
 #define GAME_H
 
 #include "entities/Pacman.hpp"
+#include "graphics/Renderer.hpp"
 #include "maze/Maze.hpp"
-#include "renderer/Renderer.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 

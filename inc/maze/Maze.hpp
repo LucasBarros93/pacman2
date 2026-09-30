@@ -2,7 +2,7 @@
 #define MAZE_HPP
 
 #include "core/Core.hpp"
-#include <bits/stdc++.h>
+#include <vector>
 
 class Maze {
   private:

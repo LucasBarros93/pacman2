@@ -1,4 +1,4 @@
-#include "renderer/Renderer.hpp"
+#include "graphics/Renderer.hpp"
 
 Renderer::Renderer(sf::RenderWindow &window) : window{window} {};
 

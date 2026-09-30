@@ -1,10 +1,7 @@
 #include "entities/Entity.hpp"
 
-Entity::Entity(Position position, Direction direction, float speed) {
-    this->position = position;
-    this->direction = direction;
-    this->speed = speed;
-}
+Entity::Entity(Position position, Direction direction, float speed)
+    : position{position}, direction{direction}, speed{speed} {}
 
 Position Entity::getPosition() const { return position; }
 
