@@ -8,6 +8,8 @@ class Renderer {
   private:
     sf::RenderWindow &window;
     sf::Texture spritesheet;
+    sf::Clock animationClock;
+    int animationFrame;
 
   public:
     Renderer(sf::RenderWindow &window);

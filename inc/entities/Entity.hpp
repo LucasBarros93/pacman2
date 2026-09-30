@@ -14,6 +14,7 @@ class Entity {
     Entity(Position position, Direction direction, float speed);
     virtual void update(const Maze &maze, float deltaTime) = 0;
     Position getPosition() const;
+    Direction getDirection() const;
     void setDirection(Direction newDirection);
 };
 

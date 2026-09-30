@@ -1,6 +1,6 @@
 #include "entities/Pacman.hpp"
 
-Pacman::Pacman() : Entity({400.0f, 300.0f}, Direction::Neutral, 100.0f) {}
+Pacman::Pacman() : Entity({400.0f, 300.0f}, Direction::Neutral, 250.0f) {}
 
 void Pacman::update(const Maze &maze, float deltaTime) {
     Position nextPosition;
