@@ -5,7 +5,7 @@
 
 class Pacman : public Entity {
   public:
-    Pacman();
+    Pacman(const Position position);
     void update(const Maze &maze, float deltaTime) override;
 };
 

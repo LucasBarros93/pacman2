@@ -4,6 +4,7 @@
 #include <utility>
 
 using Position = std::pair<float, float>;
+using GridPosition = std::pair<int, int>;
 
 enum class Direction { Up, Down, Left, Right, Neutral };
 

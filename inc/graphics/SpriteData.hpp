@@ -4,8 +4,8 @@
 #include <SFML/Graphics/Rect.hpp>
 
 namespace SpriteData {
-
-constexpr int SPRITE_SIZE = 16;
+static constexpr float CELL_SIZE = 24.0f;
+static constexpr int SPRITE_SIZE = 16;
 
 sf::IntRect pacmanRight(int frame);
 sf::IntRect pacmanLeft(int frame);

@@ -1,8 +1,8 @@
 #include "game/Game.hpp"
 
 Game::Game()
-    : window(sf::VideoMode({800, 600}), "Pacman"), pacman(), renderer(window),
-      maze() {}
+    : window(sf::VideoMode({800, 600}), "Pacman"), pacman({13.5f, 23.0f}),
+      renderer(window), maze("./assets/maps/map.txt") {}
 
 Direction Game::getInput() {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) ||
@@ -43,6 +43,7 @@ void Game::run() {
 
         window.clear();
 
+        renderer.renderMaze(maze);
         renderer.renderPacman(pacman);
 
         window.display();

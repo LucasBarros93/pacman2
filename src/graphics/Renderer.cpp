@@ -37,8 +37,31 @@ void Renderer::renderPacman(const Pacman &pacman) {
     }
 
     Position position = pacman.getPosition();
-    sprite.setPosition({position.first, position.second});
+    sprite.setPosition({position.first * SpriteData::CELL_SIZE,
+                        position.second * SpriteData::CELL_SIZE});
 
-    sprite.setScale({3.0f, 3.0f});
+    sprite.setScale({SpriteData::CELL_SIZE / SpriteData::SPRITE_SIZE,
+                     SpriteData::CELL_SIZE / SpriteData::SPRITE_SIZE});
     window.draw(sprite);
+}
+
+void Renderer::renderMaze(const Maze &maze) {
+    for (int y = 0; y < maze.getHeight(); ++y) {
+        for (int x = 0; x < maze.getWidth(); ++x) {
+
+            sf::RectangleShape cell(
+                {SpriteData::CELL_SIZE, SpriteData::CELL_SIZE});
+
+            cell.setPosition(
+                {x * SpriteData::CELL_SIZE, y * SpriteData::CELL_SIZE});
+
+            // exemplo
+            if (maze.getCell({x, y}).cellType == CellType::Wall)
+                cell.setFillColor(sf::Color::Blue);
+            else
+                cell.setFillColor(sf::Color::Black);
+
+            window.draw(cell);
+        }
+    }
 }

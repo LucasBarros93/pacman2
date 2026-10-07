@@ -15,6 +15,7 @@ class Renderer {
     Renderer(sf::RenderWindow &window);
 
     void renderPacman(const Pacman &pacman);
+    void renderMaze(const Maze &maze);
 };
 
 #endif

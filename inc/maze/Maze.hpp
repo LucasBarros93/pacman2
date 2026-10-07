@@ -2,6 +2,9 @@
 #define MAZE_HPP
 
 #include "core/Core.hpp"
+#include <cmath>
+#include <fstream>
+#include <string>
 #include <vector>
 
 class Maze {
@@ -9,10 +12,12 @@ class Maze {
     std::vector<std::vector<Cell>> grid;
 
   public:
-    Maze();
+    Maze(const std::string &filePath);
 
-    bool isWalkable(const Position position) const;
-    Cell &getCell(const Position position) const;
+    bool isWalkable(const GridPosition position) const;
+    Cell getCell(const GridPosition position) const;
+    int getHeight() const;
+    int getWidth() const;
 };
 
 #endif

@@ -1,49 +1,42 @@
 #include "entities/Pacman.hpp"
 
-Pacman::Pacman() : Entity({400.0f, 300.0f}, Direction::Neutral, 250.0f) {}
+Pacman::Pacman(Position position)
+    : Entity({position}, Direction::Neutral, 6.5f) {}
 
 void Pacman::update(const Maze &maze, float deltaTime) {
-    Position nextPosition;
+    Position nextPosition = this->position;
+    GridPosition nextGridPosition;
 
     switch (this->direction) {
 
     case Direction::Up:
-        nextPosition = this->position;
         nextPosition.second -= speed * deltaTime;
-
-        if (maze.isWalkable(nextPosition))
-            this->position = nextPosition;
-
+        nextGridPosition = {std::round(nextPosition.first),
+                            std::floor(nextPosition.second)};
         break;
 
     case Direction::Down:
-        nextPosition = this->position;
         nextPosition.second += speed * deltaTime;
-
-        if (maze.isWalkable(nextPosition))
-            this->position = nextPosition;
-
+        nextGridPosition = {std::round(nextPosition.first),
+                            std::ceil(nextPosition.second)};
         break;
 
     case Direction::Left:
-        nextPosition = this->position;
         nextPosition.first -= speed * deltaTime;
-
-        if (maze.isWalkable(nextPosition))
-            this->position = nextPosition;
-
+        nextGridPosition = {std::floor(nextPosition.first),
+                            std::round(nextPosition.second)};
         break;
 
     case Direction::Right:
-        nextPosition = this->position;
         nextPosition.first += speed * deltaTime;
-
-        if (maze.isWalkable(nextPosition))
-            this->position = nextPosition;
-
+        nextGridPosition = {std::ceil(nextPosition.first),
+                            std::round(nextPosition.second)};
         break;
 
     case Direction::Neutral:
-        break;
+        return;
     }
+
+    if (maze.isWalkable(nextGridPosition))
+        this->position = nextPosition;
 }
