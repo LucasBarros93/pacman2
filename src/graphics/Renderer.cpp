@@ -55,7 +55,6 @@ void Renderer::renderMaze(const Maze &maze) {
             cell.setPosition(
                 {x * SpriteData::CELL_SIZE, y * SpriteData::CELL_SIZE});
 
-            // exemplo
             if (maze.getCell({x, y}).cellType == CellType::Wall)
                 cell.setFillColor(sf::Color::Blue);
             else
