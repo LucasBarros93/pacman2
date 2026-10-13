@@ -7,7 +7,10 @@
 class Renderer {
   private:
     sf::RenderWindow &window;
+
     sf::Texture spritesheet;
+    sf::Texture mazeTexture;
+
     sf::Clock animationClock;
     int animationFrame;
 

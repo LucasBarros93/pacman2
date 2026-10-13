@@ -2,9 +2,11 @@
 #include "graphics/SpriteData.hpp"
 
 Renderer::Renderer(sf::RenderWindow &window) : window{window} {
-    if (!spritesheet.loadFromFile("assets/images/spritesheet.png")) {
+    if (!spritesheet.loadFromFile("assets/images/spritesheet.png"))
         throw std::runtime_error("Could not load spritesheet");
-    }
+
+    if (!mazeTexture.loadFromFile("assets/images/maze.png"))
+        throw std::runtime_error("Could not load maze.png");
 };
 
 void Renderer::renderPacman(const Pacman &pacman) {
@@ -40,27 +42,25 @@ void Renderer::renderPacman(const Pacman &pacman) {
     sprite.setPosition({position.first * SpriteData::CELL_SIZE,
                         position.second * SpriteData::CELL_SIZE});
 
-    sprite.setScale({SpriteData::CELL_SIZE / SpriteData::SPRITE_SIZE,
-                     SpriteData::CELL_SIZE / SpriteData::SPRITE_SIZE});
+    sprite.setScale({(SpriteData::CELL_SIZE / SpriteData::SPRITE_SIZE) * 1.4,
+                     (SpriteData::CELL_SIZE / SpriteData::SPRITE_SIZE) * 1.4});
     window.draw(sprite);
 }
 
 void Renderer::renderMaze(const Maze &maze) {
-    for (int y = 0; y < maze.getHeight(); ++y) {
-        for (int x = 0; x < maze.getWidth(); ++x) {
+    sf::Sprite mazeSprite{mazeTexture};
 
-            sf::RectangleShape cell(
-                {SpriteData::CELL_SIZE, SpriteData::CELL_SIZE});
+    const sf::Vector2u textureSize = mazeTexture.getSize();
 
-            cell.setPosition(
-                {x * SpriteData::CELL_SIZE, y * SpriteData::CELL_SIZE});
+    const float targetWidth = maze.getWidth() * SpriteData::CELL_SIZE;
 
-            if (maze.getCell({x, y}).cellType == CellType::Wall)
-                cell.setFillColor(sf::Color::Blue);
-            else
-                cell.setFillColor(sf::Color::Black);
+    const float targetHeight = maze.getHeight() * SpriteData::CELL_SIZE;
 
-            window.draw(cell);
-        }
-    }
+    const float scaleX = targetWidth / textureSize.x;
+    const float scaleY = targetHeight / textureSize.y;
+
+    mazeSprite.setScale({scaleX, scaleY});
+    mazeSprite.setPosition({0.f, 0.f});
+
+    window.draw(mazeSprite);
 }
