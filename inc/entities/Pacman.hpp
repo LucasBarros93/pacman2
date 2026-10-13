@@ -8,8 +8,8 @@ class Pacman : public Entity {
     bool canMove(const Maze &maze, Direction direction) const;
 
   public:
+    explicit Pacman(const Position position);
     bool trySetDirection(Direction newDirection, const Maze &maze);
-    Pacman(const Position position);
 };
 
 #endif

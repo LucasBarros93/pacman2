@@ -13,54 +13,78 @@ void Entity::setDirection(Direction newDirection) {
         this->direction = newDirection;
 }
 
+GridPosition Entity::getGridPosition(Position position,
+                                     Direction movementDirection) const {
+    switch (movementDirection) {
+    case Direction::Up:
+        return {std::round(position.first), std::floor(position.second)};
+
+    case Direction::Down:
+        return {std::round(position.first), std::ceil(position.second)};
+
+    case Direction::Left:
+        return {std::floor(position.first), std::round(position.second)};
+
+    case Direction::Right:
+        return {std::ceil(position.first), std::round(position.second)};
+
+    case Direction::Neutral:
+        return {std::round(position.first), std::round(position.second)};
+    }
+
+    return {0, 0};
+}
+
+GridPosition Entity::teleportHorizontal(const Maze &maze,
+                                        GridPosition gridPosition) const {
+    if (gridPosition.first >= maze.getWidth()) {
+        gridPosition.first = 0;
+    } else if (gridPosition.first < 0) {
+        gridPosition.first = maze.getWidth() - 1;
+    }
+
+    return gridPosition;
+}
+
 void Entity::update(const Maze &maze, float deltaTime) {
-    Position nextPosition = this->position;
-    GridPosition nextGridPosition;
+    Position nextPosition = position;
 
-    switch (this->direction) {
-
+    switch (direction) {
     case Direction::Up:
         nextPosition.second -= speed * deltaTime;
         nextPosition.first = std::round(nextPosition.first);
-        nextGridPosition = {std::round(nextPosition.first),
-                            std::floor(nextPosition.second)};
         break;
 
     case Direction::Down:
         nextPosition.second += speed * deltaTime;
         nextPosition.first = std::round(nextPosition.first);
-        nextGridPosition = {std::round(nextPosition.first),
-                            std::ceil(nextPosition.second)};
         break;
 
     case Direction::Left:
         nextPosition.first -= speed * deltaTime;
         nextPosition.second = std::round(nextPosition.second);
-        nextGridPosition = {std::floor(nextPosition.first),
-                            std::round(nextPosition.second)};
         break;
 
     case Direction::Right:
         nextPosition.first += speed * deltaTime;
         nextPosition.second = std::round(nextPosition.second);
-        nextGridPosition = {std::ceil(nextPosition.first),
-                            std::round(nextPosition.second)};
         break;
 
     case Direction::Neutral:
         return;
     }
 
-    if (nextGridPosition.first > maze.getWidth() - 1) {
-        nextPosition.first = 0;
-        nextGridPosition.first = 0;
+    const GridPosition nextGridPosition =
+        getGridPosition(nextPosition, direction);
+
+    const GridPosition teleportPosition =
+        teleportHorizontal(maze, nextGridPosition);
+
+    if (teleportPosition.first != nextGridPosition.first) {
+        nextPosition.first =
+            nextGridPosition.first < 0 ? maze.getWidth() - 1 : 0.0f;
     }
 
-    if (nextGridPosition.first < 0) {
-        nextPosition.first = maze.getWidth() - 1;
-        nextGridPosition.first = maze.getWidth() - 1;
-    }
-
-    if (maze.isWalkable(nextGridPosition))
-        this->position = nextPosition;
+    if (maze.isWalkable(teleportPosition))
+        position = nextPosition;
 }

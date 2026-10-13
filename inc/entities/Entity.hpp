@@ -11,8 +11,15 @@ class Entity {
     float speed;
     void setDirection(Direction newDirection);
 
+    GridPosition getGridPosition(Position position,
+                                 Direction movementDirection) const;
+
+    GridPosition teleportHorizontal(const Maze &maze,
+                                    GridPosition gridPosition) const;
+
   public:
     Entity(Position position, Direction direction, float speed);
+    virtual ~Entity() = default;
 
     Position getPosition() const;
     Direction getDirection() const;
