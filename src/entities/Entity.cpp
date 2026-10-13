@@ -8,6 +8,10 @@ Position Entity::getPosition() const { return position; }
 
 Direction Entity::getDirection() const { return direction; }
 
+GridPosition Entity::getCurrentGridPosition() const {
+    return getGridPosition(position, Direction::Neutral);
+}
+
 void Entity::setDirection(Direction newDirection) {
     if (newDirection != Direction::Neutral)
         this->direction = newDirection;

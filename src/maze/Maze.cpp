@@ -39,6 +39,28 @@ Maze::Maze(const std::string &filePath) {
     }
 }
 
+std::optional<CellType> Maze::consumeCollectible(GridPosition position) {
+    const int x = position.first;
+    const int y = position.second;
+
+    if (y < 0 || y >= static_cast<int>(grid.size()))
+        return std::nullopt;
+
+    if (x < 0 || x >= static_cast<int>(grid[y].size()))
+        return std::nullopt;
+
+    CellType &type = grid[y][x].cellType;
+
+    if (type != CellType::Pellet && type != CellType::PowerPellet) {
+        return std::nullopt;
+    }
+
+    const CellType consumed = type;
+    type = CellType::Empty;
+
+    return consumed;
+}
+
 bool Maze::isWalkable(const GridPosition position) const {
     const int x = position.first;
     const int y = position.second;

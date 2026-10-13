@@ -23,6 +23,7 @@ class Entity {
 
     Position getPosition() const;
     Direction getDirection() const;
+    GridPosition getCurrentGridPosition() const;
 
     void update(const Maze &maze, float deltaTime);
 };

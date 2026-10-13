@@ -40,6 +40,7 @@ void Game::run() {
         Direction newDirection = this->getInput();
         pacman.trySetDirection(newDirection, this->maze);
         pacman.update(this->maze, deltaTime);
+        maze.consumeCollectible(pacman.getCurrentGridPosition());
 
         window.clear();
 
