@@ -39,10 +39,10 @@ bool Maze::isWalkable(const GridPosition position) const {
     const int x = position.first;
     const int y = position.second;
 
-    if (y < 0 || y >= (int)grid.size())
+    if (y < 0 || y >= static_cast<int>(grid.size()))
         return false;
 
-    if (x < 0 || x >= (int)grid[y].size())
+    if (x < 0 || x >= static_cast<int>(grid[y].size()))
         return false;
 
     return grid[y][x].cellType != CellType::Wall;
@@ -52,6 +52,6 @@ Cell Maze::getCell(const GridPosition position) const {
     return this->grid[position.second][position.first];
 }
 
-int Maze::getHeight() const { return (int)this->grid.size(); }
+int Maze::getHeight() const { return static_cast<int>(this->grid.size()); }
 
-int Maze::getWidth() const { return (int)this->grid[0].size(); }
+int Maze::getWidth() const { return static_cast<int>(this->grid[0].size()); }

@@ -19,6 +19,7 @@ class Renderer {
 
     void renderPacman(const Pacman &pacman);
     void renderMaze(const Maze &maze);
+    void renderCollectibles(const Maze &maze);
 };
 
 #endif

@@ -44,6 +44,7 @@ void Game::run() {
         window.clear();
 
         renderer.renderMaze(maze);
+        renderer.renderCollectibles(maze);
         renderer.renderPacman(pacman);
 
         window.display();
