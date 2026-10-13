@@ -22,6 +22,10 @@ Maze::Maze(const std::string &filePath) {
                 row.push_back({CellType::Pellet});
                 break;
 
+            case 'o':
+                row.push_back({CellType::PowerPellet});
+                break;
+
             case ' ':
                 row.push_back({CellType::Empty});
                 break;
