@@ -4,9 +4,12 @@
 #include "entities/Entity.hpp"
 
 class Pacman : public Entity {
+  private:
+    bool canMove(const Maze &maze, Direction direction) const;
+
   public:
+    bool trySetDirection(Direction newDirection, const Maze &maze);
     Pacman(const Position position);
-    void update(const Maze &maze, float deltaTime) override;
 };
 
 #endif

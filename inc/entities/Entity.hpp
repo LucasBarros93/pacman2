@@ -9,13 +9,15 @@ class Entity {
     Position position;
     Direction direction;
     float speed;
+    void setDirection(Direction newDirection);
 
   public:
     Entity(Position position, Direction direction, float speed);
-    virtual void update(const Maze &maze, float deltaTime) = 0;
+
     Position getPosition() const;
     Direction getDirection() const;
-    void setDirection(Direction newDirection);
+
+    void update(const Maze &maze, float deltaTime);
 };
 
 #endif

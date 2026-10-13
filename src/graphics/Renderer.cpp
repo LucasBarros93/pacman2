@@ -42,8 +42,8 @@ void Renderer::renderPacman(const Pacman &pacman) {
     sprite.setPosition({position.first * SpriteData::CELL_SIZE,
                         position.second * SpriteData::CELL_SIZE});
 
-    sprite.setScale({(SpriteData::CELL_SIZE / SpriteData::SPRITE_SIZE) * 1.4,
-                     (SpriteData::CELL_SIZE / SpriteData::SPRITE_SIZE) * 1.4});
+    sprite.setScale({(SpriteData::CELL_SIZE / SpriteData::SPRITE_SIZE) * 1.35,
+                     (SpriteData::CELL_SIZE / SpriteData::SPRITE_SIZE) * 1.35});
     window.draw(sprite);
 }
 

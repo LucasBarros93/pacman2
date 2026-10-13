@@ -38,7 +38,7 @@ void Game::run() {
         }
 
         Direction newDirection = this->getInput();
-        pacman.setDirection(newDirection);
+        pacman.trySetDirection(newDirection, this->maze);
         pacman.update(this->maze, deltaTime);
 
         window.clear();
