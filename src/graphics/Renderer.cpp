@@ -167,7 +167,7 @@ void Renderer::renderHudTop(const GameState &gameState, const Maze &maze) {
     highScoreValue.setFillColor(sf::Color::White);
 
     sf::Text scoreValue{font, std::to_string(gameState.getScore())};
-    scoreValue.setCharacterSize(12);
+    scoreValue.setCharacterSize(15);
     scoreValue.setFillColor(sf::Color::White);
 
     const sf::Vector2f viewSize = hudTopView.getSize();

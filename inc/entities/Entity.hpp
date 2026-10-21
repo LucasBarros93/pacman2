@@ -3,6 +3,7 @@
 
 #include "core/Core.hpp"
 #include "maze/Maze.hpp"
+#include <cmath>
 
 class Entity {
   protected:
