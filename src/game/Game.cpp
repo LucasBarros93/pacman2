@@ -42,12 +42,16 @@ void Game::run() {
         pacman.update(this->maze, deltaTime);
         maze.consumeCollectible(pacman.getCurrentGridPosition());
 
-        window.clear();
+        renderer.render(maze, pacman, 10, 10, 3);
 
-        renderer.renderMaze(maze);
-        renderer.renderCollectibles(maze);
-        renderer.renderPacman(pacman);
+        // window.clear();
 
-        window.display();
+        // renderer.renderMaze(maze);
+        // renderer.renderCollectibles(maze);
+        // renderer.renderPacman(pacman);
+
+        // renderer.renderHud(10, 10, 3)
+
+        // window.display();
     }
 }
