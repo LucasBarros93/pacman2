@@ -2,6 +2,9 @@
 #define RENDERER_HPP
 
 #include "entities/Pacman.hpp"
+#include "game/GameState.hpp"
+#include "maze/Maze.hpp"
+
 #include <SFML/Graphics.hpp>
 
 class Renderer {
@@ -25,14 +28,14 @@ class Renderer {
     void renderPacman(const Pacman &pacman, const Maze &maze);
     void renderMaze(const Maze &maze);
     void renderCollectibles(const Maze &maze);
-    void renderHudTop(int score, int highScore, const Maze &maze);
-    void renderHudBottom(int lives, const Maze &maze);
+    void renderHudTop(const GameState &gameState, const Maze &maze);
+    void renderHudBottom(const GameState &gameState, const Maze &maze);
 
   public:
     Renderer(sf::RenderWindow &window);
 
-    void render(const Maze &maze, const Pacman &pacman, int score,
-                int highScore, int lives);
+    void render(const Pacman &pacman, const GameState &gameState,
+                const Maze &maze);
 };
 
 #endif

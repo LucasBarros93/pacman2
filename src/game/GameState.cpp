@@ -1,0 +1,23 @@
+#include "game/GameState.hpp"
+
+int GameState::getScore() const { return score; }
+
+int GameState::getHighScore() const { return highScore; }
+
+int GameState::getLives() const { return lives; }
+
+int GameState::getLevel() const { return level; }
+
+void GameState::addScore(int points) {
+    if (points <= 0)
+        return;
+
+    score += points;
+}
+
+void GameState::loseLife() {
+    if (lives > 0)
+        --lives;
+}
+
+void GameState::advanceLevel() { ++level; }

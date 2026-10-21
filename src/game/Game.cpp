@@ -1,8 +1,8 @@
 #include "game/Game.hpp"
 
 Game::Game()
-    : window(sf::VideoMode({800, 600}), "Pacman"), pacman({13.5f, 23.0f}),
-      renderer(window), maze("./assets/maps/map.txt") {}
+    : window(sf::VideoMode({800, 600}), "Pacman"), gameState(),
+      pacman({13.5f, 23.0f}), renderer(window), maze("./assets/maps/map.txt") {}
 
 Direction Game::getInput() {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) ||
@@ -40,18 +40,25 @@ void Game::run() {
         Direction newDirection = this->getInput();
         pacman.trySetDirection(newDirection, this->maze);
         pacman.update(this->maze, deltaTime);
-        maze.consumeCollectible(pacman.getCurrentGridPosition());
 
-        renderer.render(maze, pacman, 10, 10, 3);
+        const auto collectible =
+            maze.consumeCollectible(pacman.getCurrentGridPosition());
 
-        // window.clear();
+        if (collectible) {
+            switch (*collectible) {
+            case CellType::Pellet:
+                gameState.addScore(10);
+                break;
 
-        // renderer.renderMaze(maze);
-        // renderer.renderCollectibles(maze);
-        // renderer.renderPacman(pacman);
+            case CellType::PowerPellet:
+                gameState.addScore(50);
+                break;
 
-        // renderer.renderHud(10, 10, 3)
+            default:
+                break;
+            }
+        }
 
-        // window.display();
+        renderer.render(pacman, gameState, maze);
     }
 }

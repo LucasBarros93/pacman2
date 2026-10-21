@@ -157,16 +157,16 @@ void Renderer::renderCollectibles(const Maze &maze) {
     }
 }
 
-void Renderer::renderHudTop(int score, int highScore, const Maze &maze) {
+void Renderer::renderHudTop(const GameState &gameState, const Maze &maze) {
     sf::Text highScoreLabel{font, "HIGH SCORE"};
     highScoreLabel.setCharacterSize(19);
     highScoreLabel.setFillColor(sf::Color::White);
 
-    sf::Text highScoreValue{font, std::to_string(highScore)};
+    sf::Text highScoreValue{font, std::to_string(gameState.getHighScore())};
     highScoreValue.setCharacterSize(12);
     highScoreValue.setFillColor(sf::Color::White);
 
-    sf::Text scoreValue{font, std::to_string(score)};
+    sf::Text scoreValue{font, std::to_string(gameState.getScore())};
     scoreValue.setCharacterSize(12);
     scoreValue.setFillColor(sf::Color::White);
 
@@ -193,7 +193,7 @@ void Renderer::renderHudTop(int score, int highScore, const Maze &maze) {
     window.draw(scoreValue);
 }
 
-void Renderer::renderHudBottom(int lives, const Maze &maze) {
+void Renderer::renderHudBottom(const GameState &gameState, const Maze &maze) {
     const float scale = getMazeScale(maze);
     const float margin = getMazeOffset(maze).x;
 
@@ -203,7 +203,7 @@ void Renderer::renderHudBottom(int lives, const Maze &maze) {
     const float iconScale = (cellSize / spriteSize) * 1.35f;
     const float spacing = cellSize * 1.2f;
 
-    for (int i = 0; i < lives; ++i) {
+    for (int i = 0; i < gameState.getLives(); ++i) {
         sf::Sprite lifeSprite{spritesheet};
 
         lifeSprite.setTextureRect(SpriteData::pacmanLife());
@@ -219,12 +219,12 @@ void Renderer::renderHudBottom(int lives, const Maze &maze) {
     }
 }
 
-void Renderer::render(const Maze &maze, const Pacman &pacman, int score,
-                      int highScore, int lives) {
+void Renderer::render(const Pacman &pacman, const GameState &gameState,
+                      const Maze &maze) {
     window.clear();
 
     window.setView(hudTopView);
-    renderHudTop(score, highScore, maze);
+    renderHudTop(gameState, maze);
 
     window.setView(gameView);
     renderMaze(maze);
@@ -232,7 +232,7 @@ void Renderer::render(const Maze &maze, const Pacman &pacman, int score,
     renderPacman(pacman, maze);
 
     window.setView(hudBottomView);
-    renderHudBottom(lives, maze);
+    renderHudBottom(gameState, maze);
 
     window.display();
 }
