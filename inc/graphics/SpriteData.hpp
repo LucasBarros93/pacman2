@@ -12,13 +12,14 @@ sf::IntRect pacmanLeft(int frame);
 sf::IntRect pacmanUp(int frame);
 sf::IntRect pacmanDown(int frame);
 sf::IntRect pacmanNeutral();
+sf::IntRect pacmanLife();
 
 } // namespace SpriteData
 
 namespace Layout {
 
 constexpr float HUD_TOP_HEIGHT = 40.f;
-constexpr float HUD_BOTTOM_HEIGHT = 20.f;
+constexpr float HUD_BOTTOM_HEIGHT = 30.f;
 
 } // namespace Layout
 

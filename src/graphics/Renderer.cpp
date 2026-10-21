@@ -99,7 +99,6 @@ void Renderer::renderPacman(const Pacman &pacman, const Maze &maze) {
     sprite.setScale({(cellSize / SpriteData::SPRITE_SIZE) * 1.35f,
                      (cellSize / SpriteData::SPRITE_SIZE) * 1.35f});
 
-    // A posição lógica representa o centro da célula.
     sprite.setOrigin(
         {SpriteData::SPRITE_SIZE / 2.f, SpriteData::SPRITE_SIZE / 2.f});
 
@@ -194,6 +193,32 @@ void Renderer::renderHudTop(int score, int highScore, const Maze &maze) {
     window.draw(scoreValue);
 }
 
+void Renderer::renderHudBottom(int lives, const Maze &maze) {
+    const float scale = getMazeScale(maze);
+    const float margin = getMazeOffset(maze).x;
+
+    const float cellSize = SpriteData::CELL_SIZE * scale;
+    const float spriteSize = SpriteData::SPRITE_SIZE;
+
+    const float iconScale = (cellSize / spriteSize) * 1.35f;
+    const float spacing = cellSize * 1.2f;
+
+    for (int i = 0; i < lives; ++i) {
+        sf::Sprite lifeSprite{spritesheet};
+
+        lifeSprite.setTextureRect(SpriteData::pacmanLife());
+
+        lifeSprite.setScale({iconScale, iconScale});
+
+        lifeSprite.setOrigin({spriteSize / 2.f, spriteSize / 2.f});
+
+        lifeSprite.setPosition({margin + cellSize / 2.f + i * spacing,
+                                Layout::HUD_BOTTOM_HEIGHT / 2.f});
+
+        window.draw(lifeSprite);
+    }
+}
+
 void Renderer::render(const Maze &maze, const Pacman &pacman, int score,
                       int highScore, int lives) {
     window.clear();
@@ -206,8 +231,8 @@ void Renderer::render(const Maze &maze, const Pacman &pacman, int score,
     renderCollectibles(maze);
     renderPacman(pacman, maze);
 
-    // window.setView(hudBottomView);
-    // renderHudBottom(lives);
+    window.setView(hudBottomView);
+    renderHudBottom(lives, maze);
 
     window.display();
 }

@@ -26,7 +26,7 @@ class Renderer {
     void renderMaze(const Maze &maze);
     void renderCollectibles(const Maze &maze);
     void renderHudTop(int score, int highScore, const Maze &maze);
-    void renderHudBottom(int lives);
+    void renderHudBottom(int lives, const Maze &maze);
 
   public:
     Renderer(sf::RenderWindow &window);

@@ -21,5 +21,8 @@ sf::IntRect pacmanDown(int frame) {
 sf::IntRect pacmanNeutral() {
     return {{2 * SPRITE_SIZE, 0}, {SPRITE_SIZE, SPRITE_SIZE}};
 }
+sf::IntRect pacmanLife() {
+    return {{8 * SPRITE_SIZE, SPRITE_SIZE}, {SPRITE_SIZE, SPRITE_SIZE}};
+}
 
 } // namespace SpriteData
