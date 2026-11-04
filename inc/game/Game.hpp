@@ -13,7 +13,7 @@
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
-enum class GameMode { Menu, Playing, Clearing };
+enum class GameMode { Menu, Ready, Playing, Clearing, Paused };
 
 class Game {
   private:
@@ -29,6 +29,8 @@ class Game {
     MenuRenderer menuRenderer;
 
     GameMode mode = GameMode::Menu;
+    GameMode modeBeforePause = GameMode::Playing;
+
     int dotsEatenThisRound = 0;
     float modeTimer = 0.0f;
 
@@ -39,7 +41,10 @@ class Game {
     void startClearing();
     void finishGame();
     void resetRound();
+    void startReady();
+    void togglePause();
 
+    void updateReady(float deltaTime);
     void updatePlaying(float deltaTime);
     void updateClearing(float deltaTime);
 

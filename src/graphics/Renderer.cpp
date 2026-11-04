@@ -85,8 +85,18 @@ sf::Vector2f Renderer::getMazeOffset(const Maze &maze) const {
             (viewSize.y - mazeHeight * scale) / 2.f};
 }
 
+void Renderer::setShowReady(bool show) { showReady = show; }
+
+void Renderer::setPaused(bool value) {
+    paused = value;
+    if (!value)
+        animationClock.restart();
+}
+
 void Renderer::renderPacman(const Pacman &pacman, const Maze &maze) {
-    if (animationClock.getElapsedTime().asMilliseconds() > 200) {
+    if (!this->paused &&
+        animationClock.getElapsedTime().asMilliseconds() > 200) {
+
         animationFrame = (animationFrame + 1) % 2;
         animationClock.restart();
     }
@@ -289,6 +299,26 @@ void Renderer::renderHudBottom(const GameState &gameState, const Maze &maze) {
     }
 }
 
+void Renderer::renderReady(const Maze &maze) {
+    if (!showReady)
+        return;
+
+    const float cellSize = SpriteData::CELL_SIZE * getMazeScale(maze);
+    const sf::Vector2f offset = getMazeOffset(maze);
+
+    sf::Text text{font, "READY!", static_cast<unsigned int>(cellSize * 0.9f)};
+    text.setFillColor(sf::Color::Yellow);
+
+    const sf::FloatRect bounds = text.getLocalBounds();
+    text.setOrigin({bounds.position.x + bounds.size.x / 2.f,
+                    bounds.position.y + bounds.size.y / 2.f});
+
+    text.setPosition({offset.x + (maze.getWidth() / 2.f) * cellSize,
+                      offset.y + (17.0f + 0.5f) * cellSize});
+
+    window.draw(text);
+}
+
 void Renderer::render(const Pacman &pacman, const GameState &gameState,
                       const FruitSpawner &fruitSpawner, const Maze &maze) {
     window.clear();
@@ -300,6 +330,7 @@ void Renderer::render(const Pacman &pacman, const GameState &gameState,
     renderMaze(maze);
     renderCollectibles(maze);
     renderFruit(fruitSpawner, maze);
+    renderReady(maze);
     renderPacman(pacman, maze);
 
     window.setView(hudBottomView);

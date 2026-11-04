@@ -10,6 +10,7 @@ namespace {
 constexpr float CLEAR_PAUSE = 0.8f;
 constexpr float FLASH_INTERVAL = 0.25f;
 constexpr int FLASH_COUNT = 3;
+constexpr float READY_DURATION = 2.0f;
 } // namespace
 
 Game::Game()
@@ -62,6 +63,8 @@ void Game::handleEvents() {
         } else if (const auto *key = event->getIf<sf::Event::KeyPressed>()) {
             if (key->code == sf::Keyboard::Key::Escape)
                 finishGame();
+            else if (key->code == sf::Keyboard::Key::P)
+                togglePause();
         }
     }
 }
@@ -75,10 +78,38 @@ void Game::resetRound() {
     mode = GameMode::Playing;
 }
 
+void Game::startReady() {
+    mode = GameMode::Ready;
+    modeTimer = 0.0f;
+    renderer.setShowReady(true);
+}
+
+void Game::updateReady(float deltaTime) {
+    modeTimer += deltaTime;
+
+    if (modeTimer >= READY_DURATION) {
+        renderer.setShowReady(false);
+        mode = GameMode::Playing;
+    }
+}
+
+void Game::togglePause() {
+    if (mode == GameMode::Paused) {
+        mode = modeBeforePause;
+        renderer.setPaused(false);
+    } else if (mode == GameMode::Ready || mode == GameMode::Playing ||
+               mode == GameMode::Clearing) {
+        modeBeforePause = mode;
+        mode = GameMode::Paused;
+        renderer.setPaused(true);
+    }
+}
+
 void Game::startNewGame() {
     gameState.reset();
     gameState.setHighScore(leaderboard.getTopScore());
     resetRound();
+    startReady();
 }
 
 void Game::startNextRound() {
@@ -95,6 +126,8 @@ void Game::startClearing() {
 
 void Game::finishGame() {
     renderer.setMazeFlash(false);
+    renderer.setShowReady(false);
+    renderer.setPaused(false);
     menuController.onGameOver(gameState.getScore());
     mode = GameMode::Menu;
 }
@@ -142,20 +175,26 @@ void Game::run() {
         if (!window.isOpen())
             break;
 
-        switch (mode) {
-        case GameMode::Menu:
+        if (mode == GameMode::Menu) {
             menuRenderer.render(menu, leaderboard);
-            break;
+            continue;
+        }
 
+        switch (mode) {
+        case GameMode::Ready:
+            updateReady(deltaTime);
+            break;
         case GameMode::Playing:
             updatePlaying(deltaTime);
-            renderer.render(pacman, gameState, fruitSpawner, maze);
             break;
-
         case GameMode::Clearing:
             updateClearing(deltaTime);
-            renderer.render(pacman, gameState, fruitSpawner, maze);
+            break;
+        case GameMode::Menu:
+        case GameMode::Paused:
             break;
         }
+
+        renderer.render(pacman, gameState, fruitSpawner, maze);
     }
 }

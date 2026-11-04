@@ -22,6 +22,8 @@ class Renderer {
     sf::Texture mazeWhiteTexture;
 
     bool mazeFlash = false;
+    bool showReady = false;
+    bool paused = false;
 
     sf::Font font;
 
@@ -41,9 +43,13 @@ class Renderer {
     void renderFruit(const FruitSpawner &fruitSpawner, const Maze &maze);
     void renderHudTop(const GameState &gameState, const Maze &maze);
     void renderHudBottom(const GameState &gameState, const Maze &maze);
+    void renderReady(const Maze &maze);
 
   public:
     Renderer(sf::RenderWindow &window);
+
+    void setShowReady(bool show);
+    void setPaused(bool value);
 
     void render(const Pacman &pacman, const GameState &gameState,
                 const FruitSpawner &fruitSpawner, const Maze &maze);
