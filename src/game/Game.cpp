@@ -2,7 +2,8 @@
 
 Game::Game()
     : window(sf::VideoMode({800, 600}), "Pacman"), gameState(),
-      pacman({13.5f, 23.0f}), renderer(window), maze("./assets/maps/map.txt") {}
+      fruitSpawner({13.5f, 17.0f}), maze("./assets/maps/map.txt"),
+      pacman({13.5f, 23.0f}), renderer(window) {}
 
 Direction Game::getInput() {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) ||
@@ -27,6 +28,7 @@ Direction Game::getInput() {
 void Game::run() {
 
     sf::Clock clock;
+    int dotsEatenThisRound = 0;
 
     while (this->window.isOpen()) {
 
@@ -40,6 +42,8 @@ void Game::run() {
         Direction newDirection = this->getInput();
         pacman.trySetDirection(newDirection, this->maze);
         pacman.update(this->maze, deltaTime);
+
+        fruitSpawner.update(deltaTime);
 
         const auto collectible =
             maze.consumeCollectible(pacman.getCurrentGridPosition());
@@ -57,8 +61,17 @@ void Game::run() {
             default:
                 break;
             }
+            ++dotsEatenThisRound;
+            fruitSpawner.onDotEaten(dotsEatenThisRound, gameState.getRound());
         }
 
-        renderer.render(pacman, gameState, maze);
+        const auto points =
+            fruitSpawner.tryCollect(pacman.getCurrentGridPosition());
+
+        if (points.has_value()) {
+            gameState.addScore(*points);
+        }
+
+        renderer.render(pacman, gameState, fruitSpawner, maze);
     }
 }

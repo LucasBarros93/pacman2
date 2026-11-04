@@ -24,5 +24,9 @@ sf::IntRect pacmanNeutral() {
 sf::IntRect pacmanLife() {
     return {{8 * SPRITE_SIZE, SPRITE_SIZE}, {SPRITE_SIZE, SPRITE_SIZE}};
 }
+sf::IntRect fruit(int fruit) {
+    return {{(1 + fruit) * SPRITE_SIZE, 3 * SPRITE_SIZE},
+            {SPRITE_SIZE, SPRITE_SIZE}};
+}
 
 } // namespace SpriteData

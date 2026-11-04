@@ -157,6 +157,34 @@ void Renderer::renderCollectibles(const Maze &maze) {
     }
 }
 
+void Renderer::renderFruit(const FruitSpawner &fruitSpawner, const Maze &maze) {
+    const auto &fruit = fruitSpawner.getActiveFruit();
+
+    if (!fruit.has_value())
+        return;
+
+    sf::Sprite fruitSprite{spritesheet};
+
+    fruitSprite.setTextureRect(
+        SpriteData::fruit(static_cast<int>(fruit->type)));
+
+    const float scale = getMazeScale(maze);
+    const float cellSize = SpriteData::CELL_SIZE * scale;
+    const sf::Vector2f offset = getMazeOffset(maze);
+
+    fruitSprite.setOrigin(
+        {SpriteData::SPRITE_SIZE / 2.f, SpriteData::SPRITE_SIZE / 2.f});
+
+    fruitSprite.setScale({cellSize / SpriteData::SPRITE_SIZE * 1.35f,
+                          cellSize / SpriteData::SPRITE_SIZE * 1.35f});
+
+    fruitSprite.setPosition(
+        {offset.x + (fruit->position.first + 0.5f) * cellSize,
+         offset.y + (fruit->position.second + 0.5f) * cellSize});
+
+    window.draw(fruitSprite);
+}
+
 void Renderer::renderHudTop(const GameState &gameState, const Maze &maze) {
     sf::Text highScoreLabel{font, "HIGH SCORE"};
     highScoreLabel.setCharacterSize(19);
@@ -220,7 +248,7 @@ void Renderer::renderHudBottom(const GameState &gameState, const Maze &maze) {
 }
 
 void Renderer::render(const Pacman &pacman, const GameState &gameState,
-                      const Maze &maze) {
+                      const FruitSpawner &fruitSpawner, const Maze &maze) {
     window.clear();
 
     window.setView(hudTopView);
@@ -229,6 +257,7 @@ void Renderer::render(const Pacman &pacman, const GameState &gameState,
     window.setView(gameView);
     renderMaze(maze);
     renderCollectibles(maze);
+    renderFruit(fruitSpawner, maze);
     renderPacman(pacman, maze);
 
     window.setView(hudBottomView);

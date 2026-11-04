@@ -2,6 +2,7 @@
 #define RENDERER_HPP
 
 #include "entities/Pacman.hpp"
+#include "game/FruitSpawner.hpp"
 #include "game/GameState.hpp"
 #include "maze/Maze.hpp"
 
@@ -28,6 +29,7 @@ class Renderer {
     void renderPacman(const Pacman &pacman, const Maze &maze);
     void renderMaze(const Maze &maze);
     void renderCollectibles(const Maze &maze);
+    void renderFruit(const FruitSpawner &fruitSpawner, const Maze &maze);
     void renderHudTop(const GameState &gameState, const Maze &maze);
     void renderHudBottom(const GameState &gameState, const Maze &maze);
 
@@ -35,7 +37,7 @@ class Renderer {
     Renderer(sf::RenderWindow &window);
 
     void render(const Pacman &pacman, const GameState &gameState,
-                const Maze &maze);
+                const FruitSpawner &fruitSpawner, const Maze &maze);
 };
 
 #endif

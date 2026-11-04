@@ -6,7 +6,7 @@ int GameState::getHighScore() const { return highScore; }
 
 int GameState::getLives() const { return lives; }
 
-int GameState::getLevel() const { return level; }
+int GameState::getRound() const { return round; }
 
 void GameState::addScore(int points) {
     if (points <= 0)
@@ -20,4 +20,4 @@ void GameState::loseLife() {
         --lives;
 }
 
-void GameState::advanceLevel() { ++level; }
+void GameState::advanceLevel() { ++round; }
