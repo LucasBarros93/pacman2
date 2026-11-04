@@ -1,4 +1,4 @@
 **/bin/*
 **/obj/*
 compile_commands.json
-./assets/leaderboard/scores.txt
+assets/leaderboard/scores.txt
