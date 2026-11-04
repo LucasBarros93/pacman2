@@ -13,6 +13,8 @@
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
+enum class GameMode { Menu, Playing, Clearing };
+
 class Game {
   private:
     sf::RenderWindow window;
@@ -25,6 +27,21 @@ class Game {
     MenuController menuController;
     Renderer renderer;
     MenuRenderer menuRenderer;
+
+    GameMode mode = GameMode::Menu;
+    int dotsEatenThisRound = 0;
+    float modeTimer = 0.0f;
+
+    void handleEvents();
+
+    void startNewGame();
+    void startNextRound();
+    void startClearing();
+    void finishGame();
+    void resetRound();
+
+    void updatePlaying(float deltaTime);
+    void updateClearing(float deltaTime);
 
   public:
     Game();

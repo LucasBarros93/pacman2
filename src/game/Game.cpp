@@ -7,10 +7,6 @@
 #include <algorithm>
 
 namespace {
-enum class Mode { Menu, Playing };
-
-enum class RoundPhase { Playing, Clearing };
-
 constexpr float CLEAR_PAUSE = 0.8f;
 constexpr float FLASH_INTERVAL = 0.25f;
 constexpr int FLASH_COUNT = 3;
@@ -45,126 +41,121 @@ Direction Game::getInput() {
     return Direction::Neutral;
 }
 
+void Game::handleEvents() {
+    while (auto event = window.pollEvent()) {
+        if (event->is<sf::Event::Closed>()) {
+            window.close();
+            return;
+        }
+
+        if (mode == GameMode::Menu) {
+            switch (menuController.handleEvent(*event)) {
+            case Menu::Action::Play:
+                startNewGame();
+                break;
+            case Menu::Action::Quit:
+                window.close();
+                break;
+            case Menu::Action::None:
+                break;
+            }
+        } else if (const auto *key = event->getIf<sf::Event::KeyPressed>()) {
+            if (key->code == sf::Keyboard::Key::Escape)
+                finishGame();
+        }
+    }
+}
+
+void Game::resetRound() {
+    maze.reset();
+    pacman.reset();
+    fruitSpawner.resetRound();
+    dotsEatenThisRound = 0;
+    renderer.setMazeFlash(false);
+    mode = GameMode::Playing;
+}
+
+void Game::startNewGame() {
+    gameState.reset();
+    gameState.setHighScore(leaderboard.getTopScore());
+    resetRound();
+}
+
+void Game::startNextRound() {
+    gameState.advanceLevel();
+    resetRound();
+}
+
+void Game::startClearing() {
+    mode = GameMode::Clearing;
+    modeTimer = 0.0f;
+    pacman.stop();
+    fruitSpawner.resetRound();
+}
+
+void Game::finishGame() {
+    renderer.setMazeFlash(false);
+    menuController.onGameOver(gameState.getScore());
+    mode = GameMode::Menu;
+}
+
+void Game::updatePlaying(float deltaTime) {
+    pacman.trySetDirection(getInput(), maze);
+    pacman.update(maze, deltaTime);
+    fruitSpawner.update(deltaTime);
+
+    if (const auto collectible = maze.consumeCollectible(
+            pacman.getPosition(), Collision::PELLET_RADIUS)) {
+        gameState.addScore(*collectible == CellType::PowerPellet ? 50 : 10);
+        ++dotsEatenThisRound;
+        fruitSpawner.onDotEaten(dotsEatenThisRound, gameState.getRound());
+    }
+
+    if (const auto points = fruitSpawner.tryCollect(pacman.getPosition()))
+        gameState.addScore(*points);
+
+    if (maze.getRemainingCollectibles() == 0)
+        startClearing();
+}
+
+void Game::updateClearing(float deltaTime) {
+    modeTimer += deltaTime;
+
+    const float flashTime = modeTimer - CLEAR_PAUSE;
+    const bool white = flashTime >= 0.0f &&
+                       static_cast<int>(flashTime / FLASH_INTERVAL) % 2 == 0;
+
+    renderer.setMazeFlash(white);
+
+    if (flashTime >= 2 * FLASH_COUNT * FLASH_INTERVAL)
+        startNextRound();
+}
+
 void Game::run() {
     sf::Clock clock;
-    int dotsEatenThisRound = 0;
-
-    Mode mode = Mode::Menu;
-    RoundPhase phase = RoundPhase::Playing;
-    float phaseTimer = 0.0f;
-
-    auto startNewGame = [&]() {
-        gameState.reset();
-        gameState.setHighScore(leaderboard.getTopScore());
-        maze.reset();
-        pacman.reset();
-        fruitSpawner.resetRound();
-        dotsEatenThisRound = 0;
-        renderer.setMazeFlash(false);
-        phase = RoundPhase::Playing;
-        mode = Mode::Playing;
-    };
-
-    auto startNextRound = [&]() {
-        gameState.advanceLevel();
-        maze.reset();
-        pacman.reset();
-        fruitSpawner.resetRound();
-        dotsEatenThisRound = 0;
-        renderer.setMazeFlash(false);
-        phase = RoundPhase::Playing;
-    };
-    auto finishGame = [&]() {
-        renderer.setMazeFlash(false);
-        menuController.onGameOver(gameState.getScore());
-        mode = Mode::Menu;
-    };
 
     while (window.isOpen()) {
         const float deltaTime = std::min(clock.restart().asSeconds(), 0.05f);
 
-        while (auto event = window.pollEvent()) {
-            if (event->is<sf::Event::Closed>())
-                window.close();
-
-            if (mode == Mode::Menu) {
-                switch (menuController.handleEvent(*event)) {
-                case Menu::Action::Play:
-                    startNewGame();
-                    break;
-                case Menu::Action::Quit:
-                    window.close();
-                    break;
-                case Menu::Action::None:
-                    break;
-                }
-            } else if (const auto *key =
-                           event->getIf<sf::Event::KeyPressed>()) {
-                if (key->code == sf::Keyboard::Key::Escape)
-                    finishGame();
-            }
-        }
+        handleEvents();
 
         if (!window.isOpen())
             break;
 
-        if (mode == Mode::Menu) {
+        switch (mode) {
+        case GameMode::Menu:
             menuRenderer.render(menu, leaderboard);
-            continue;
+            break;
+
+        case GameMode::Playing:
+            updatePlaying(deltaTime);
+            renderer.render(pacman, gameState, fruitSpawner, maze);
+            break;
+
+        case GameMode::Clearing:
+            updateClearing(deltaTime);
+            renderer.render(pacman, gameState, fruitSpawner, maze);
+            break;
         }
-
-        if (phase == RoundPhase::Playing) {
-            Direction input = this->getInput();
-            pacman.trySetDirection(input, this->maze);
-            pacman.update(this->maze, deltaTime);
-
-            fruitSpawner.update(deltaTime);
-
-            const auto collectible = maze.consumeCollectible(
-                pacman.getPosition(), Collision::PELLET_RADIUS);
-
-            if (collectible) {
-                switch (*collectible) {
-                case CellType::Pellet:
-                    gameState.addScore(10);
-                    break;
-                case CellType::PowerPellet:
-                    gameState.addScore(50);
-                    break;
-                default:
-                    break;
-                }
-                ++dotsEatenThisRound;
-                fruitSpawner.onDotEaten(dotsEatenThisRound,
-                                        gameState.getRound());
-            }
-
-            const auto points = fruitSpawner.tryCollect(pacman.getPosition());
-            if (points.has_value())
-                gameState.addScore(*points);
-
-            if (maze.getRemainingCollectibles() == 0) {
-                phase = RoundPhase::Clearing;
-                phaseTimer = 0.0f;
-                pacman.stop();
-                fruitSpawner.resetRound();
-            }
-        } else {
-            phaseTimer += deltaTime;
-
-            const float flashTime = phaseTimer - CLEAR_PAUSE;
-            bool white = false;
-
-            if (flashTime >= 0.0f) {
-                const int step = static_cast<int>(flashTime / FLASH_INTERVAL);
-                white = (step % 2 == 0);
-            }
-            renderer.setMazeFlash(white);
-
-            if (flashTime >= 2 * FLASH_COUNT * FLASH_INTERVAL)
-                startNextRound();
-        }
-
-        renderer.render(pacman, gameState, fruitSpawner, maze);
     }
 }
