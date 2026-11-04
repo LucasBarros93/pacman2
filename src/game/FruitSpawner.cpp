@@ -4,28 +4,7 @@ FruitSpawner::FruitSpawner(Position spawnPosition)
     : spawnPosition(spawnPosition) {}
 
 Fruit FruitSpawner::createFruit(int round) const {
-    if (round <= 1)
-        return {FruitType::Cherry, spawnPosition, 100};
-
-    if (round == 2)
-        return {FruitType::Strawberry, spawnPosition, 300};
-
-    if (round <= 4)
-        return {FruitType::Orange, spawnPosition, 500};
-
-    if (round <= 6)
-        return {FruitType::Apple, spawnPosition, 700};
-
-    if (round <= 8)
-        return {FruitType::Melon, spawnPosition, 1000};
-
-    if (round <= 10)
-        return {FruitType::Galaxian, spawnPosition, 2000};
-
-    if (round <= 12)
-        return {FruitType::Bell, spawnPosition, 3000};
-
-    return {FruitType::Key, spawnPosition, 5000};
+    return Fruit{fruitTypeForRound(round), spawnPosition};
 }
 
 void FruitSpawner::onDotEaten(int dotsEaten, int round) {
@@ -60,7 +39,7 @@ std::optional<int> FruitSpawner::tryCollect(Position pacmanPosition) {
                              Collision::FRUIT_RADIUS))
         return std::nullopt;
 
-    const int points = activeFruit->score;
+    const int points = scoreFor(activeFruit->type);
     activeFruit.reset();
     remainingTime = 0.0f;
     return points;

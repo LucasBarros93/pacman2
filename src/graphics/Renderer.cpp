@@ -241,7 +241,7 @@ void Renderer::renderHudBottom(const GameState &gameState, const Maze &maze) {
     const float cellSize = SpriteData::CELL_SIZE * scale;
     const float spriteSize = SpriteData::SPRITE_SIZE;
 
-    const float iconScale = (cellSize / spriteSize) * 1.35f;
+    const float iconScale = (cellSize / spriteSize) * 1.25f;
     const float spacing = cellSize * 1.2f;
 
     for (int i = 0; i < gameState.getLives(); ++i) {
@@ -257,6 +257,24 @@ void Renderer::renderHudBottom(const GameState &gameState, const Maze &maze) {
                                 Layout::HUD_BOTTOM_HEIGHT / 2.f});
 
         window.draw(lifeSprite);
+    }
+
+    const float mazeRight = margin + maze.getWidth() * cellSize;
+    const int round = gameState.getRound();
+    const int first = std::max(1, round - 6);
+
+    for (int r = first; r <= round; ++r) {
+        sf::Sprite icon{spritesheet};
+        icon.setTextureRect(
+            SpriteData::fruit(static_cast<int>(fruitTypeForRound(r))));
+        icon.setScale({iconScale, iconScale});
+        icon.setOrigin({spriteSize / 2.f, spriteSize / 2.f});
+
+        const int slot = round - r;
+        icon.setPosition({mazeRight - cellSize / 2.f - slot * spacing,
+                          Layout::HUD_BOTTOM_HEIGHT / 2.f});
+
+        window.draw(icon);
     }
 }
 
