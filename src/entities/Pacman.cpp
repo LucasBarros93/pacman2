@@ -43,3 +43,10 @@ bool Pacman::canMove(const Maze &maze, Direction direction) const {
 
     return maze.isWalkable(targetGridPosition);
 }
+
+void Pacman::reset() {
+    position = spawnPosition;
+    direction = Direction::Neutral;
+}
+
+void Pacman::stop() { direction = Direction::Neutral; }

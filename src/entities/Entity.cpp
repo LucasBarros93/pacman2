@@ -2,7 +2,8 @@
 #include "core/Core.hpp"
 
 Entity::Entity(Position position, Direction direction, float speed)
-    : position{position}, direction{direction}, speed{speed} {}
+    : position{position}, direction{direction}, speed{speed},
+      spawnPosition{position} {}
 
 Position Entity::getPosition() const { return position; }
 

@@ -7,6 +7,7 @@
 #include "maze/Maze.hpp"
 
 #include <SFML/Graphics.hpp>
+#include <algorithm>
 
 class Renderer {
   private:
@@ -14,6 +15,10 @@ class Renderer {
 
     sf::Texture spritesheet;
     sf::Texture mazeTexture;
+    sf::Texture mazeWhiteTexture;
+
+    bool mazeFlash = false;
+
     sf::Font font;
 
     sf::View hudTopView;
@@ -38,6 +43,8 @@ class Renderer {
 
     void render(const Pacman &pacman, const GameState &gameState,
                 const FruitSpawner &fruitSpawner, const Maze &maze);
+
+    void setMazeFlash(bool flash);
 };
 
 #endif

@@ -10,6 +10,8 @@ class Pacman : public Entity {
   public:
     explicit Pacman(const Position position);
     bool trySetDirection(Direction newDirection, const Maze &maze);
+    void reset();
+    void stop();
 };
 
 #endif

@@ -10,6 +10,8 @@ class Entity {
     Position position;
     Direction direction;
     float speed;
+    Position spawnPosition;
+
     void setDirection(Direction newDirection);
 
     GridPosition getGridPosition(Position position,

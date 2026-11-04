@@ -37,6 +37,18 @@ Maze::Maze(const std::string &filePath) {
 
         this->grid.push_back(row);
     }
+    initialGrid = grid;
+    remainingCollectibles = countCollectibles();
+}
+
+int Maze::countCollectibles() const {
+    int count = 0;
+    for (const auto &row : grid)
+        for (const Cell &cell : row)
+            if (cell.cellType == CellType::Pellet ||
+                cell.cellType == CellType::PowerPellet)
+                ++count;
+    return count;
 }
 
 std::optional<CellType> Maze::consumeCollectible(Position position,
@@ -64,6 +76,7 @@ std::optional<CellType> Maze::consumeCollectible(Position position,
             if (Collision::overlaps(position, pelletPosition, radius)) {
                 const CellType consumed = type;
                 type = CellType::Empty;
+                --remainingCollectibles;
                 return consumed;
             }
         }
@@ -82,6 +95,13 @@ bool Maze::isWalkable(const GridPosition position) const {
 
     return grid[position.y][position.x].cellType != CellType::Wall;
 };
+
+void Maze::reset() {
+    grid = initialGrid;
+    remainingCollectibles = countCollectibles();
+}
+
+int Maze::getRemainingCollectibles() const { return remainingCollectibles; }
 
 Cell Maze::getCell(const GridPosition position) const {
     const int x = position.x;

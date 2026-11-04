@@ -8,6 +8,20 @@ Renderer::Renderer(sf::RenderWindow &window) : window{window} {
     if (!mazeTexture.loadFromFile("assets/images/maze.png"))
         throw std::runtime_error("Could not load maze.png");
 
+    sf::Image whiteImage = mazeTexture.copyToImage();
+    const sf::Vector2u imageSize = whiteImage.getSize();
+
+    for (unsigned int y = 0; y < imageSize.y; ++y) {
+        for (unsigned int x = 0; x < imageSize.x; ++x) {
+            const sf::Color p = whiteImage.getPixel({x, y});
+            const std::uint8_t v = std::max({p.r, p.g, p.b});
+            whiteImage.setPixel({x, y}, sf::Color(v, v, v, p.a));
+        }
+    }
+
+    if (!mazeWhiteTexture.loadFromImage(whiteImage))
+        throw std::runtime_error("Could not create white maze texture");
+
     if (!font.openFromFile("assets/fonts/pacman.ttf"))
         throw std::runtime_error("Could not load HUD font");
 
@@ -109,7 +123,7 @@ void Renderer::renderPacman(const Pacman &pacman, const Maze &maze) {
 }
 
 void Renderer::renderMaze(const Maze &maze) {
-    sf::Sprite mazeSprite{mazeTexture};
+    sf::Sprite mazeSprite{mazeFlash ? mazeWhiteTexture : mazeTexture};
 
     const sf::Vector2u textureSize = mazeTexture.getSize();
 
@@ -264,3 +278,5 @@ void Renderer::render(const Pacman &pacman, const GameState &gameState,
 
     window.display();
 }
+
+void Renderer::setMazeFlash(bool flash) { mazeFlash = flash; }
