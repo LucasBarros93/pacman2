@@ -21,3 +21,11 @@ void GameState::loseLife() {
 }
 
 void GameState::advanceLevel() { ++round; }
+
+void GameState::reset() {
+    score = 0;
+    lives = 3;
+    round = 1;
+}
+
+void GameState::setHighScore(int value) { highScore = value; }

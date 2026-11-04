@@ -17,6 +17,9 @@ class GameState {
     void addScore(int points);
     void loseLife();
     void advanceLevel();
+
+    void reset();
+    void setHighScore(int value);
 };
 
 #endif
