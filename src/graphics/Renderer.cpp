@@ -102,8 +102,8 @@ void Renderer::renderPacman(const Pacman &pacman, const Maze &maze) {
     sprite.setOrigin(
         {SpriteData::SPRITE_SIZE / 2.f, SpriteData::SPRITE_SIZE / 2.f});
 
-    sprite.setPosition({offset.x + (position.first + 0.5f) * cellSize,
-                        offset.y + (position.second + 0.5f) * cellSize});
+    sprite.setPosition({offset.x + (position.x + 0.5f) * cellSize,
+                        offset.y + (position.y + 0.5f) * cellSize});
 
     window.draw(sprite);
 }
@@ -178,9 +178,8 @@ void Renderer::renderFruit(const FruitSpawner &fruitSpawner, const Maze &maze) {
     fruitSprite.setScale({cellSize / SpriteData::SPRITE_SIZE * 1.35f,
                           cellSize / SpriteData::SPRITE_SIZE * 1.35f});
 
-    fruitSprite.setPosition(
-        {offset.x + (fruit->position.first + 0.5f) * cellSize,
-         offset.y + (fruit->position.second + 0.5f) * cellSize});
+    fruitSprite.setPosition({offset.x + (fruit->position.x + 0.5f) * cellSize,
+                             offset.y + (fruit->position.y + 0.5f) * cellSize});
 
     window.draw(fruitSprite);
 }

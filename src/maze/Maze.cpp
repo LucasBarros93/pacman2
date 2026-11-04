@@ -41,10 +41,10 @@ Maze::Maze(const std::string &filePath) {
 
 std::optional<CellType> Maze::consumeCollectible(Position position,
                                                  float radius) {
-    const int minX = static_cast<int>(std::floor(position.first - radius));
-    const int maxX = static_cast<int>(std::ceil(position.first + radius));
-    const int minY = static_cast<int>(std::floor(position.second - radius));
-    const int maxY = static_cast<int>(std::ceil(position.second + radius));
+    const int minX = static_cast<int>(std::floor(position.x - radius));
+    const int maxX = static_cast<int>(std::ceil(position.x + radius));
+    const int minY = static_cast<int>(std::floor(position.y - radius));
+    const int maxY = static_cast<int>(std::ceil(position.y + radius));
 
     for (int y = minY; y <= maxY; ++y) {
         if (y < 0 || y >= static_cast<int>(grid.size()))
@@ -73,20 +73,25 @@ std::optional<CellType> Maze::consumeCollectible(Position position,
 }
 
 bool Maze::isWalkable(const GridPosition position) const {
-    const int x = position.first;
-    const int y = position.second;
-
-    if (y < 0 || y >= static_cast<int>(grid.size()))
+    if (position.y < 0 || position.y >= static_cast<int>(grid.size()))
         return false;
 
-    if (x < 0 || x >= static_cast<int>(grid[y].size()))
+    if (position.x < 0 ||
+        position.x >= static_cast<int>(grid[position.y].size()))
         return false;
 
-    return grid[y][x].cellType != CellType::Wall;
+    return grid[position.y][position.x].cellType != CellType::Wall;
 };
 
 Cell Maze::getCell(const GridPosition position) const {
-    return this->grid[position.second][position.first];
+    const int x = position.x;
+    const int y = position.y;
+
+    if (y < 0 || y >= static_cast<int>(grid.size()) || x < 0 ||
+        x >= static_cast<int>(grid[y].size()))
+        return Cell{CellType::Wall};
+
+    return grid[y][x];
 }
 
 int Maze::getHeight() const { return static_cast<int>(this->grid.size()); }

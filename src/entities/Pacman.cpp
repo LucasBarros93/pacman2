@@ -20,19 +20,19 @@ bool Pacman::canMove(const Maze &maze, Direction direction) const {
 
     switch (direction) {
     case Direction::Up:
-        --targetGridPosition.second;
+        --targetGridPosition.y;
         break;
 
     case Direction::Down:
-        ++targetGridPosition.second;
+        ++targetGridPosition.y;
         break;
 
     case Direction::Left:
-        --targetGridPosition.first;
+        --targetGridPosition.x;
         break;
 
     case Direction::Right:
-        ++targetGridPosition.first;
+        ++targetGridPosition.x;
         break;
 
     case Direction::Neutral:

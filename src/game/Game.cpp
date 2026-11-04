@@ -39,8 +39,8 @@ void Game::run() {
                 window.close();
         }
 
-        Direction newDirection = this->getInput();
-        pacman.trySetDirection(newDirection, this->maze);
+        Direction input = this->getInput();
+        pacman.trySetDirection(input, this->maze);
         pacman.update(this->maze, deltaTime);
 
         fruitSpawner.update(deltaTime);
@@ -65,8 +65,7 @@ void Game::run() {
             fruitSpawner.onDotEaten(dotsEatenThisRound, gameState.getRound());
         }
 
-        const auto points =
-            fruitSpawner.tryCollect(pacman.getCurrentGridPosition());
+        const auto points = fruitSpawner.tryCollect(pacman.getPosition());
 
         if (points.has_value()) {
             gameState.addScore(*points);

@@ -1,10 +1,13 @@
 #ifndef CORE_HPP
 #define CORE_HPP
 
-#include <utility>
+struct Position {
+    float x, y;
+};
 
-using Position = std::pair<float, float>;
-using GridPosition = std::pair<int, int>;
+struct GridPosition {
+    int x, y;
+};
 
 enum class Direction { Up, Down, Left, Right, Neutral };
 
@@ -25,8 +28,8 @@ constexpr float FRUIT_RADIUS = 0.6f;
 constexpr float GHOST_RADIUS = 0.5f;
 
 inline bool overlaps(Position a, Position b, float radius) {
-    const float dx = a.first - b.first;
-    const float dy = a.second - b.second;
+    const float dx = a.x - b.x;
+    const float dy = a.y - b.y;
     return dx * dx + dy * dy <= radius * radius;
 }
 } // namespace Collision
