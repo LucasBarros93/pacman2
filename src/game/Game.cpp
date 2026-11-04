@@ -1,4 +1,10 @@
 #include "game/Game.hpp"
+#include "core/Core.hpp"
+
+#include <SFML/System/Clock.hpp>
+#include <SFML/Window/Event.hpp>
+#include <SFML/Window/Keyboard.hpp>
+#include <algorithm>
 
 namespace {
 enum class Mode { Menu, Playing };

@@ -1,9 +1,10 @@
 #ifndef FRUITSPAWNER_HPP
 #define FRUITSPAWNER_HPP
 
-#include <optional>
-
+#include "core/Core.hpp"
 #include "entities/Fruit.hpp"
+
+#include <optional>
 
 class FruitSpawner {
   private:

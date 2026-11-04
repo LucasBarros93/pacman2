@@ -1,5 +1,8 @@
 #include "entities/Entity.hpp"
 #include "core/Core.hpp"
+#include "maze/Maze.hpp"
+
+#include <cmath>
 
 Entity::Entity(Position position, Direction direction, float speed)
     : position{position}, direction{direction}, speed{speed},

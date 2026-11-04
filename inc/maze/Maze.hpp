@@ -2,8 +2,7 @@
 #define MAZE_HPP
 
 #include "core/Core.hpp"
-#include <cmath>
-#include <fstream>
+
 #include <optional>
 #include <string>
 #include <vector>

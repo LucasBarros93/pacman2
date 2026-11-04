@@ -4,6 +4,7 @@
 #include "entities/Pacman.hpp"
 #include "game/FruitSpawner.hpp"
 #include "game/GameState.hpp"
+#include "game/Leaderboard.hpp"
 #include "graphics/MenuRenderer.hpp"
 #include "graphics/Renderer.hpp"
 #include "maze/Maze.hpp"

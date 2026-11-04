@@ -1,7 +1,6 @@
 #include "graphics/MenuRenderer.hpp"
 
 #include <SFML/Graphics/Text.hpp>
-
 #include <stdexcept>
 #include <string>
 

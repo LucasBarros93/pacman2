@@ -1,10 +1,11 @@
 #ifndef MENUCONTROLLER_HPP
 #define MENUCONTROLLER_HPP
 
-#include "game/Leaderboard.hpp"
 #include "menus/Menu.hpp"
 
 #include <SFML/Window/Event.hpp>
+
+class Leaderboard;
 
 class MenuController {
   private:

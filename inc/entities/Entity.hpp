@@ -2,8 +2,8 @@
 #define ENTITY_HPP
 
 #include "core/Core.hpp"
-#include "maze/Maze.hpp"
-#include <cmath>
+
+class Maze;
 
 class Entity {
   protected:

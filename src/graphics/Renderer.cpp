@@ -1,5 +1,16 @@
 #include "graphics/Renderer.hpp"
+#include "entities/Fruit.hpp"
+#include "entities/Pacman.hpp"
+#include "game/FruitSpawner.hpp"
+#include "game/GameState.hpp"
 #include "graphics/SpriteData.hpp"
+#include "maze/Maze.hpp"
+
+#include <SFML/Graphics.hpp>
+#include <algorithm>
+#include <cstdint>
+#include <stdexcept>
+#include <string>
 
 Renderer::Renderer(sf::RenderWindow &window) : window{window} {
     if (!spritesheet.loadFromFile("assets/images/spritesheet.png"))

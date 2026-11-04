@@ -1,7 +1,10 @@
 #ifndef PACMAN_HPP
 #define PACMAN_HPP
 
+#include "core/Core.hpp"
 #include "entities/Entity.hpp"
+
+class Maze;
 
 class Pacman : public Entity {
   private:

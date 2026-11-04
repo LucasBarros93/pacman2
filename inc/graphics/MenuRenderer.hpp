@@ -4,10 +4,10 @@
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <string>
 
 #include "game/Leaderboard.hpp"
 #include "menus/Menu.hpp"
-#include <string>
 
 class MenuRenderer {
   private:

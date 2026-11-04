@@ -1,13 +1,17 @@
 #ifndef RENDERER_HPP
 #define RENDERER_HPP
 
-#include "entities/Pacman.hpp"
-#include "game/FruitSpawner.hpp"
-#include "game/GameState.hpp"
-#include "maze/Maze.hpp"
+#include <SFML/Graphics/Font.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/View.hpp>
+#include <SFML/System/Clock.hpp>
+#include <SFML/System/Vector2.hpp>
 
-#include <SFML/Graphics.hpp>
-#include <algorithm>
+class FruitSpawner;
+class GameState;
+class Maze;
+class Pacman;
 
 class Renderer {
   private:

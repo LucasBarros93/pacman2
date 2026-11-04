@@ -1,4 +1,5 @@
 #include "menus/Menu.hpp"
+
 #include <cctype>
 
 void Menu::moveUp() {

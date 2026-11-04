@@ -1,6 +1,10 @@
 #include "maze/Maze.hpp"
 #include "core/Core.hpp"
 
+#include <cmath>
+#include <fstream>
+#include <stdexcept>
+
 Maze::Maze(const std::string &filePath) {
     std::ifstream file(filePath);
 

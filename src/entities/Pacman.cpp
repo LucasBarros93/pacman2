@@ -1,4 +1,5 @@
 #include "entities/Pacman.hpp"
+#include "maze/Maze.hpp"
 
 Pacman::Pacman(Position position)
     : Entity({position}, Direction::Neutral, 6.5f) {}

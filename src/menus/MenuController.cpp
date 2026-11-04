@@ -1,4 +1,5 @@
 #include "menus/MenuController.hpp"
+#include "game/Leaderboard.hpp"
 
 MenuController::MenuController(Menu &menu, Leaderboard &leaderboard)
     : menu{menu}, leaderboard{leaderboard} {}

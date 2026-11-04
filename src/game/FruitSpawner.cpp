@@ -1,4 +1,6 @@
 #include "game/FruitSpawner.hpp"
+#include "core/Core.hpp"
+#include "entities/Fruit.hpp"
 
 FruitSpawner::FruitSpawner(Position spawnPosition)
     : spawnPosition(spawnPosition) {}
