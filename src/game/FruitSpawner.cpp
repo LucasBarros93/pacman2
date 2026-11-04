@@ -53,23 +53,17 @@ void FruitSpawner::update(float deltaTime) {
 }
 
 std::optional<int> FruitSpawner::tryCollect(Position pacmanPosition) {
-    if (!activeFruit.has_value()) {
+    if (!activeFruit.has_value())
         return std::nullopt;
-    }
 
-    constexpr float COLLISION_RADIUS = 0.6f;
+    if (!Collision::overlaps(pacmanPosition, activeFruit->position,
+                             Collision::FRUIT_RADIUS))
+        return std::nullopt;
 
-    const float dx = pacmanPosition.first - activeFruit->position.first;
-    const float dy = pacmanPosition.second - activeFruit->position.second;
-
-    if (dx * dx + dy * dy <= COLLISION_RADIUS * COLLISION_RADIUS) {
-        const int points = activeFruit->score;
-        activeFruit.reset();
-        remainingTime = 0.0f;
-        return points;
-    }
-
-    return std::nullopt;
+    const int points = activeFruit->score;
+    activeFruit.reset();
+    remainingTime = 0.0f;
+    return points;
 }
 
 const std::optional<Fruit> &FruitSpawner::getActiveFruit() const {

@@ -45,8 +45,8 @@ void Game::run() {
 
         fruitSpawner.update(deltaTime);
 
-        const auto collectible =
-            maze.consumeCollectible(pacman.getCurrentGridPosition());
+        const auto collectible = maze.consumeCollectible(
+            pacman.getPosition(), Collision::PELLET_RADIUS);
 
         if (collectible) {
             switch (*collectible) {

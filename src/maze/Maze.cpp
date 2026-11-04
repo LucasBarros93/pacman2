@@ -39,26 +39,37 @@ Maze::Maze(const std::string &filePath) {
     }
 }
 
-std::optional<CellType> Maze::consumeCollectible(GridPosition position) {
-    const int x = position.first;
-    const int y = position.second;
+std::optional<CellType> Maze::consumeCollectible(Position position,
+                                                 float radius) {
+    const int minX = static_cast<int>(std::floor(position.first - radius));
+    const int maxX = static_cast<int>(std::ceil(position.first + radius));
+    const int minY = static_cast<int>(std::floor(position.second - radius));
+    const int maxY = static_cast<int>(std::ceil(position.second + radius));
 
-    if (y < 0 || y >= static_cast<int>(grid.size()))
-        return std::nullopt;
+    for (int y = minY; y <= maxY; ++y) {
+        if (y < 0 || y >= static_cast<int>(grid.size()))
+            continue;
 
-    if (x < 0 || x >= static_cast<int>(grid[y].size()))
-        return std::nullopt;
+        for (int x = minX; x <= maxX; ++x) {
+            if (x < 0 || x >= static_cast<int>(grid[y].size()))
+                continue;
 
-    CellType &type = grid[y][x].cellType;
+            CellType &type = grid[y][x].cellType;
+            if (type != CellType::Pellet && type != CellType::PowerPellet)
+                continue;
 
-    if (type != CellType::Pellet && type != CellType::PowerPellet) {
-        return std::nullopt;
+            const Position pelletPosition{static_cast<float>(x),
+                                          static_cast<float>(y)};
+
+            if (Collision::overlaps(position, pelletPosition, radius)) {
+                const CellType consumed = type;
+                type = CellType::Empty;
+                return consumed;
+            }
+        }
     }
 
-    const CellType consumed = type;
-    type = CellType::Empty;
-
-    return consumed;
+    return std::nullopt;
 }
 
 bool Maze::isWalkable(const GridPosition position) const {
