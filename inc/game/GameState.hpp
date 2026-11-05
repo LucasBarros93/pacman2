@@ -5,7 +5,8 @@ class GameState {
   private:
     int score = 0;
     int highScore = 0;
-    int lives = 3;
+    int livesOnStart = 2;
+    int lives = 2;
     int round = 1;
 
   public:

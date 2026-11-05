@@ -24,7 +24,7 @@ void GameState::advanceLevel() { ++round; }
 
 void GameState::reset() {
     score = 0;
-    lives = 3;
+    lives = livesOnStart;
     round = 1;
 }
 
