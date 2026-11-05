@@ -24,6 +24,10 @@ sf::IntRect pacmanNeutral() {
 sf::IntRect pacmanLife() {
     return {{8 * SPRITE_SIZE, SPRITE_SIZE}, {SPRITE_SIZE, SPRITE_SIZE}};
 }
+sf::IntRect pacmanDeath(int frame) {
+    return {{(frame + 2) * SPRITE_SIZE, 0}, {SPRITE_SIZE, SPRITE_SIZE}};
+}
+
 sf::IntRect fruit(int fruit) {
     return {{(1 + fruit) * SPRITE_SIZE, 3 * SPRITE_SIZE},
             {SPRITE_SIZE, SPRITE_SIZE}};

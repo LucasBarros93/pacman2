@@ -33,6 +33,8 @@ class Renderer {
 
     sf::Clock animationClock;
     int animationFrame;
+    int pacmanDeathFrame = -1;
+    bool pacmanVisible = true;
 
     sf::Vector2f getMazeOffset(const Maze &maze) const;
     float getMazeScale(const Maze &maze) const;
@@ -55,6 +57,9 @@ class Renderer {
                 const FruitSpawner &fruitSpawner, const Maze &maze);
 
     void setMazeFlash(bool flash);
+
+    void setPacmanDeathFrame(int frame);
+    void setPacmanVisible(bool visible);
 };
 
 #endif

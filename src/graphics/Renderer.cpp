@@ -103,26 +103,30 @@ void Renderer::renderPacman(const Pacman &pacman, const Maze &maze) {
 
     sf::Sprite sprite{spritesheet};
 
-    switch (pacman.getDirection()) {
-    case Direction::Right:
-        sprite.setTextureRect(SpriteData::pacmanRight(animationFrame));
-        break;
+    if (pacmanDeathFrame >= 0) {
+        sprite.setTextureRect(SpriteData::pacmanDeath(pacmanDeathFrame));
+    } else {
+        switch (pacman.getDirection()) {
+        case Direction::Right:
+            sprite.setTextureRect(SpriteData::pacmanRight(animationFrame));
+            break;
 
-    case Direction::Left:
-        sprite.setTextureRect(SpriteData::pacmanLeft(animationFrame));
-        break;
+        case Direction::Left:
+            sprite.setTextureRect(SpriteData::pacmanLeft(animationFrame));
+            break;
 
-    case Direction::Up:
-        sprite.setTextureRect(SpriteData::pacmanUp(animationFrame));
-        break;
+        case Direction::Up:
+            sprite.setTextureRect(SpriteData::pacmanUp(animationFrame));
+            break;
 
-    case Direction::Down:
-        sprite.setTextureRect(SpriteData::pacmanDown(animationFrame));
-        break;
+        case Direction::Down:
+            sprite.setTextureRect(SpriteData::pacmanDown(animationFrame));
+            break;
 
-    case Direction::Neutral:
-        sprite.setTextureRect(SpriteData::pacmanNeutral());
-        break;
+        case Direction::Neutral:
+            sprite.setTextureRect(SpriteData::pacmanNeutral());
+            break;
+        }
     }
 
     const Position position = pacman.getPosition();
@@ -331,7 +335,8 @@ void Renderer::render(const Pacman &pacman, const GameState &gameState,
     renderCollectibles(maze);
     renderFruit(fruitSpawner, maze);
     renderReady(maze);
-    renderPacman(pacman, maze);
+    if (pacmanVisible)
+        renderPacman(pacman, maze);
 
     window.setView(hudBottomView);
     renderHudBottom(gameState, maze);
@@ -340,3 +345,7 @@ void Renderer::render(const Pacman &pacman, const GameState &gameState,
 }
 
 void Renderer::setMazeFlash(bool flash) { mazeFlash = flash; }
+
+void Renderer::setPacmanDeathFrame(int frame) { pacmanDeathFrame = frame; }
+
+void Renderer::setPacmanVisible(bool visible) { pacmanVisible = visible; }

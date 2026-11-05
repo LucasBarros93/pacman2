@@ -13,6 +13,7 @@ sf::IntRect pacmanUp(int frame);
 sf::IntRect pacmanDown(int frame);
 sf::IntRect pacmanNeutral();
 sf::IntRect pacmanLife();
+sf::IntRect pacmanDeath(int frame);
 sf::IntRect fruit(int fruit);
 
 } // namespace SpriteData

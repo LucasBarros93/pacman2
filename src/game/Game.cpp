@@ -11,6 +11,10 @@ constexpr float CLEAR_PAUSE = 0.8f;
 constexpr float FLASH_INTERVAL = 0.25f;
 constexpr int FLASH_COUNT = 3;
 constexpr float READY_DURATION = 2.0f;
+constexpr float DEATH_FREEZE = 0.8f;
+constexpr float DEATH_FRAME_TIME = 0.12f;
+constexpr int DEATH_FRAMES = 12;
+constexpr float DEATH_END_PAUSE = 0.6f;
 } // namespace
 
 Game::Game()
@@ -61,10 +65,12 @@ void Game::handleEvents() {
                 break;
             }
         } else if (const auto *key = event->getIf<sf::Event::KeyPressed>()) {
-            if (key->code == sf::Keyboard::Key::Escape)
-                finishGame();
-            else if (key->code == sf::Keyboard::Key::P)
+            if (key->code == sf::Keyboard::Key::Escape) {
+                if (mode == GameMode::Playing)
+                    killPacman();
+            } else if (key->code == sf::Keyboard::Key::P) {
                 togglePause();
+            }
         }
     }
 }
@@ -98,7 +104,7 @@ void Game::togglePause() {
         mode = modeBeforePause;
         renderer.setPaused(false);
     } else if (mode == GameMode::Ready || mode == GameMode::Playing ||
-               mode == GameMode::Clearing) {
+               mode == GameMode::Clearing || mode == GameMode::Dying) {
         modeBeforePause = mode;
         mode = GameMode::Paused;
         renderer.setPaused(true);
@@ -128,8 +134,31 @@ void Game::finishGame() {
     renderer.setMazeFlash(false);
     renderer.setShowReady(false);
     renderer.setPaused(false);
+    renderer.setPacmanDeathFrame(-1);
+    renderer.setPacmanVisible(true);
     menuController.onGameOver(gameState.getScore());
     mode = GameMode::Menu;
+}
+
+void Game::killPacman() {
+    mode = GameMode::Dying;
+    modeTimer = 0.0f;
+    fruitSpawner.resetRound();
+}
+
+void Game::finishDeath() {
+    renderer.setPacmanDeathFrame(-1);
+    renderer.setPacmanVisible(true);
+
+    gameState.loseLife();
+
+    if (gameState.getLives() <= 0) {
+        finishGame();
+        return;
+    }
+
+    pacman.reset();
+    startReady();
 }
 
 void Game::updatePlaying(float deltaTime) {
@@ -164,6 +193,24 @@ void Game::updateClearing(float deltaTime) {
         startNextRound();
 }
 
+void Game::updateDying(float deltaTime) {
+    modeTimer += deltaTime;
+
+    const float animTime = modeTimer - DEATH_FREEZE;
+    if (animTime < 0.0f)
+        return;
+
+    const int frame = static_cast<int>(animTime / DEATH_FRAME_TIME);
+
+    if (frame < DEATH_FRAMES)
+        renderer.setPacmanDeathFrame(frame);
+    else
+        renderer.setPacmanVisible(false);
+
+    if (animTime >= DEATH_FRAMES * DEATH_FRAME_TIME + DEATH_END_PAUSE)
+        finishDeath();
+}
+
 void Game::run() {
     sf::Clock clock;
 
@@ -189,6 +236,9 @@ void Game::run() {
             break;
         case GameMode::Clearing:
             updateClearing(deltaTime);
+            break;
+        case GameMode::Dying:
+            updateDying(deltaTime);
             break;
         case GameMode::Menu:
         case GameMode::Paused:

@@ -13,7 +13,7 @@
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
-enum class GameMode { Menu, Ready, Playing, Clearing, Paused };
+enum class GameMode { Menu, Ready, Playing, Clearing, Paused, Dying };
 
 class Game {
   private:
@@ -43,10 +43,13 @@ class Game {
     void resetRound();
     void startReady();
     void togglePause();
+    void killPacman();
+    void finishDeath();
 
     void updateReady(float deltaTime);
     void updatePlaying(float deltaTime);
     void updateClearing(float deltaTime);
+    void updateDying(float deltaTime);
 
   public:
     Game();
