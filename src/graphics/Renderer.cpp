@@ -87,6 +87,8 @@ sf::Vector2f Renderer::getMazeOffset(const Maze &maze) const {
 
 void Renderer::setShowReady(bool show) { showReady = show; }
 
+void Renderer::setShowGameOver(bool show) { showGameOver = show; }
+
 void Renderer::setPaused(bool value) {
     paused = value;
     if (!value)
@@ -303,15 +305,13 @@ void Renderer::renderHudBottom(const GameState &gameState, const Maze &maze) {
     }
 }
 
-void Renderer::renderReady(const Maze &maze) {
-    if (!showReady)
-        return;
-
+void Renderer::renderBanner(const Maze &maze, const std::string &str,
+                            sf::Color color) {
     const float cellSize = SpriteData::CELL_SIZE * getMazeScale(maze);
     const sf::Vector2f offset = getMazeOffset(maze);
 
-    sf::Text text{font, "READY!", static_cast<unsigned int>(cellSize * 0.9f)};
-    text.setFillColor(sf::Color::Yellow);
+    sf::Text text{font, str, static_cast<unsigned int>(cellSize * 0.9f)};
+    text.setFillColor(color);
 
     const sf::FloatRect bounds = text.getLocalBounds();
     text.setOrigin({bounds.position.x + bounds.size.x / 2.f,
@@ -334,7 +334,10 @@ void Renderer::render(const Pacman &pacman, const GameState &gameState,
     renderMaze(maze);
     renderCollectibles(maze);
     renderFruit(fruitSpawner, maze);
-    renderReady(maze);
+    if (showReady)
+        renderBanner(maze, "READY!", sf::Color::Yellow);
+    if (showGameOver)
+        renderBanner(maze, "GAME OVER", sf::Color::Red);
     if (pacmanVisible)
         renderPacman(pacman, maze);
 

@@ -23,6 +23,7 @@ class Renderer {
 
     bool mazeFlash = false;
     bool showReady = false;
+    bool showGameOver = false;
     bool paused = false;
 
     sf::Font font;
@@ -45,12 +46,14 @@ class Renderer {
     void renderFruit(const FruitSpawner &fruitSpawner, const Maze &maze);
     void renderHudTop(const GameState &gameState, const Maze &maze);
     void renderHudBottom(const GameState &gameState, const Maze &maze);
-    void renderReady(const Maze &maze);
+    void renderBanner(const Maze &maze, const std::string &str,
+                      sf::Color color);
 
   public:
     Renderer(sf::RenderWindow &window);
 
     void setShowReady(bool show);
+    void setShowGameOver(bool show);
     void setPaused(bool value);
 
     void render(const Pacman &pacman, const GameState &gameState,

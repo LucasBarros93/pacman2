@@ -10,11 +10,12 @@ namespace {
 constexpr float CLEAR_PAUSE = 0.8f;
 constexpr float FLASH_INTERVAL = 0.25f;
 constexpr int FLASH_COUNT = 3;
-constexpr float READY_DURATION = 2.0f;
+constexpr float READY_DURATION = 1.0f;
 constexpr float DEATH_FREEZE = 0.8f;
 constexpr float DEATH_FRAME_TIME = 0.12f;
 constexpr int DEATH_FRAMES = 12;
 constexpr float DEATH_END_PAUSE = 0.6f;
+constexpr float GAME_OVER_INPUT_DELAY = 0.5f;
 } // namespace
 
 Game::Game()
@@ -65,10 +66,19 @@ void Game::handleEvents() {
                 break;
             }
         } else if (const auto *key = event->getIf<sf::Event::KeyPressed>()) {
-            if (key->code == sf::Keyboard::Key::Escape) {
+            const auto code = key->code;
+
+            if (mode == GameMode::GameOver) {
+                const bool confirm = code == sf::Keyboard::Key::Escape ||
+                                     code == sf::Keyboard::Key::Enter ||
+                                     code == sf::Keyboard::Key::Space;
+
+                if (confirm && modeTimer >= GAME_OVER_INPUT_DELAY)
+                    finishGame();
+            } else if (code == sf::Keyboard::Key::Escape) {
                 if (mode == GameMode::Playing)
                     killPacman();
-            } else if (key->code == sf::Keyboard::Key::P) {
+            } else if (code == sf::Keyboard::Key::P) {
                 togglePause();
             }
         }
@@ -130,9 +140,16 @@ void Game::startClearing() {
     fruitSpawner.resetRound();
 }
 
+void Game::startGameOver() {
+    mode = GameMode::GameOver;
+    modeTimer = 0.0f;
+    renderer.setShowGameOver(true);
+}
+
 void Game::finishGame() {
     renderer.setMazeFlash(false);
     renderer.setShowReady(false);
+    renderer.setShowGameOver(false);
     renderer.setPaused(false);
     renderer.setPacmanDeathFrame(-1);
     renderer.setPacmanVisible(true);
@@ -148,15 +165,14 @@ void Game::killPacman() {
 
 void Game::finishDeath() {
     renderer.setPacmanDeathFrame(-1);
-    renderer.setPacmanVisible(true);
-
     gameState.loseLife();
 
     if (gameState.getLives() <= 0) {
-        finishGame();
+        startGameOver();
         return;
     }
 
+    renderer.setPacmanVisible(true);
     pacman.reset();
     startReady();
 }
@@ -211,6 +227,8 @@ void Game::updateDying(float deltaTime) {
         finishDeath();
 }
 
+void Game::updateGameOver(float deltaTime) { modeTimer += deltaTime; }
+
 void Game::run() {
     sf::Clock clock;
 
@@ -239,6 +257,9 @@ void Game::run() {
             break;
         case GameMode::Dying:
             updateDying(deltaTime);
+            break;
+        case GameMode::GameOver:
+            updateGameOver(deltaTime);
             break;
         case GameMode::Menu:
         case GameMode::Paused:
