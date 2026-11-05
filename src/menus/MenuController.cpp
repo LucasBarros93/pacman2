@@ -55,7 +55,7 @@ void MenuController::handleLeaderboard(const sf::Event &event) {
 
     if (key->code == sf::Keyboard::Key::Escape ||
         key->code == sf::Keyboard::Key::Enter ||
-        key->code == sf::Keyboard::Key::Backspace)
+        key->code == sf::Keyboard::Key::Space)
         menu.back();
 }
 
