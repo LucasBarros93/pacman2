@@ -21,8 +21,6 @@ class Entity {
     GridPosition teleportHorizontal(const Maze &maze,
                                     GridPosition gridPosition) const;
 
-    virtual bool canEnter(const Maze &maze, GridPosition tile) const;
-
   public:
     Entity(Position position, Direction direction, float speed);
     virtual ~Entity() = default;

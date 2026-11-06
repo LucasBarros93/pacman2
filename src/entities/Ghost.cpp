@@ -43,10 +43,6 @@ Ghost::Ghost(GhostType type, Position spawnPosition, Direction initialDirection)
 
 GhostType Ghost::getType() const { return type; }
 
-bool Ghost::canEnter(const Maze &maze, GridPosition tile) const {
-    return maze.isGhostWalkable(tile);
-}
-
 Direction Ghost::chooseDirection(const Maze &, const std::vector<Direction> &) {
     return Direction::Neutral;
 }
@@ -65,7 +61,7 @@ std::vector<Direction> Ghost::getAvailableDirections(const Maze &maze) const {
         const GridPosition target =
             teleportHorizontal(maze, neighbor(tile, candidate));
 
-        if (!canEnter(maze, target))
+        if (!maze.isWalkable(target))
             continue;
 
         if (candidate == Direction::Down &&

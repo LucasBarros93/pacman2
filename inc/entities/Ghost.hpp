@@ -17,8 +17,6 @@ class Ghost : public Entity {
     std::vector<Direction> getAvailableDirections(const Maze &maze) const;
 
   protected:
-    bool canEnter(const Maze &maze, GridPosition tile) const override;
-
     virtual Direction chooseDirection(const Maze &maze,
                                       const std::vector<Direction> &options);
 
