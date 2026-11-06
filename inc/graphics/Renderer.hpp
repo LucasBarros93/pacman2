@@ -7,11 +7,14 @@
 #include <SFML/Graphics/View.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <memory>
+#include <vector>
 
 class FruitSpawner;
 class GameState;
 class Maze;
 class Pacman;
+class Ghost;
 
 class Renderer {
   private:
@@ -41,6 +44,8 @@ class Renderer {
     float getMazeScale(const Maze &maze) const;
 
     void renderPacman(const Pacman &pacman, const Maze &maze);
+    void renderGhosts(const std::vector<std::unique_ptr<Ghost>> &ghosts,
+                      const Maze &maze);
     void renderMaze(const Maze &maze);
     void renderCollectibles(const Maze &maze);
     void renderFruit(const FruitSpawner &fruitSpawner, const Maze &maze);
@@ -56,8 +61,10 @@ class Renderer {
     void setShowGameOver(bool show);
     void setPaused(bool value);
 
-    void render(const Pacman &pacman, const GameState &gameState,
-                const FruitSpawner &fruitSpawner, const Maze &maze);
+    void render(const Pacman &pacman,
+                const std::vector<std::unique_ptr<Ghost>> &ghosts,
+                const GameState &gameState, const FruitSpawner &fruitSpawner,
+                const Maze &maze);
 
     void setMazeFlash(bool flash);
 

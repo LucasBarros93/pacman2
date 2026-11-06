@@ -11,12 +11,25 @@ struct GridPosition {
 
 enum class Direction { Up, Down, Left, Right, Neutral };
 
-enum class CellType {
-    Wall,
-    Empty,
-    Pellet,
-    PowerPellet,
-};
+inline Direction opposite(Direction direction) {
+    switch (direction) {
+    case Direction::Up:
+        return Direction::Down;
+    case Direction::Down:
+        return Direction::Up;
+    case Direction::Left:
+        return Direction::Right;
+    case Direction::Right:
+        return Direction::Left;
+    case Direction::Neutral:
+        break;
+    }
+    return Direction::Neutral;
+}
+
+enum class GhostType { Blinky, Pinky, Inky, Clyde };
+
+enum class CellType { Wall, Empty, Pellet, PowerPellet, GhostDoor };
 
 struct Cell {
     CellType cellType;

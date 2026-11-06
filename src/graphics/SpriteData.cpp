@@ -22,7 +22,7 @@ sf::IntRect pacman(int frame, Direction direction) {
                 {SPRITE_SIZE, SPRITE_SIZE}};
 
     case Direction::Neutral:
-        return {{2 * SPRITE_SIZE, 0}, {SPRITE_SIZE, SPRITE_SIZE}};
+        break;
     }
 
     return {{2 * SPRITE_SIZE, 0}, {SPRITE_SIZE, SPRITE_SIZE}};
@@ -32,6 +32,32 @@ sf::IntRect pacmanLife() {
 }
 sf::IntRect pacmanDeath(int frame) {
     return {{(frame + 2) * SPRITE_SIZE, 0}, {SPRITE_SIZE, SPRITE_SIZE}};
+}
+
+sf::IntRect ghost(GhostType type, Direction direction, int frame) {
+    int directionIndex = 1;
+    switch (direction) {
+    case Direction::Right:
+        directionIndex = 0;
+        break;
+    case Direction::Left:
+        directionIndex = 1;
+        break;
+    case Direction::Up:
+        directionIndex = 2;
+        break;
+    case Direction::Down:
+        directionIndex = 3;
+        break;
+    case Direction::Neutral:
+        break;
+    }
+
+    const int column = directionIndex * 2 + frame;
+    const int row = static_cast<int>(type) + 4;
+
+    return sf::IntRect({column * SPRITE_SIZE, row * SPRITE_SIZE},
+                       {SPRITE_SIZE, SPRITE_SIZE});
 }
 
 sf::IntRect fruit(int fruit) {

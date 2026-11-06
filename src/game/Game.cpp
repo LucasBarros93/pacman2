@@ -1,6 +1,18 @@
 #include "game/Game.hpp"
 #include "core/Core.hpp"
 
+#include "entities/Blinky.hpp"
+#include "entities/Ghost.hpp"
+#include "entities/Pacman.hpp"
+#include "game/FruitSpawner.hpp"
+#include "game/GameState.hpp"
+#include "game/Leaderboard.hpp"
+#include "graphics/MenuRenderer.hpp"
+#include "graphics/Renderer.hpp"
+#include "maze/Maze.hpp"
+#include "menus/Menu.hpp"
+#include "menus/MenuController.hpp"
+
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
@@ -25,6 +37,14 @@ Game::Game()
       menu(), menuController(menu, leaderboard), renderer(window),
       menuRenderer(window) {
     window.setFramerateLimit(60);
+
+    ghosts.push_back(std::make_unique<Blinky>(Position{13.5f, 11.f}));
+    ghosts.push_back(
+        std::make_unique<Ghost>(GhostType::Clyde, Position{15.5f, 14.f}));
+    ghosts.push_back(
+        std::make_unique<Ghost>(GhostType::Pinky, Position{13.5f, 14.f}));
+    ghosts.push_back(
+        std::make_unique<Ghost>(GhostType::Inky, Position{11.5f, 14.f}));
 }
 
 Direction Game::getInput() {
@@ -88,6 +108,8 @@ void Game::handleEvents() {
 void Game::resetRound() {
     maze.reset();
     pacman.reset();
+    for (const auto &ghost : ghosts)
+        ghost->reset();
     fruitSpawner.resetRound();
     dotsEatenThisRound = 0;
     renderer.setMazeFlash(false);
@@ -174,12 +196,26 @@ void Game::finishDeath() {
 
     renderer.setPacmanVisible(true);
     pacman.reset();
+    for (const auto &ghost : ghosts)
+        ghost->reset();
     startReady();
 }
 
 void Game::updatePlaying(float deltaTime) {
     pacman.trySetDirection(getInput(), maze);
     pacman.update(maze, deltaTime);
+
+    for (const auto &ghost : ghosts)
+        ghost->update(maze, deltaTime);
+
+    for (const auto &ghost : ghosts) {
+        if (Collision::overlaps(pacman.getPosition(), ghost->getPosition(),
+                                Collision::GHOST_RADIUS)) {
+            killPacman();
+            return;
+        }
+    }
+
     fruitSpawner.update(deltaTime);
 
     if (const auto collectible = maze.consumeCollectible(
@@ -265,7 +301,6 @@ void Game::run() {
         case GameMode::Paused:
             break;
         }
-
-        renderer.render(pacman, gameState, fruitSpawner, maze);
+        renderer.render(pacman, ghosts, gameState, fruitSpawner, maze);
     }
 }

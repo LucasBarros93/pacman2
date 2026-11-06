@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "entities/Ghost.hpp"
 #include "entities/Pacman.hpp"
 #include "game/FruitSpawner.hpp"
 #include "game/GameState.hpp"
@@ -22,6 +23,7 @@ class Game {
     FruitSpawner fruitSpawner;
     Maze maze;
     Pacman pacman;
+    std::vector<std::unique_ptr<Ghost>> ghosts;
     Leaderboard leaderboard;
     Menu menu;
     MenuController menuController;

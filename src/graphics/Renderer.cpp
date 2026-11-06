@@ -1,5 +1,6 @@
 #include "graphics/Renderer.hpp"
 #include "entities/Fruit.hpp"
+#include "entities/Ghost.hpp"
 #include "entities/Pacman.hpp"
 #include "game/FruitSpawner.hpp"
 #include "game/GameState.hpp"
@@ -128,6 +129,28 @@ void Renderer::renderPacman(const Pacman &pacman, const Maze &maze) {
                         offset.y + (position.y + 0.5f) * cellSize});
 
     window.draw(sprite);
+}
+void Renderer::renderGhosts(const std::vector<std::unique_ptr<Ghost>> &ghosts,
+                            const Maze &maze) {
+    const float cellSize = SpriteData::CELL_SIZE * getMazeScale(maze);
+    const sf::Vector2f offset = getMazeOffset(maze);
+    const float scale = (cellSize / SpriteData::SPRITE_SIZE) * 1.35f;
+
+    for (const auto &ghost : ghosts) {
+        sf::Sprite sprite{spritesheet};
+
+        sprite.setTextureRect(SpriteData::ghost(
+            ghost->getType(), ghost->getDirection(), animationFrame));
+        sprite.setOrigin(
+            {SpriteData::SPRITE_SIZE / 2.f, SpriteData::SPRITE_SIZE / 2.f});
+        sprite.setScale({scale, scale});
+
+        const Position position = ghost->getPosition();
+        sprite.setPosition({offset.x + (position.x + 0.5f) * cellSize,
+                            offset.y + (position.y + 0.5f) * cellSize});
+
+        window.draw(sprite);
+    }
 }
 
 void Renderer::renderMaze(const Maze &maze) {
@@ -304,7 +327,9 @@ void Renderer::renderBanner(const Maze &maze, const std::string &str,
     window.draw(text);
 }
 
-void Renderer::render(const Pacman &pacman, const GameState &gameState,
+void Renderer::render(const Pacman &pacman,
+                      const std::vector<std::unique_ptr<Ghost>> &ghosts,
+                      const GameState &gameState,
                       const FruitSpawner &fruitSpawner, const Maze &maze) {
     window.clear();
 
@@ -319,6 +344,7 @@ void Renderer::render(const Pacman &pacman, const GameState &gameState,
         renderBanner(maze, "READY!", sf::Color::Yellow);
     if (showGameOver)
         renderBanner(maze, "GAME OVER", sf::Color::Red);
+    renderGhosts(ghosts, maze);
     if (pacmanVisible)
         renderPacman(pacman, maze);
 

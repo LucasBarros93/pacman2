@@ -59,6 +59,10 @@ GridPosition Entity::teleportHorizontal(const Maze &maze,
     return gridPosition;
 }
 
+bool Entity::canEnter(const Maze &maze, GridPosition tile) const {
+    return maze.isWalkable(tile);
+}
+
 void Entity::update(const Maze &maze, float deltaTime) {
     Position nextPosition = position;
 
@@ -97,6 +101,11 @@ void Entity::update(const Maze &maze, float deltaTime) {
         nextPosition.x = nextGridPosition.x < 0 ? maze.getWidth() - 1 : 0.0f;
     }
 
-    if (maze.isWalkable(teleportPosition))
+    if (canEnter(maze, teleportPosition))
         position = nextPosition;
+}
+
+void Entity::reset() {
+    position = spawnPosition;
+    direction = Direction::Neutral;
 }

@@ -12,6 +12,7 @@ static constexpr int SPRITE_SIZE = 16;
 sf::IntRect pacman(int frame, Direction direction);
 sf::IntRect pacmanLife();
 sf::IntRect pacmanDeath(int frame);
+sf::IntRect ghost(GhostType type, Direction direction, int frame);
 sf::IntRect fruit(int fruit);
 
 } // namespace SpriteData

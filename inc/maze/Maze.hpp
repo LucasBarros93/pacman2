@@ -19,6 +19,7 @@ class Maze {
     Maze(const std::string &filePath);
 
     bool isWalkable(const GridPosition position) const;
+    bool isGhostWalkable(const GridPosition position) const;
     std::optional<CellType> consumeCollectible(Position position, float radius);
     void reset();
     int getRemainingCollectibles() const;

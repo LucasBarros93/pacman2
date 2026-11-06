@@ -20,6 +20,8 @@ class Entity {
     GridPosition teleportHorizontal(const Maze &maze,
                                     GridPosition gridPosition) const;
 
+    virtual bool canEnter(const Maze &maze, GridPosition tile) const;
+
   public:
     Entity(Position position, Direction direction, float speed);
     virtual ~Entity() = default;
@@ -28,7 +30,8 @@ class Entity {
     Direction getDirection() const;
     GridPosition getCurrentGridPosition() const;
 
-    void update(const Maze &maze, float deltaTime);
+    virtual void update(const Maze &maze, float deltaTime);
+    virtual void reset();
 };
 
 #endif

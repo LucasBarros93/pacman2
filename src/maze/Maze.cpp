@@ -22,6 +22,10 @@ Maze::Maze(const std::string &filePath) {
                 row.push_back({CellType::Wall});
                 break;
 
+            case '-':
+                row.push_back({CellType::GhostDoor});
+                break;
+
             case '.':
                 row.push_back({CellType::Pellet});
                 break;
@@ -97,8 +101,20 @@ bool Maze::isWalkable(const GridPosition position) const {
         position.x >= static_cast<int>(grid[position.y].size()))
         return false;
 
-    return grid[position.y][position.x].cellType != CellType::Wall;
+    const CellType type = grid[position.y][position.x].cellType;
+    return type != CellType::Wall && type != CellType::GhostDoor;
 };
+
+bool Maze::isGhostWalkable(const GridPosition position) const {
+
+    if (position.y < 0 || position.y >= static_cast<int>(grid.size()))
+        return false;
+    if (position.x < 0 ||
+        position.x >= static_cast<int>(grid[position.y].size()))
+        return false;
+
+    return grid[position.y][position.x].cellType != CellType::Wall;
+}
 
 void Maze::reset() {
     grid = initialGrid;
