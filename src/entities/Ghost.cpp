@@ -38,8 +38,8 @@ bool crossedTileCenter(Position before, Position after, Direction moved) {
 }
 } // namespace
 
-Ghost::Ghost(GhostType type, Position spawnPosition)
-    : Entity(spawnPosition, Direction::Neutral, DEFAULT_SPEED), type{type} {}
+Ghost::Ghost(GhostType type, Position spawnPosition, Direction initialDirection)
+    : Entity(spawnPosition, initialDirection, DEFAULT_SPEED), type{type} {}
 
 GhostType Ghost::getType() const { return type; }
 
@@ -82,6 +82,8 @@ std::vector<Direction> Ghost::getAvailableDirections(const Maze &maze) const {
 }
 
 void Ghost::update(const Maze &maze, float deltaTime) {
+    if (direction == Direction::Neutral)
+        return;
     const Position before = position;
     const Direction moved = direction;
 

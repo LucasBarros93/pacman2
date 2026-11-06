@@ -23,7 +23,8 @@ class Ghost : public Entity {
                                       const std::vector<Direction> &options);
 
   public:
-    Ghost(GhostType type, Position spawnPosition);
+    Ghost(GhostType type, Position spawnPosition,
+          Direction initialDirection = Direction::Neutral);
 
     void update(const Maze &maze, float deltaTime) override;
     GhostType getType() const;

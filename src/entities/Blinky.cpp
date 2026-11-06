@@ -1,7 +1,7 @@
 #include "entities/Blinky.hpp"
 
 Blinky::Blinky(Position spawnPosition)
-    : Ghost(GhostType::Blinky, spawnPosition) {}
+    : Ghost(GhostType::Blinky, spawnPosition, Direction::Left) {}
 
 Direction Blinky::chooseDirection(const Maze &,
                                   const std::vector<Direction> &options) {

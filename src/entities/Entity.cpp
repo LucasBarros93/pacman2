@@ -6,7 +6,7 @@
 
 Entity::Entity(Position position, Direction direction, float speed)
     : position{position}, direction{direction}, speed{speed},
-      spawnPosition{position} {}
+      spawnPosition{position}, spawnDirection{direction} {}
 
 Position Entity::getPosition() const { return position; }
 
@@ -107,5 +107,5 @@ void Entity::update(const Maze &maze, float deltaTime) {
 
 void Entity::reset() {
     position = spawnPosition;
-    direction = Direction::Neutral;
+    direction = spawnDirection;
 }

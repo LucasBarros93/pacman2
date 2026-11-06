@@ -11,6 +11,7 @@ class Entity {
     Direction direction;
     float speed;
     Position spawnPosition;
+    Direction spawnDirection;
 
     void setDirection(Direction newDirection);
 
