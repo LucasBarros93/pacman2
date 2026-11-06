@@ -8,6 +8,8 @@ class Maze;
 
 class Pacman : public Entity {
   private:
+    static constexpr float DEFAULT_SPEED = 6.5f;
+
     bool canMove(const Maze &maze, Direction direction) const;
 
   public:

@@ -2,7 +2,7 @@
 #include "maze/Maze.hpp"
 
 Pacman::Pacman(Position position)
-    : Entity({position}, Direction::Neutral, 6.5f) {}
+    : Entity({position}, Direction::Neutral, DEFAULT_SPEED) {}
 
 bool Pacman::trySetDirection(Direction newDirection, const Maze &maze) {
     if (!canMove(maze, newDirection))
