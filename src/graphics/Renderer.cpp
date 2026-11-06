@@ -108,27 +108,8 @@ void Renderer::renderPacman(const Pacman &pacman, const Maze &maze) {
     if (pacmanDeathFrame >= 0) {
         sprite.setTextureRect(SpriteData::pacmanDeath(pacmanDeathFrame));
     } else {
-        switch (pacman.getDirection()) {
-        case Direction::Right:
-            sprite.setTextureRect(SpriteData::pacmanRight(animationFrame));
-            break;
-
-        case Direction::Left:
-            sprite.setTextureRect(SpriteData::pacmanLeft(animationFrame));
-            break;
-
-        case Direction::Up:
-            sprite.setTextureRect(SpriteData::pacmanUp(animationFrame));
-            break;
-
-        case Direction::Down:
-            sprite.setTextureRect(SpriteData::pacmanDown(animationFrame));
-            break;
-
-        case Direction::Neutral:
-            sprite.setTextureRect(SpriteData::pacmanNeutral());
-            break;
-        }
+        sprite.setTextureRect(
+            SpriteData::pacman(animationFrame, pacman.getDirection()));
     }
 
     const Position position = pacman.getPosition();
