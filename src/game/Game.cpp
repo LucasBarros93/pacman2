@@ -28,6 +28,14 @@ constexpr float DEATH_FRAME_TIME = 0.12f;
 constexpr int DEATH_FRAMES = 12;
 constexpr float DEATH_END_PAUSE = 0.6f;
 constexpr float GAME_OVER_INPUT_DELAY = 0.5f;
+
+float ghostReleaseInterval(int round) {
+    if (round == 1)
+        return 4.0f;
+    if (round < 4)
+        return 3.0f;
+    return 2.0f;
+}
 } // namespace
 
 Game::Game()
@@ -38,13 +46,14 @@ Game::Game()
       menuRenderer(window) {
     window.setFramerateLimit(60);
 
+    // leave house order is defined here
     ghosts.push_back(std::make_unique<Blinky>(Position{13.5f, 11.f}));
-    ghosts.push_back(
-        std::make_unique<Ghost>(GhostType::Clyde, Position{15.5f, 14.f}));
     ghosts.push_back(
         std::make_unique<Ghost>(GhostType::Pinky, Position{13.5f, 14.f}));
     ghosts.push_back(
         std::make_unique<Ghost>(GhostType::Inky, Position{11.5f, 14.f}));
+    ghosts.push_back(
+        std::make_unique<Ghost>(GhostType::Clyde, Position{15.5f, 14.f}));
 }
 
 Direction Game::getInput() {
@@ -107,9 +116,7 @@ void Game::handleEvents() {
 
 void Game::resetRound() {
     maze.reset();
-    pacman.reset();
-    for (const auto &ghost : ghosts)
-        ghost->reset();
+    resetActors();
     fruitSpawner.resetRound();
     dotsEatenThisRound = 0;
     renderer.setMazeFlash(false);
@@ -195,10 +202,15 @@ void Game::finishDeath() {
     }
 
     renderer.setPacmanVisible(true);
+    resetActors();
+    startReady();
+}
+
+void Game::resetActors() {
     pacman.reset();
     for (const auto &ghost : ghosts)
         ghost->reset();
-    startReady();
+    ghostReleaseTimer = ghostReleaseInterval(gameState.getRound());
 }
 
 void Game::updatePlaying(float deltaTime) {
@@ -207,6 +219,8 @@ void Game::updatePlaying(float deltaTime) {
 
     for (const auto &ghost : ghosts)
         ghost->update(maze, deltaTime);
+
+    updateGhostRelease(deltaTime);
 
     for (const auto &ghost : ghosts) {
         if (Collision::overlaps(pacman.getPosition(), ghost->getPosition(),
@@ -264,6 +278,22 @@ void Game::updateDying(float deltaTime) {
 }
 
 void Game::updateGameOver(float deltaTime) { modeTimer += deltaTime; }
+
+void Game::updateGhostRelease(float deltaTime) {
+    ghostReleaseTimer += deltaTime;
+
+    if (ghostReleaseTimer < ghostReleaseInterval(gameState.getRound()))
+        return;
+
+    // a ordem do vetor é a ordem de saída
+    for (const auto &ghost : ghosts) {
+        if (ghost->isInHouse()) {
+            ghost->leaveHouse();
+            ghostReleaseTimer = 0.0f;
+            return;
+        }
+    }
+}
 
 void Game::run() {
     sf::Clock clock;

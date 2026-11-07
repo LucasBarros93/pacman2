@@ -3,6 +3,7 @@
 
 #include <array>
 #include <cmath>
+#include <random>
 
 namespace {
 GridPosition neighbor(GridPosition tile, Direction direction) {
@@ -36,15 +37,41 @@ bool crossedTileCenter(Position before, Position after, Direction moved) {
     }
     return false;
 }
+std::mt19937 &randomEngine() {
+    static std::mt19937 engine{std::random_device{}()};
+    return engine;
+}
+
+constexpr float HOUSE_CENTER_X = 13.5f;
+constexpr float HOUSE_EXIT_Y = 11.0f;
+
+float sign(float value) {
+    return value > 0.0f ? 1.0f : (value < 0.0f ? -1.0f : 0.0f);
+}
 } // namespace
 
-Ghost::Ghost(GhostType type, Position spawnPosition, Direction initialDirection)
-    : Entity(spawnPosition, initialDirection, DEFAULT_SPEED), type{type} {}
+Ghost::Ghost(GhostType type, Position spawnPosition, Direction initialDirection,
+             GhostState initialState)
+    : Entity(spawnPosition, initialDirection, DEFAULT_SPEED), type{type},
+      state{initialState}, spawnState{initialState} {}
+
+void Ghost::reset() {
+    Entity::reset();
+    state = spawnState;
+    route.clear();
+    routeIndex = 0;
+}
 
 GhostType Ghost::getType() const { return type; }
 
-Direction Ghost::chooseDirection(const Maze &, const std::vector<Direction> &) {
-    return Direction::Neutral;
+bool Ghost::isInHouse() const { return state == GhostState::InHouse; }
+
+bool Ghost::isLeaving() const { return state == GhostState::Leaving; }
+
+Direction Ghost::chooseDirection(const Maze &,
+                                 const std::vector<Direction> &options) {
+    std::uniform_int_distribution<std::size_t> pick(0, options.size() - 1);
+    return options[pick(randomEngine())];
 }
 
 std::vector<Direction> Ghost::getAvailableDirections(const Maze &maze) const {
@@ -77,7 +104,48 @@ std::vector<Direction> Ghost::getAvailableDirections(const Maze &maze) const {
     return options;
 }
 
-void Ghost::update(const Maze &maze, float deltaTime) {
+void Ghost::leaveHouse() {
+    if (state != GhostState::InHouse)
+        return;
+
+    state = GhostState::Leaving;
+    route = {Position{HOUSE_CENTER_X, position.y},
+             Position{HOUSE_CENTER_X, HOUSE_EXIT_Y}};
+    routeIndex = 0;
+}
+
+void Ghost::updateLeaving(float deltaTime) {
+    float remaining = speed * deltaTime;
+
+    while (remaining > 0.0f && routeIndex < route.size()) {
+        const Position target = route[routeIndex];
+        const float dx = target.x - position.x;
+        const float dy = target.y - position.y;
+        const float distance = std::abs(dx) + std::abs(dy);
+
+        if (dx != 0.0f)
+            direction = dx > 0.0f ? Direction::Right : Direction::Left;
+        else if (dy != 0.0f)
+            direction = dy > 0.0f ? Direction::Down : Direction::Up;
+
+        if (distance <= remaining) {
+            position = target;
+            remaining -= distance;
+            ++routeIndex;
+        } else {
+            position.x += sign(dx) * remaining;
+            position.y += sign(dy) * remaining;
+            remaining = 0.0f;
+        }
+    }
+
+    if (routeIndex >= route.size()) {
+        state = GhostState::Roaming;
+        direction = Direction::Left;
+    }
+}
+
+void Ghost::updateRoaming(const Maze &maze, float deltaTime) {
     if (direction == Direction::Neutral)
         return;
     const Position before = position;
@@ -96,4 +164,17 @@ void Ghost::update(const Maze &maze, float deltaTime) {
         position = {std::round(position.x), std::round(position.y)};
 
     direction = next;
+}
+
+void Ghost::update(const Maze &maze, float deltaTime) {
+    switch (state) {
+    case GhostState::InHouse:
+        break;
+    case GhostState::Leaving:
+        updateLeaving(deltaTime);
+        break;
+    case GhostState::Roaming:
+        updateRoaming(maze, deltaTime);
+        break;
+    }
 }

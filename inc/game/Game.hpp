@@ -35,6 +35,7 @@ class Game {
 
     int dotsEatenThisRound = 0;
     float modeTimer = 0.0f;
+    float ghostReleaseTimer = 0.0f;
 
     void handleEvents();
 
@@ -48,12 +49,14 @@ class Game {
     void togglePause();
     void killPacman();
     void finishDeath();
+    void resetActors();
 
     void updateReady(float deltaTime);
     void updatePlaying(float deltaTime);
     void updateClearing(float deltaTime);
     void updateDying(float deltaTime);
     void updateGameOver(float deltaTime);
+    void updateGhostRelease(float deltaTime);
 
   public:
     Game();

@@ -4,17 +4,27 @@
 #include "core/Core.hpp"
 #include "entities/Entity.hpp"
 
+#include <cstddef>
 #include <vector>
 
 class Maze;
+
+enum class GhostState { InHouse, Leaving, Roaming };
 
 class Ghost : public Entity {
   private:
     static constexpr float DEFAULT_SPEED = 6.0f;
 
     GhostType type;
+    GhostState state;
+    GhostState spawnState;
+
+    std::vector<Position> route;
+    std::size_t routeIndex = 0;
 
     std::vector<Direction> getAvailableDirections(const Maze &maze) const;
+    void updateRoaming(const Maze &maze, float deltaTime);
+    void updateLeaving(float deltaTime);
 
   protected:
     virtual Direction chooseDirection(const Maze &maze,
@@ -22,9 +32,15 @@ class Ghost : public Entity {
 
   public:
     Ghost(GhostType type, Position spawnPosition,
-          Direction initialDirection = Direction::Neutral);
+          Direction initialDirection = Direction::Neutral,
+          GhostState initialState = GhostState::InHouse);
 
     void update(const Maze &maze, float deltaTime) override;
+    void reset() override;
+
+    void leaveHouse();
+    bool isInHouse() const;
+    bool isLeaving() const;
     GhostType getType() const;
 };
 
