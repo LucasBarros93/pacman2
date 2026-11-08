@@ -14,6 +14,9 @@ enum class GhostState { InHouse, Leaving, Roaming };
 class Ghost : public Entity {
   private:
     static constexpr float DEFAULT_SPEED = 6.0f;
+    static constexpr float FRIGHTENED_SPEED = 3.0f;
+
+    float frightenedTime = 0.0f;
 
     GhostType type;
     GhostState state;
@@ -39,8 +42,12 @@ class Ghost : public Entity {
     void reset() override;
 
     void leaveHouse();
+    void frighten(float duration);
+    void respawnInHouse();
     bool isInHouse() const;
     bool isLeaving() const;
+    bool isFrightened() const;
+    bool isFlashingWhite() const;
     GhostType getType() const;
 };
 

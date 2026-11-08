@@ -36,6 +36,7 @@ class Game {
     int dotsEatenThisRound = 0;
     float modeTimer = 0.0f;
     float ghostReleaseTimer = 0.0f;
+    int ghostsEatenInRow = 0;
 
     void handleEvents();
 
@@ -50,6 +51,7 @@ class Game {
     void killPacman();
     void finishDeath();
     void resetActors();
+    void frightenGhosts();
 
     void updateReady(float deltaTime);
     void updatePlaying(float deltaTime);

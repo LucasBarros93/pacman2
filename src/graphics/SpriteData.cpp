@@ -60,6 +60,13 @@ sf::IntRect ghost(GhostType type, Direction direction, int frame) {
                        {SPRITE_SIZE, SPRITE_SIZE});
 }
 
+sf::IntRect ghostFrightened(bool white, int frame) {
+    const int column = 8 + (white ? 2 : 0) + frame;
+
+    return sf::IntRect({column * SPRITE_SIZE, 4 * SPRITE_SIZE},
+                       {SPRITE_SIZE, SPRITE_SIZE});
+}
+
 sf::IntRect fruit(int fruit) {
     return {{(1 + fruit) * SPRITE_SIZE, 3 * SPRITE_SIZE},
             {SPRITE_SIZE, SPRITE_SIZE}};

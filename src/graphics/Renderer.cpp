@@ -132,6 +132,7 @@ void Renderer::renderPacman(const Pacman &pacman, const Maze &maze) {
 }
 void Renderer::renderGhosts(const std::vector<std::unique_ptr<Ghost>> &ghosts,
                             const Maze &maze) {
+
     const float cellSize = SpriteData::CELL_SIZE * getMazeScale(maze);
     const sf::Vector2f offset = getMazeOffset(maze);
     const float scale = (cellSize / SpriteData::SPRITE_SIZE) * 1.35f;
@@ -139,8 +140,15 @@ void Renderer::renderGhosts(const std::vector<std::unique_ptr<Ghost>> &ghosts,
     for (const auto &ghost : ghosts) {
         sf::Sprite sprite{spritesheet};
 
-        sprite.setTextureRect(SpriteData::ghost(
-            ghost->getType(), ghost->getDirection(), animationFrame));
+        const sf::IntRect rect =
+            ghost->isFrightened()
+                ? SpriteData::ghostFrightened(ghost->isFlashingWhite(),
+                                              animationFrame)
+                : SpriteData::ghost(ghost->getType(), ghost->getDirection(),
+                                    animationFrame);
+
+        sprite.setTextureRect(rect);
+
         sprite.setOrigin(
             {SpriteData::SPRITE_SIZE / 2.f, SpriteData::SPRITE_SIZE / 2.f});
         sprite.setScale({scale, scale});

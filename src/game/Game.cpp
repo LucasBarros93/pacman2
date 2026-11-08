@@ -36,6 +36,18 @@ float ghostReleaseInterval(int round) {
         return 3.0f;
     return 2.0f;
 }
+float frightenedDuration(int round) {
+    if (round == 1)
+        return 6.0f;
+    if (round == 2)
+        return 5.0f;
+    if (round == 3)
+        return 4.0f;
+    if (round == 4)
+        return 3.0f;
+    return 2.0f;
+}
+
 } // namespace
 
 Game::Game()
@@ -46,7 +58,7 @@ Game::Game()
       menuRenderer(window) {
     window.setFramerateLimit(60);
 
-    // leave house order is defined here
+    // ghosts realease order is defined here
     ghosts.push_back(std::make_unique<Blinky>(Position{13.5f, 11.f}));
     ghosts.push_back(
         std::make_unique<Ghost>(GhostType::Pinky, Position{13.5f, 14.f}));
@@ -213,6 +225,14 @@ void Game::resetActors() {
     ghostReleaseTimer = ghostReleaseInterval(gameState.getRound());
 }
 
+void Game::frightenGhosts() {
+    ghostsEatenInRow = 0;
+
+    const float duration = frightenedDuration(gameState.getRound());
+    for (const auto &ghost : ghosts)
+        ghost->frighten(duration);
+}
+
 void Game::updatePlaying(float deltaTime) {
     pacman.trySetDirection(getInput(), maze);
     pacman.update(maze, deltaTime);
@@ -223,8 +243,16 @@ void Game::updatePlaying(float deltaTime) {
     updateGhostRelease(deltaTime);
 
     for (const auto &ghost : ghosts) {
-        if (Collision::overlaps(pacman.getPosition(), ghost->getPosition(),
-                                Collision::GHOST_RADIUS)) {
+        if (!Collision::overlaps(pacman.getPosition(), ghost->getPosition(),
+                                 Collision::GHOST_RADIUS))
+            continue;
+
+        if (ghost->isFrightened()) {
+            gameState.addScore(200
+                               << std::min(ghostsEatenInRow, 3)); // 200..1600
+            ++ghostsEatenInRow;
+            ghost->respawnInHouse();
+        } else {
             killPacman();
             return;
         }
@@ -234,9 +262,13 @@ void Game::updatePlaying(float deltaTime) {
 
     if (const auto collectible = maze.consumeCollectible(
             pacman.getPosition(), Collision::PELLET_RADIUS)) {
+
         gameState.addScore(*collectible == CellType::PowerPellet ? 50 : 10);
         ++dotsEatenThisRound;
         fruitSpawner.onDotEaten(dotsEatenThisRound, gameState.getRound());
+
+        if (*collectible == CellType::PowerPellet)
+            frightenGhosts();
     }
 
     if (const auto points = fruitSpawner.tryCollect(pacman.getPosition()))

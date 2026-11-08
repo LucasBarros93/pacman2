@@ -6,6 +6,13 @@
 #include <random>
 
 namespace {
+
+constexpr float FLASH_TIME = 2.0f;
+constexpr float FLASH_INTERVAL = 0.2f;
+constexpr float HOUSE_CENTER_Y = 14.0f;
+constexpr float HOUSE_CENTER_X = 13.5f;
+constexpr float HOUSE_EXIT_Y = 11.0f;
+
 GridPosition neighbor(GridPosition tile, Direction direction) {
     switch (direction) {
     case Direction::Up:
@@ -42,9 +49,6 @@ std::mt19937 &randomEngine() {
     return engine;
 }
 
-constexpr float HOUSE_CENTER_X = 13.5f;
-constexpr float HOUSE_EXIT_Y = 11.0f;
-
 float sign(float value) {
     return value > 0.0f ? 1.0f : (value < 0.0f ? -1.0f : 0.0f);
 }
@@ -60,6 +64,8 @@ void Ghost::reset() {
     state = spawnState;
     route.clear();
     routeIndex = 0;
+    frightenedTime = 0.0f;
+    speed = DEFAULT_SPEED;
 }
 
 GhostType Ghost::getType() const { return type; }
@@ -112,6 +118,32 @@ void Ghost::leaveHouse() {
     route = {Position{HOUSE_CENTER_X, position.y},
              Position{HOUSE_CENTER_X, HOUSE_EXIT_Y}};
     routeIndex = 0;
+}
+
+void Ghost::frighten(float duration) {
+    frightenedTime = duration;
+    speed = FRIGHTENED_SPEED;
+
+    if (state == GhostState::Roaming)
+        direction = opposite(direction);
+}
+
+bool Ghost::isFrightened() const { return frightenedTime > 0.0f; }
+
+bool Ghost::isFlashingWhite() const {
+    if (frightenedTime <= 0.0f || frightenedTime > FLASH_TIME)
+        return false;
+
+    return static_cast<int>(frightenedTime / FLASH_INTERVAL) % 2 == 1;
+}
+
+void Ghost::respawnInHouse() {
+    position = {HOUSE_CENTER_X, HOUSE_CENTER_Y};
+    direction = Direction::Neutral;
+    frightenedTime = 0.0f;
+    speed = DEFAULT_SPEED;
+    state = GhostState::InHouse;
+    leaveHouse();
 }
 
 void Ghost::updateLeaving(float deltaTime) {
@@ -167,6 +199,15 @@ void Ghost::updateRoaming(const Maze &maze, float deltaTime) {
 }
 
 void Ghost::update(const Maze &maze, float deltaTime) {
+    if (frightenedTime > 0.0f) {
+        frightenedTime -= deltaTime;
+
+        if (frightenedTime <= 0.0f) {
+            frightenedTime = 0.0f;
+            speed = DEFAULT_SPEED;
+        }
+    }
+
     switch (state) {
     case GhostState::InHouse:
         break;
