@@ -208,7 +208,7 @@ void Game::finishDeath() {
     renderer.setPacmanDeathFrame(-1);
     gameState.loseLife();
 
-    if (gameState.getLives() <= 0) {
+    if (gameState.getLives() < 0) {
         startGameOver();
         return;
     }

@@ -16,7 +16,7 @@ void GameState::addScore(int points) {
 }
 
 void GameState::loseLife() {
-    if (lives > 0)
+    if (lives >= 0)
         --lives;
 }
 
