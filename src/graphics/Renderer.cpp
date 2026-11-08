@@ -218,8 +218,7 @@ void Renderer::renderFruit(const FruitSpawner &fruitSpawner, const Maze &maze) {
 
     sf::Sprite fruitSprite{spritesheet};
 
-    fruitSprite.setTextureRect(
-        SpriteData::fruit(static_cast<int>(fruit->type)));
+    fruitSprite.setTextureRect(SpriteData::fruit(fruit->type));
 
     const float scale = getMazeScale(maze);
     const float cellSize = SpriteData::CELL_SIZE * scale;
@@ -304,8 +303,7 @@ void Renderer::renderHudBottom(const GameState &gameState, const Maze &maze) {
 
     for (int r = first; r <= round; ++r) {
         sf::Sprite icon{spritesheet};
-        icon.setTextureRect(
-            SpriteData::fruit(static_cast<int>(fruitTypeForRound(r))));
+        icon.setTextureRect(SpriteData::fruit(fruitTypeForRound(r)));
         icon.setScale({iconScale, iconScale});
         icon.setOrigin({spriteSize / 2.f, spriteSize / 2.f});
 

@@ -1,5 +1,6 @@
 #include "graphics/SpriteData.hpp"
 #include "core/Core.hpp"
+#include "entities/Fruit.hpp"
 
 #include <SFML/Graphics/Rect.hpp>
 
@@ -67,8 +68,9 @@ sf::IntRect ghostFrightened(bool white, int frame) {
                        {SPRITE_SIZE, SPRITE_SIZE});
 }
 
-sf::IntRect fruit(int fruit) {
-    return {{(1 + fruit) * SPRITE_SIZE, 3 * SPRITE_SIZE},
+sf::IntRect fruit(FruitType fruit) {
+    const int column = static_cast<int>(fruit);
+    return {{(1 + column) * SPRITE_SIZE, 3 * SPRITE_SIZE},
             {SPRITE_SIZE, SPRITE_SIZE}};
 }
 

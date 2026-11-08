@@ -2,6 +2,7 @@
 #define SPRITE_DATA_HPP
 
 #include "core/Core.hpp"
+#include "entities/Fruit.hpp"
 
 #include <SFML/Graphics/Rect.hpp>
 
@@ -14,7 +15,7 @@ sf::IntRect pacmanLife();
 sf::IntRect pacmanDeath(int frame);
 sf::IntRect ghost(GhostType type, Direction direction, int frame);
 sf::IntRect ghostFrightened(bool white, int frame);
-sf::IntRect fruit(int fruit);
+sf::IntRect fruit(FruitType fruit);
 
 } // namespace SpriteData
 
