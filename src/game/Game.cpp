@@ -247,12 +247,11 @@ void Game::updatePlaying(float deltaTime) {
                                  Collision::GHOST_RADIUS))
             continue;
 
-        if (ghost->isFrightened()) {
-            gameState.addScore(200
-                               << std::min(ghostsEatenInRow, 3)); // 200..1600
+        if (ghost->isEdible()) {
+            gameState.addScore(200 << std::min(ghostsEatenInRow, 3));
             ++ghostsEatenInRow;
-            ghost->respawnInHouse();
-        } else {
+            ghost->eat();
+        } else if (ghost->isDeadly()) {
             killPacman();
             return;
         }

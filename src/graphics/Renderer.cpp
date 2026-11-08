@@ -140,12 +140,16 @@ void Renderer::renderGhosts(const std::vector<std::unique_ptr<Ghost>> &ghosts,
     for (const auto &ghost : ghosts) {
         sf::Sprite sprite{spritesheet};
 
-        const sf::IntRect rect =
-            ghost->isFrightened()
-                ? SpriteData::ghostFrightened(ghost->isFlashingWhite(),
-                                              animationFrame)
-                : SpriteData::ghost(ghost->getType(), ghost->getDirection(),
-                                    animationFrame);
+        sf::IntRect rect;
+
+        if (ghost->isDead())
+            rect = SpriteData::ghostDead(ghost->getDirection());
+        else if (ghost->isFrightened())
+            rect = SpriteData::ghostFrightened(ghost->isFlashingWhite(),
+                                               animationFrame);
+        else
+            rect = SpriteData::ghost(ghost->getType(), ghost->getDirection(),
+                                     animationFrame);
 
         sprite.setTextureRect(rect);
 

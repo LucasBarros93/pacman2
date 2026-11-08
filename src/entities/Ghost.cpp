@@ -3,6 +3,7 @@
 
 #include <array>
 #include <cmath>
+#include <limits.h>
 #include <random>
 
 namespace {
@@ -12,6 +13,7 @@ constexpr float FLASH_INTERVAL = 0.2f;
 constexpr float HOUSE_CENTER_Y = 14.0f;
 constexpr float HOUSE_CENTER_X = 13.5f;
 constexpr float HOUSE_EXIT_Y = 11.0f;
+constexpr GridPosition DEAD_TARGET{13, 11};
 
 GridPosition neighbor(GridPosition tile, Direction direction) {
     switch (direction) {
@@ -68,11 +70,27 @@ void Ghost::reset() {
     speed = DEFAULT_SPEED;
 }
 
+void Ghost::eat() {
+    state = GhostState::Dead;
+    frightenedTime = 0.0f;
+    speed = DEAD_SPEED;
+}
+
 GhostType Ghost::getType() const { return type; }
 
 bool Ghost::isInHouse() const { return state == GhostState::InHouse; }
 
 bool Ghost::isLeaving() const { return state == GhostState::Leaving; }
+
+bool Ghost::isDead() const {
+    return state == GhostState::Dead || state == GhostState::Entering;
+}
+
+bool Ghost::isEdible() const {
+    return isFrightened() && state == GhostState::Roaming;
+}
+
+bool Ghost::isDeadly() const { return !isFrightened() && !isDead(); }
 
 Direction Ghost::chooseDirection(const Maze &,
                                  const std::vector<Direction> &options) {
@@ -82,7 +100,7 @@ Direction Ghost::chooseDirection(const Maze &,
 
 std::vector<Direction> Ghost::getAvailableDirections(const Maze &maze) const {
     static constexpr std::array<Direction, 4> ALL{
-        Direction::Up, Direction::Down, Direction::Left, Direction::Right};
+        Direction::Up, Direction::Left, Direction::Down, Direction::Right};
 
     const GridPosition tile = getCurrentGridPosition();
     std::vector<Direction> options;
@@ -110,6 +128,28 @@ std::vector<Direction> Ghost::getAvailableDirections(const Maze &maze) const {
     return options;
 }
 
+Direction Ghost::chooseTowards(const std::vector<Direction> &options,
+                               GridPosition target) const {
+    const GridPosition tile = getCurrentGridPosition();
+
+    Direction best = options.front();
+    int bestDistance = std::numeric_limits<int>::max();
+
+    for (const Direction option : options) {
+        const GridPosition next = neighbor(tile, option);
+        const int dx = next.x - target.x;
+        const int dy = next.y - target.y;
+        const int distance = dx * dx + dy * dy;
+
+        if (distance < bestDistance) {
+            bestDistance = distance;
+            best = option;
+        }
+    }
+
+    return best;
+}
+
 void Ghost::leaveHouse() {
     if (state != GhostState::InHouse)
         return;
@@ -121,6 +161,9 @@ void Ghost::leaveHouse() {
 }
 
 void Ghost::frighten(float duration) {
+    if (isDead())
+        return;
+
     frightenedTime = duration;
     speed = FRIGHTENED_SPEED;
 
@@ -146,7 +189,7 @@ void Ghost::respawnInHouse() {
     leaveHouse();
 }
 
-void Ghost::updateLeaving(float deltaTime) {
+bool Ghost::followRoute(float deltaTime) {
     float remaining = speed * deltaTime;
 
     while (remaining > 0.0f && routeIndex < route.size()) {
@@ -175,11 +218,21 @@ void Ghost::updateLeaving(float deltaTime) {
         state = GhostState::Roaming;
         direction = Direction::Left;
     }
+
+    return routeIndex >= route.size();
 }
 
-void Ghost::updateRoaming(const Maze &maze, float deltaTime) {
+void Ghost::startEntering() {
+    state = GhostState::Entering;
+    route = {Position{HOUSE_CENTER_X, HOUSE_EXIT_Y},
+             Position{HOUSE_CENTER_X, HOUSE_CENTER_Y}};
+    routeIndex = 0;
+}
+
+void Ghost::updateWalking(const Maze &maze, float deltaTime) {
     if (direction == Direction::Neutral)
         return;
+
     const Position before = position;
     const Direction moved = direction;
 
@@ -190,7 +243,20 @@ void Ghost::updateRoaming(const Maze &maze, float deltaTime) {
     if (!blocked && !crossedTileCenter(before, position, moved))
         return;
 
-    const Direction next = chooseDirection(maze, getAvailableDirections(maze));
+    const std::vector<Direction> options = getAvailableDirections(maze);
+
+    if (state == GhostState::Dead) {
+        const GridPosition tile = getCurrentGridPosition();
+
+        if (tile.x == DEAD_TARGET.x && tile.y == DEAD_TARGET.y) {
+            startEntering();
+            return;
+        }
+    }
+
+    const Direction next = (state == GhostState::Dead)
+                               ? chooseTowards(options, DEAD_TARGET)
+                               : chooseDirection(maze, options);
 
     if (blocked || next != direction)
         position = {std::round(position.x), std::round(position.y)};
@@ -211,11 +277,25 @@ void Ghost::update(const Maze &maze, float deltaTime) {
     switch (state) {
     case GhostState::InHouse:
         break;
+
     case GhostState::Leaving:
-        updateLeaving(deltaTime);
+        if (followRoute(deltaTime)) {
+            state = GhostState::Roaming;
+            direction = Direction::Left;
+        }
         break;
+
+    case GhostState::Entering:
+        if (followRoute(deltaTime)) {
+            speed = DEFAULT_SPEED;
+            state = GhostState::InHouse;
+            leaveHouse();
+        }
+        break;
+
     case GhostState::Roaming:
-        updateRoaming(maze, deltaTime);
+    case GhostState::Dead:
+        updateWalking(maze, deltaTime);
         break;
     }
 }

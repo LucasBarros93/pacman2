@@ -68,6 +68,31 @@ sf::IntRect ghostFrightened(bool white, int frame) {
                        {SPRITE_SIZE, SPRITE_SIZE});
 }
 
+sf::IntRect ghostDead(Direction direction) {
+    int directionIndex = 1;
+    switch (direction) {
+    case Direction::Right:
+        directionIndex = 0;
+        break;
+    case Direction::Left:
+        directionIndex = 1;
+        break;
+    case Direction::Up:
+        directionIndex = 2;
+        break;
+    case Direction::Down:
+        directionIndex = 3;
+        break;
+    case Direction::Neutral:
+        break;
+    }
+
+    const int column = directionIndex + 8;
+
+    return sf::IntRect({column * SPRITE_SIZE, 5 * SPRITE_SIZE},
+                       {SPRITE_SIZE, SPRITE_SIZE});
+}
+
 sf::IntRect fruit(FruitType fruit) {
     const int column = static_cast<int>(fruit);
     return {{(1 + column) * SPRITE_SIZE, 3 * SPRITE_SIZE},
