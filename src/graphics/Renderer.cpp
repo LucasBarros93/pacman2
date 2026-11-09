@@ -138,6 +138,9 @@ void Renderer::renderGhosts(const std::vector<std::unique_ptr<Ghost>> &ghosts,
     const float scale = (cellSize / SpriteData::SPRITE_SIZE) * 1.35f;
 
     for (const auto &ghost : ghosts) {
+        if (!ghost->isVisible())
+            continue;
+
         sf::Sprite sprite{spritesheet};
 
         sf::IntRect rect;
@@ -337,8 +340,29 @@ void Renderer::renderBanner(const Maze &maze, const std::string &str,
     window.draw(text);
 }
 
+void Renderer::renderPopups(const std::vector<ScorePopup> &popups,
+                            const Maze &maze) {
+    const float cellSize = SpriteData::CELL_SIZE * getMazeScale(maze);
+    const sf::Vector2f offset = getMazeOffset(maze);
+    const float scale = (cellSize / SpriteData::SPRITE_SIZE) * 1.35f;
+
+    for (const ScorePopup &popup : popups) {
+        const sf::IntRect rect = SpriteData::scorePopup(popup.points);
+
+        sf::Sprite sprite{spritesheet};
+        sprite.setTextureRect(rect);
+        sprite.setOrigin({rect.size.x / 2.f, rect.size.y / 2.f});
+        sprite.setScale({scale, scale});
+        sprite.setPosition({offset.x + (popup.position.x + 0.5f) * cellSize,
+                            offset.y + (popup.position.y + 0.5f) * cellSize});
+
+        window.draw(sprite);
+    }
+}
+
 void Renderer::render(const Pacman &pacman,
                       const std::vector<std::unique_ptr<Ghost>> &ghosts,
+                      const std::vector<ScorePopup> &popups,
                       const GameState &gameState,
                       const FruitSpawner &fruitSpawner, const Maze &maze) {
     window.clear();
@@ -357,6 +381,7 @@ void Renderer::render(const Pacman &pacman,
     renderGhosts(ghosts, maze);
     if (pacmanVisible)
         renderPacman(pacman, maze);
+    renderPopups(popups, maze);
 
     window.setView(hudBottomView);
     renderHudBottom(gameState, maze);

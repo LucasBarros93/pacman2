@@ -1,6 +1,8 @@
 #ifndef RENDERER_HPP
 #define RENDERER_HPP
 
+#include "core/Core.hpp"
+
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Texture.hpp>
@@ -53,6 +55,7 @@ class Renderer {
     void renderHudBottom(const GameState &gameState, const Maze &maze);
     void renderBanner(const Maze &maze, const std::string &str,
                       sf::Color color);
+    void renderPopups(const std::vector<ScorePopup> &popups, const Maze &maze);
 
   public:
     Renderer(sf::RenderWindow &window);
@@ -63,6 +66,7 @@ class Renderer {
 
     void render(const Pacman &pacman,
                 const std::vector<std::unique_ptr<Ghost>> &ghosts,
+                const std::vector<ScorePopup> &popups,
                 const GameState &gameState, const FruitSpawner &fruitSpawner,
                 const Maze &maze);
 

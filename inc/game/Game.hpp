@@ -14,7 +14,16 @@
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
-enum class GameMode { Menu, Ready, Playing, Clearing, Paused, Dying, GameOver };
+enum class GameMode {
+    Menu,
+    Ready,
+    Playing,
+    Clearing,
+    Paused,
+    Dying,
+    GameOver,
+    EatingGhost
+};
 
 class Game {
   private:
@@ -29,6 +38,7 @@ class Game {
     MenuController menuController;
     Renderer renderer;
     MenuRenderer menuRenderer;
+    std::vector<ScorePopup> popups;
 
     GameMode mode = GameMode::Menu;
     GameMode modeBeforePause = GameMode::Playing;
@@ -44,6 +54,7 @@ class Game {
     void startNextRound();
     void startGameOver();
     void startClearing();
+    void startGhostFreeze(Ghost &ghost, int points);
     void finishGame();
     void resetRound();
     void startReady();
@@ -59,6 +70,8 @@ class Game {
     void updateDying(float deltaTime);
     void updateGameOver(float deltaTime);
     void updateGhostRelease(float deltaTime);
+    void updateEatingGhost(float deltaTime);
+    void updatePopups(float deltaTime);
 
   public:
     Game();

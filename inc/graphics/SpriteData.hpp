@@ -17,6 +17,7 @@ sf::IntRect ghost(GhostType type, Direction direction, int frame);
 sf::IntRect ghostFrightened(bool white, int frame);
 sf::IntRect ghostDead(Direction direction);
 sf::IntRect fruit(FruitType fruit);
+sf::IntRect scorePopup(int points);
 
 } // namespace SpriteData
 

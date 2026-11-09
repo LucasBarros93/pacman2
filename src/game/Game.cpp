@@ -28,6 +28,8 @@ constexpr float DEATH_FRAME_TIME = 0.12f;
 constexpr int DEATH_FRAMES = 12;
 constexpr float DEATH_END_PAUSE = 0.6f;
 constexpr float GAME_OVER_INPUT_DELAY = 0.5f;
+constexpr float GHOST_FREEZE_TIME = 0.8f;
+constexpr float FRUIT_POPUP_TIME = 2.0f;
 
 float ghostReleaseInterval(int round) {
     if (round == 1)
@@ -155,7 +157,8 @@ void Game::togglePause() {
         mode = modeBeforePause;
         renderer.setPaused(false);
     } else if (mode == GameMode::Ready || mode == GameMode::Playing ||
-               mode == GameMode::Clearing || mode == GameMode::Dying) {
+               mode == GameMode::Clearing || mode == GameMode::Dying ||
+               mode == GameMode::EatingGhost) {
         modeBeforePause = mode;
         mode = GameMode::Paused;
         renderer.setPaused(true);
@@ -187,6 +190,17 @@ void Game::startGameOver() {
     renderer.setShowGameOver(true);
 }
 
+void Game::startGhostFreeze(Ghost &ghost, int points) {
+    ghost.eat();
+    ghost.setVisible(false);
+    renderer.setPacmanVisible(false);
+
+    popups.push_back({ghost.getPosition(), points, GHOST_FREEZE_TIME});
+
+    mode = GameMode::EatingGhost;
+    modeTimer = 0.0f;
+}
+
 void Game::finishGame() {
     renderer.setMazeFlash(false);
     renderer.setShowReady(false);
@@ -202,6 +216,7 @@ void Game::killPacman() {
     mode = GameMode::Dying;
     modeTimer = 0.0f;
     fruitSpawner.resetRound();
+    popups.clear();
 }
 
 void Game::finishDeath() {
@@ -223,6 +238,7 @@ void Game::resetActors() {
     for (const auto &ghost : ghosts)
         ghost->reset();
     ghostReleaseTimer = ghostReleaseInterval(gameState.getRound());
+    popups.clear();
 }
 
 void Game::frightenGhosts() {
@@ -234,6 +250,7 @@ void Game::frightenGhosts() {
 }
 
 void Game::updatePlaying(float deltaTime) {
+    updatePopups(deltaTime);
     pacman.trySetDirection(getInput(), maze);
     pacman.update(maze, deltaTime);
 
@@ -248,9 +265,11 @@ void Game::updatePlaying(float deltaTime) {
             continue;
 
         if (ghost->isEdible()) {
-            gameState.addScore(200 << std::min(ghostsEatenInRow, 3));
+            const int points = 200 << std::min(ghostsEatenInRow, 3);
+            gameState.addScore(points);
             ++ghostsEatenInRow;
-            ghost->eat();
+            startGhostFreeze(*ghost, points);
+            return;
         } else if (ghost->isDeadly()) {
             killPacman();
             return;
@@ -270,8 +289,11 @@ void Game::updatePlaying(float deltaTime) {
             frightenGhosts();
     }
 
-    if (const auto points = fruitSpawner.tryCollect(pacman.getPosition()))
+    const auto fruit = fruitSpawner.getActiveFruit();
+    if (const auto points = fruitSpawner.tryCollect(pacman.getPosition())) {
         gameState.addScore(*points);
+        popups.push_back({fruit->position, *points, FRUIT_POPUP_TIME});
+    }
 
     if (maze.getRemainingCollectibles() == 0)
         startClearing();
@@ -326,6 +348,31 @@ void Game::updateGhostRelease(float deltaTime) {
     }
 }
 
+void Game::updateEatingGhost(float deltaTime) {
+    modeTimer += deltaTime;
+    updatePopups(deltaTime);
+
+    if (modeTimer < GHOST_FREEZE_TIME)
+        return;
+
+    for (const auto &ghost : ghosts)
+        ghost->setVisible(true);
+
+    renderer.setPacmanVisible(true);
+    mode = GameMode::Playing;
+}
+
+void Game::updatePopups(float deltaTime) {
+    for (ScorePopup &popup : popups)
+        popup.remaining -= deltaTime;
+
+    popups.erase(std::remove_if(popups.begin(), popups.end(),
+                                [](const ScorePopup &popup) {
+                                    return popup.remaining <= 0.0f;
+                                }),
+                 popups.end());
+}
+
 void Game::run() {
     sf::Clock clock;
 
@@ -358,10 +405,13 @@ void Game::run() {
         case GameMode::GameOver:
             updateGameOver(deltaTime);
             break;
+        case GameMode::EatingGhost:
+            updateEatingGhost(deltaTime);
+            break;
         case GameMode::Menu:
         case GameMode::Paused:
             break;
         }
-        renderer.render(pacman, ghosts, gameState, fruitSpawner, maze);
+        renderer.render(pacman, ghosts, popups, gameState, fruitSpawner, maze);
     }
 }

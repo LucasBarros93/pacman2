@@ -99,4 +99,55 @@ sf::IntRect fruit(FruitType fruit) {
             {SPRITE_SIZE, SPRITE_SIZE}};
 }
 
+sf::IntRect scorePopup(int points) {
+    int row, column;
+    switch (points) {
+    case 200:
+        row = 8;
+        column = 0;
+        break;
+    case 400:
+        row = 8;
+        column = 1;
+        break;
+    case 800:
+        row = 8;
+        column = 2;
+        break;
+    case 1600:
+        row = 8;
+        column = 3;
+        break;
+
+    case 100:
+        row = 9;
+        column = 0;
+        break;
+    case 300:
+        row = 9;
+        column = 1;
+        break;
+    case 500:
+        row = 9;
+        column = 2;
+        break;
+    case 700:
+        row = 9;
+        column = 3;
+        break;
+    case 1000:
+    case 2000:
+    case 3000:
+    case 5000:
+        row = 9;
+        column = 4;
+        break;
+
+    default:
+        return sf::IntRect();
+    }
+    return sf::IntRect({column * SPRITE_SIZE, row * SPRITE_SIZE},
+                       {SPRITE_SIZE, SPRITE_SIZE});
+}
+
 } // namespace SpriteData

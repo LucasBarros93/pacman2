@@ -35,6 +35,14 @@ struct Cell {
     CellType cellType;
 };
 
+enum class PopupKind { Ghost, Fruit };
+
+struct ScorePopup {
+    Position position;
+    int points;
+    float remaining;
+};
+
 namespace Collision {
 constexpr float PELLET_RADIUS = 0.4f;
 constexpr float FRUIT_RADIUS = 0.6f;

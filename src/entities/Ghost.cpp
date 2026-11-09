@@ -68,6 +68,7 @@ void Ghost::reset() {
     routeIndex = 0;
     frightenedTime = 0.0f;
     speed = DEFAULT_SPEED;
+    visible = true;
 }
 
 void Ghost::eat() {
@@ -179,6 +180,10 @@ bool Ghost::isFlashingWhite() const {
 
     return static_cast<int>(frightenedTime / FLASH_INTERVAL) % 2 == 1;
 }
+
+void Ghost::setVisible(bool value) { visible = value; }
+
+bool Ghost::isVisible() const { return visible; }
 
 void Ghost::respawnInHouse() {
     position = {HOUSE_CENTER_X, HOUSE_CENTER_Y};
