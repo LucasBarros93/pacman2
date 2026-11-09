@@ -193,7 +193,7 @@ void Game::startGameOver() {
 void Game::startGhostFreeze(Ghost &ghost, int points) {
     ghost.eat();
     ghost.setVisible(false);
-    renderer.setPacmanVisible(false);
+    pacman.setVisible(false);
 
     popups.push_back({ghost.getPosition(), points, GHOST_FREEZE_TIME});
 
@@ -207,7 +207,6 @@ void Game::finishGame() {
     renderer.setShowGameOver(false);
     renderer.setPaused(false);
     renderer.setPacmanDeathFrame(-1);
-    renderer.setPacmanVisible(true);
     menuController.onGameOver(gameState.getScore());
     mode = GameMode::Menu;
 }
@@ -228,7 +227,6 @@ void Game::finishDeath() {
         return;
     }
 
-    renderer.setPacmanVisible(true);
     resetActors();
     startReady();
 }
@@ -324,7 +322,7 @@ void Game::updateDying(float deltaTime) {
     if (frame < DEATH_FRAMES)
         renderer.setPacmanDeathFrame(frame);
     else
-        renderer.setPacmanVisible(false);
+        pacman.setVisible(false);
 
     if (animTime >= DEATH_FRAMES * DEATH_FRAME_TIME + DEATH_END_PAUSE)
         finishDeath();
@@ -358,7 +356,7 @@ void Game::updateEatingGhost(float deltaTime) {
     for (const auto &ghost : ghosts)
         ghost->setVisible(true);
 
-    renderer.setPacmanVisible(true);
+    pacman.setVisible(true);
     mode = GameMode::Playing;
 }
 

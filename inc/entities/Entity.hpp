@@ -12,6 +12,7 @@ class Entity {
     float speed;
     Position spawnPosition;
     Direction spawnDirection;
+    bool visible = true;
 
     void setDirection(Direction newDirection);
 
@@ -25,9 +26,12 @@ class Entity {
     Entity(Position position, Direction direction, float speed);
     virtual ~Entity() = default;
 
+    bool isVisible() const;
+
     Position getPosition() const;
     Direction getDirection() const;
     GridPosition getCurrentGridPosition() const;
+    void setVisible(bool value);
 
     virtual void update(const Maze &maze, float deltaTime);
     virtual void reset();

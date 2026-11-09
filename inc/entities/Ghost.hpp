@@ -25,7 +25,6 @@ class Ghost : public Entity {
 
     std::vector<Position> route;
     std::size_t routeIndex = 0;
-    bool visible = true;
 
     std::vector<Direction> getAvailableDirections(const Maze &maze) const;
     void updateWalking(const Maze &maze, float deltaTime);
@@ -57,9 +56,7 @@ class Ghost : public Entity {
     bool isDead() const;
     bool isEdible() const;
     bool isDeadly() const;
-    bool isVisible() const;
     GhostType getType() const;
-    void setVisible(bool value);
 };
 
 #endif

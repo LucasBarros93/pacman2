@@ -48,6 +48,10 @@ GridPosition Entity::getGridPosition(Position position,
     return {0, 0};
 }
 
+void Entity::setVisible(bool value) { visible = value; }
+
+bool Entity::isVisible() const { return visible; }
+
 GridPosition Entity::teleportHorizontal(const Maze &maze,
                                         GridPosition gridPosition) const {
     if (gridPosition.x >= maze.getWidth()) {
@@ -104,4 +108,5 @@ void Entity::update(const Maze &maze, float deltaTime) {
 void Entity::reset() {
     position = spawnPosition;
     direction = spawnDirection;
+    visible = true;
 }

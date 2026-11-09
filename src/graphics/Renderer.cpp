@@ -379,7 +379,7 @@ void Renderer::render(const Pacman &pacman,
     if (showGameOver)
         renderBanner(maze, "GAME OVER", sf::Color::Red);
     renderGhosts(ghosts, maze);
-    if (pacmanVisible)
+    if (pacman.isVisible())
         renderPacman(pacman, maze);
     renderPopups(popups, maze);
 
@@ -392,5 +392,3 @@ void Renderer::render(const Pacman &pacman,
 void Renderer::setMazeFlash(bool flash) { mazeFlash = flash; }
 
 void Renderer::setPacmanDeathFrame(int frame) { pacmanDeathFrame = frame; }
-
-void Renderer::setPacmanVisible(bool visible) { pacmanVisible = visible; }
