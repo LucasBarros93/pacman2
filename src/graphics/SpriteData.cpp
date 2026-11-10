@@ -136,12 +136,25 @@ sf::IntRect scorePopup(int points) {
         column = 3;
         break;
     case 1000:
-    case 2000:
-    case 3000:
-    case 5000:
         row = 9;
         column = 4;
-        break;
+        return sf::IntRect({column * SPRITE_SIZE, row * SPRITE_SIZE},
+                           {SPRITE_SIZE + 4, SPRITE_SIZE});
+    case 2000:
+        row = 10;
+        column = 4;
+        return sf::IntRect({column * SPRITE_SIZE - 4, row * SPRITE_SIZE},
+                           {SPRITE_SIZE + 8, SPRITE_SIZE});
+    case 3000:
+        row = 11;
+        column = 4;
+        return sf::IntRect({column * SPRITE_SIZE - 4, row * SPRITE_SIZE},
+                           {SPRITE_SIZE + 8, SPRITE_SIZE});
+    case 5000:
+        row = 12;
+        column = 4;
+        return sf::IntRect({column * SPRITE_SIZE - 4, row * SPRITE_SIZE},
+                           {SPRITE_SIZE + 8, SPRITE_SIZE});
 
     default:
         return sf::IntRect();

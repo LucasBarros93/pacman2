@@ -8,7 +8,7 @@
 
 namespace SpriteData {
 static constexpr float CELL_SIZE = 24.0f;
-static constexpr int SPRITE_SIZE = 16;
+static constexpr int SPRITE_SIZE = 32;
 
 sf::IntRect pacman(int frame, Direction direction);
 sf::IntRect pacmanLife();
