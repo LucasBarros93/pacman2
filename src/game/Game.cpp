@@ -118,10 +118,8 @@ void Game::handleEvents() {
 
                 if (confirm && modeTimer >= GAME_OVER_INPUT_DELAY)
                     finishGame();
-            } else if (code == sf::Keyboard::Key::Escape) {
-                if (mode == GameMode::Playing)
-                    killPacman();
-            } else if (code == sf::Keyboard::Key::P) {
+            } else if (code == sf::Keyboard::Key::P ||
+                       code == sf::Keyboard::Key::Escape) {
                 togglePause();
             }
         }
@@ -212,6 +210,8 @@ void Game::finishGame() {
 }
 
 void Game::killPacman() {
+    for (const auto &ghost : ghosts)
+        ghost->setVisible(false);
     mode = GameMode::Dying;
     modeTimer = 0.0f;
     fruitSpawner.resetRound();
