@@ -10,12 +10,18 @@ class Pacman : public Entity {
   private:
     static constexpr float DEFAULT_SPEED = 6.5f;
 
+    float stallTime = 0.0f;
+
     bool canMove(const Maze &maze, Direction direction) const;
 
   public:
     explicit Pacman(const Position position);
     bool trySetDirection(Direction newDirection, const Maze &maze);
     void stop();
+
+    void stall(float duration);
+    void update(const Maze &maze, float deltaTime) override;
+    void reset() override;
 };
 
 #endif

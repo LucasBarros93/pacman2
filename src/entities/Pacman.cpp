@@ -46,3 +46,19 @@ bool Pacman::canMove(const Maze &maze, Direction direction) const {
 }
 
 void Pacman::stop() { direction = Direction::Neutral; }
+
+void Pacman::stall(float duration) { stallTime = duration; }
+
+void Pacman::reset() {
+    Entity::reset();
+    stallTime = 0.0f;
+}
+
+void Pacman::update(const Maze &maze, float deltaTime) {
+    if (stallTime > 0.0f) {
+        stallTime -= deltaTime;
+        return;
+    }
+
+    Entity::update(maze, deltaTime);
+}

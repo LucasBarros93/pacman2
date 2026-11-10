@@ -30,6 +30,8 @@ constexpr float DEATH_END_PAUSE = 0.6f;
 constexpr float GAME_OVER_INPUT_DELAY = 0.5f;
 constexpr float GHOST_FREEZE_TIME = 0.8f;
 constexpr float FRUIT_POPUP_TIME = 2.0f;
+constexpr float PELLET_STALL = 0.5f / 60.0f;
+constexpr float POWER_PELLET_STALL = 2.5f / 60.0f;
 
 float ghostReleaseInterval(int round) {
     if (round == 1)
@@ -282,6 +284,8 @@ void Game::updatePlaying(float deltaTime) {
         gameState.addScore(*collectible == CellType::PowerPellet ? 50 : 10);
         ++dotsEatenThisRound;
         fruitSpawner.onDotEaten(dotsEatenThisRound, gameState.getRound());
+        pacman.stall(*collectible == CellType::PowerPellet ? POWER_PELLET_STALL
+                                                           : PELLET_STALL);
 
         if (*collectible == CellType::PowerPellet)
             frightenGhosts();
