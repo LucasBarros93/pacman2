@@ -16,6 +16,7 @@ class Ghost : public Entity {
     static constexpr float DEFAULT_SPEED = 6.0f;
     static constexpr float FRIGHTENED_SPEED = 3.0f;
     static constexpr float DEAD_SPEED = 12.0f;
+    static constexpr float TUNNEL_SPEED = 4.5f;
 
     float frightenedTime = 0.0f;
 
@@ -30,6 +31,8 @@ class Ghost : public Entity {
     void updateWalking(const Maze &maze, float deltaTime);
     bool followRoute(float deltaTime);
     void startEntering();
+    float stateSpeed() const;
+    bool inTunnel() const;
 
   protected:
     virtual Direction chooseDirection(const Maze &maze,

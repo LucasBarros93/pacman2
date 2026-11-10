@@ -14,6 +14,9 @@ constexpr float HOUSE_CENTER_Y = 14.0f;
 constexpr float HOUSE_CENTER_X = 13.5f;
 constexpr float HOUSE_EXIT_Y = 11.0f;
 constexpr GridPosition DEAD_TARGET{13, 11};
+constexpr int TUNNEL_ROW = 14;
+constexpr int TUNNEL_LEFT_END = 5;
+constexpr int TUNNEL_RIGHT_START = 22;
 
 GridPosition neighbor(GridPosition tile, Direction direction) {
     switch (direction) {
@@ -229,6 +232,21 @@ void Ghost::startEntering() {
     routeIndex = 0;
 }
 
+float Ghost::stateSpeed() const {
+    if (isDead())
+        return DEAD_SPEED;
+    if (isFrightened())
+        return FRIGHTENED_SPEED;
+    return DEFAULT_SPEED;
+}
+
+bool Ghost::inTunnel() const {
+    const GridPosition tile = getCurrentGridPosition();
+
+    return tile.y == TUNNEL_ROW &&
+           (tile.x <= TUNNEL_LEFT_END || tile.x >= TUNNEL_RIGHT_START);
+}
+
 void Ghost::updateWalking(const Maze &maze, float deltaTime) {
     if (direction == Direction::Neutral)
         return;
@@ -265,14 +283,12 @@ void Ghost::updateWalking(const Maze &maze, float deltaTime) {
 }
 
 void Ghost::update(const Maze &maze, float deltaTime) {
-    if (frightenedTime > 0.0f) {
-        frightenedTime -= deltaTime;
+    if (frightenedTime > 0.0f)
+        frightenedTime = std::max(0.0f, frightenedTime - deltaTime);
 
-        if (frightenedTime <= 0.0f) {
-            frightenedTime = 0.0f;
-            speed = DEFAULT_SPEED;
-        }
-    }
+    speed = stateSpeed();
+    if (!isDead() && inTunnel())
+        speed = std::min(speed, TUNNEL_SPEED);
 
     switch (state) {
     case GhostState::InHouse:
