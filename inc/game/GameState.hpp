@@ -3,11 +3,14 @@
 
 class GameState {
   private:
+    static constexpr int EXTRA_LIFE_SCORE = 10000;
+
     int score = 0;
     int highScore = 0;
     int livesOnStart = 2;
     int lives = 2;
     int round = 1;
+    bool extraLifeGiven = false;
 
   public:
     int getScore() const;

@@ -13,6 +13,10 @@ void GameState::addScore(int points) {
         return;
 
     score += points;
+    if (!extraLifeGiven && score >= EXTRA_LIFE_SCORE) {
+        extraLifeGiven = true;
+        ++lives;
+    }
 }
 
 void GameState::loseLife() {
@@ -26,6 +30,8 @@ void GameState::reset() {
     score = 0;
     lives = livesOnStart;
     round = 1;
+
+    extraLifeGiven = false;
 }
 
 void GameState::setHighScore(int value) { highScore = value; }
