@@ -45,13 +45,19 @@ bool Pacman::canMove(const Maze &maze, Direction direction) const {
     return maze.isWalkable(targetGridPosition);
 }
 
-void Pacman::stop() { direction = Direction::Neutral; }
+void Pacman::stop() {
+    direction = Direction::Neutral;
+    moving = false;
+}
+
+bool Pacman::isMoving() const { return moving; }
 
 void Pacman::stall(float duration) { stallTime = duration; }
 
 void Pacman::reset() {
     Entity::reset();
     stallTime = 0.0f;
+    moving = false;
 }
 
 void Pacman::update(const Maze &maze, float deltaTime) {
@@ -60,5 +66,8 @@ void Pacman::update(const Maze &maze, float deltaTime) {
         return;
     }
 
+    const Position before = position;
     Entity::update(maze, deltaTime);
+
+    moving = position.x != before.x || position.y != before.y;
 }

@@ -11,6 +11,7 @@ class Pacman : public Entity {
     static constexpr float DEFAULT_SPEED = 6.5f;
 
     float stallTime = 0.0f;
+    bool moving = false;
 
     bool canMove(const Maze &maze, Direction direction) const;
 
@@ -19,6 +20,7 @@ class Pacman : public Entity {
     bool trySetDirection(Direction newDirection, const Maze &maze);
     void stop();
 
+    bool isMoving() const;
     void stall(float duration);
     void update(const Maze &maze, float deltaTime) override;
     void reset() override;

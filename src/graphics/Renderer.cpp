@@ -108,9 +108,11 @@ void Renderer::renderPacman(const Pacman &pacman, const Maze &maze) {
 
     if (pacmanDeathFrame >= 0) {
         sprite.setTextureRect(SpriteData::pacmanDeath(pacmanDeathFrame));
-    } else {
+    } else if (pacman.isMoving()) {
         sprite.setTextureRect(
             SpriteData::pacman(animationFrame, pacman.getDirection()));
+    } else {
+        sprite.setTextureRect(SpriteData::pacman(0, pacman.getDirection()));
     }
 
     const Position position = pacman.getPosition();

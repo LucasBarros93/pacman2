@@ -1,6 +1,7 @@
 #include "entities/Ghost.hpp"
 #include "maze/Maze.hpp"
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <limits.h>
