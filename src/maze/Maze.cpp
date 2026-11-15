@@ -2,61 +2,85 @@
 #include "core/Core.hpp"
 
 #include <cmath>
+#include <cstddef>
 #include <fstream>
 #include <stdexcept>
+#include <utility>
+
+namespace {
+/// Converts one character of the map file into a tile.
+CellType parseCell(char character, int row, int column) {
+    switch (character) {
+    case '#':
+        return CellType::Wall;
+    case '.':
+        return CellType::Pellet;
+    case 'o':
+        return CellType::PowerPellet;
+    case ' ':
+        return CellType::Empty;
+    default:
+        throw std::runtime_error(std::string("Invalid character '") +
+                                 character + "' in maze at row " +
+                                 std::to_string(row) + ", column " +
+                                 std::to_string(column));
+    }
+}
+} // namespace
 
 Maze::Maze(const std::string &filePath) {
     std::ifstream file(filePath);
 
-    if (!file.is_open()) {
-        throw std::runtime_error("Could not open maze file");
-    }
+    if (!file.is_open())
+        throw std::runtime_error("Could not open maze file: " + filePath);
 
     std::string line;
     while (std::getline(file, line)) {
-        std::vector<Cell> row;
+        if (!line.empty() && line.back() == '\r')
+            line.pop_back(); // file saved on Windows
 
-        for (char character : line) {
-            switch (character) {
-            case '#':
-                row.push_back({CellType::Wall});
-                break;
+        if (line.empty())
+            continue;
 
-            case '-':
-                row.push_back({CellType::GhostDoor});
-                break;
+        const int row = static_cast<int>(grid.size());
 
-            case '.':
-                row.push_back({CellType::Pellet});
-                break;
+        std::vector<CellType> cells;
+        cells.reserve(line.size());
 
-            case 'o':
-                row.push_back({CellType::PowerPellet});
-                break;
+        for (std::size_t column = 0; column < line.size(); ++column)
+            cells.push_back(
+                parseCell(line[column], row, static_cast<int>(column)));
 
-            case ' ':
-                row.push_back({CellType::Empty});
-                break;
+        if (!grid.empty() && cells.size() != grid.front().size())
+            throw std::runtime_error("Maze row " + std::to_string(row) +
+                                     " has " + std::to_string(cells.size()) +
+                                     " columns, expected " +
+                                     std::to_string(grid.front().size()));
 
-            default:
-                throw std::runtime_error("Invalid character in maze");
-            }
-        }
-
-        this->grid.push_back(row);
+        grid.push_back(std::move(cells));
     }
+
+    if (grid.empty())
+        throw std::runtime_error("Maze file has no rows: " + filePath);
+
     initialGrid = grid;
     remainingCollectibles = countCollectibles();
 }
 
 int Maze::countCollectibles() const {
     int count = 0;
+
     for (const auto &row : grid)
-        for (const Cell &cell : row)
-            if (cell.cellType == CellType::Pellet ||
-                cell.cellType == CellType::PowerPellet)
+        for (const CellType type : row)
+            if (type == CellType::Pellet || type == CellType::PowerPellet)
                 ++count;
+
     return count;
+}
+
+bool Maze::isInside(GridPosition position) const {
+    return position.x >= 0 && position.x < getWidth() && position.y >= 0 &&
+           position.y < getHeight();
 }
 
 std::optional<CellType> Maze::consumeCollectible(Position position,
@@ -67,53 +91,45 @@ std::optional<CellType> Maze::consumeCollectible(Position position,
     const int maxY = static_cast<int>(std::ceil(position.y + radius));
 
     for (int y = minY; y <= maxY; ++y) {
-        if (y < 0 || y >= static_cast<int>(grid.size()))
-            continue;
-
         for (int x = minX; x <= maxX; ++x) {
-            if (x < 0 || x >= static_cast<int>(grid[y].size()))
+            if (!isInside({x, y}))
                 continue;
 
-            CellType &type = grid[y][x].cellType;
+            CellType &type = grid[y][x];
             if (type != CellType::Pellet && type != CellType::PowerPellet)
                 continue;
 
-            const Position pelletPosition{static_cast<float>(x),
-                                          static_cast<float>(y)};
+            // a pellet sits at the center of its tile, which is exactly (x, y)
+            const Position center{static_cast<float>(x), static_cast<float>(y)};
+            if (!Collision::overlaps(position, center, radius))
+                continue;
 
-            if (Collision::overlaps(position, pelletPosition, radius)) {
-                const CellType consumed = type;
-                type = CellType::Empty;
-                --remainingCollectibles;
-                return consumed;
-            }
+            const CellType eaten = type;
+            type = CellType::Empty;
+            --remainingCollectibles;
+            return eaten;
         }
     }
 
     return std::nullopt;
 }
 
-bool Maze::isWalkable(const GridPosition position) const {
-    if (position.y < 0 || position.y >= static_cast<int>(grid.size()))
-        return false;
+bool Maze::isWalkable(GridPosition position) const {
+    return isInside(position) && grid[position.y][position.x] != CellType::Wall;
+}
 
-    if (position.x < 0 ||
-        position.x >= static_cast<int>(grid[position.y].size()))
-        return false;
+GridPosition Maze::wrap(GridPosition tile) const {
+    if (tile.x < 0)
+        tile.x = getWidth() - 1;
+    else if (tile.x >= getWidth())
+        tile.x = 0;
 
-    const CellType type = grid[position.y][position.x].cellType;
-    return type != CellType::Wall && type != CellType::GhostDoor;
-};
+    return tile;
+}
 
-bool Maze::isGhostWalkable(const GridPosition position) const {
-
-    if (position.y < 0 || position.y >= static_cast<int>(grid.size()))
-        return false;
-    if (position.x < 0 ||
-        position.x >= static_cast<int>(grid[position.y].size()))
-        return false;
-
-    return grid[position.y][position.x].cellType != CellType::Wall;
+bool Maze::canStep(GridPosition from, Direction direction) const {
+    return direction != Direction::Neutral &&
+           isWalkable(wrap(neighbor(from, direction)));
 }
 
 void Maze::reset() {
@@ -123,17 +139,10 @@ void Maze::reset() {
 
 int Maze::getRemainingCollectibles() const { return remainingCollectibles; }
 
-Cell Maze::getCell(const GridPosition position) const {
-    const int x = position.x;
-    const int y = position.y;
-
-    if (y < 0 || y >= static_cast<int>(grid.size()) || x < 0 ||
-        x >= static_cast<int>(grid[y].size()))
-        return Cell{CellType::Wall};
-
-    return grid[y][x];
+CellType Maze::getCellType(GridPosition position) const {
+    return isInside(position) ? grid[position.y][position.x] : CellType::Wall;
 }
 
-int Maze::getHeight() const { return static_cast<int>(this->grid.size()); }
+int Maze::getHeight() const { return static_cast<int>(grid.size()); }
 
-int Maze::getWidth() const { return static_cast<int>(this->grid[0].size()); }
+int Maze::getWidth() const { return static_cast<int>(grid.front().size()); }

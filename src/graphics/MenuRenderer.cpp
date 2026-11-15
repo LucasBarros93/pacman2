@@ -1,8 +1,17 @@
 #include "graphics/MenuRenderer.hpp"
+#include "game/Leaderboard.hpp"
+#include "menus/Menu.hpp"
 
 #include <SFML/Graphics/Text.hpp>
+
+#include <cstddef>
 #include <stdexcept>
 #include <string>
+
+namespace {
+const sf::Color HINT_COLOR(150, 150,
+                           150); ///< Color of the "press enter" hints.
+} // namespace
 
 MenuRenderer::MenuRenderer(sf::RenderWindow &window) : window{window} {
     if (!font.openFromFile("assets/fonts/pacman.ttf"))
@@ -60,7 +69,7 @@ void MenuRenderer::renderLeaderboard(const Leaderboard &leaderboard) {
         window.draw(right);
     }
 
-    drawCentered("PRESS ENTER TO GO BACK", 14, sf::Color(150, 150, 150), 520.f);
+    drawCentered("PRESS ENTER TO GO BACK", 14, HINT_COLOR, 520.f);
 }
 
 void MenuRenderer::renderNameEntry(const Menu &menu) {
@@ -79,7 +88,7 @@ void MenuRenderer::renderNameEntry(const Menu &menu) {
     }
 
     drawCentered(slots, 48, sf::Color::Yellow, 330.f);
-    drawCentered("PRESS ENTER TO CONFIRM", 14, sf::Color(150, 150, 150), 480.f);
+    drawCentered("PRESS ENTER TO CONFIRM", 14, HINT_COLOR, 480.f);
 }
 
 void MenuRenderer::render(const Menu &menu, const Leaderboard &leaderboard) {

@@ -3,6 +3,10 @@
 
 #include "core/Core.hpp"
 
+/// @brief The bonus items, from the cheapest to the most valuable.
+/// @warning SpriteData uses the numeric value as the fruit's column in the
+///          sprite sheet (guarded by a static_assert), so the order must match
+///          it.
 enum class FruitType {
     Cherry = 1,
     Strawberry = 2,
@@ -14,7 +18,10 @@ enum class FruitType {
     Key = 8
 };
 
-inline FruitType fruitTypeForRound(int round) {
+/// @brief Tells which fruit appears in a round.
+/// @param round The round number, starting at 1.
+/// @return The fruit of that round. From round 13 on it is always the key.
+[[nodiscard]] constexpr FruitType fruitTypeForRound(int round) {
     switch (round) {
     case 1:
         return FruitType::Cherry;
@@ -40,7 +47,11 @@ inline FruitType fruitTypeForRound(int round) {
     }
 }
 
-inline int scoreFor(FruitType type) {
+/// @brief Tells how many points a fruit is worth.
+/// @param type The fruit.
+/// @return The points for eating it (100 for the cherry up to 5000 for the
+/// key).
+[[nodiscard]] constexpr int scoreFor(FruitType type) {
     switch (type) {
     case FruitType::Cherry:
         return 100;
@@ -62,9 +73,10 @@ inline int scoreFor(FruitType type) {
     return 0;
 }
 
+/// @brief A bonus fruit waiting to be eaten.
 struct Fruit {
-    FruitType type;
-    Position position;
+    FruitType type;    ///< Which fruit it is.
+    Position position; ///< Where it is, in tiles.
 };
 
 #endif

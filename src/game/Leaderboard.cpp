@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <sstream>
 #include <utility>
 
 Leaderboard::Leaderboard(std::string path) : filePath{std::move(path)} {
@@ -25,9 +26,14 @@ void Leaderboard::load() {
     if (!file.is_open())
         return;
 
-    ScoreEntry entry;
-    while (file >> entry.name >> entry.score)
-        entries.push_back(entry);
+    std::string line;
+    while (std::getline(file, line)) {
+        std::istringstream stream(line);
+        ScoreEntry entry;
+
+        if (stream >> entry.name >> entry.score)
+            entries.push_back(entry); // malformed lines are skipped
+    }
 
     sortAndTrim();
 }

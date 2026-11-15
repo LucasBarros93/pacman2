@@ -8,11 +8,14 @@ int GameState::getLives() const { return lives; }
 
 int GameState::getRound() const { return round; }
 
+bool GameState::isGameOver() const { return lives < 0; }
+
 void GameState::addScore(int points) {
     if (points <= 0)
         return;
 
     score += points;
+
     if (!extraLifeGiven && score >= EXTRA_LIFE_SCORE) {
         extraLifeGiven = true;
         ++lives;
@@ -28,9 +31,8 @@ void GameState::advanceLevel() { ++round; }
 
 void GameState::reset() {
     score = 0;
-    lives = livesOnStart;
+    lives = LIVES_ON_START;
     round = 1;
-
     extraLifeGiven = false;
 }
 

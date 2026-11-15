@@ -1,166 +1,119 @@
 #include "graphics/SpriteData.hpp"
-#include "core/Core.hpp"
-#include "entities/Fruit.hpp"
 
-#include <SFML/Graphics/Rect.hpp>
+static_assert(static_cast<int>(GhostType::Blinky) == 0 &&
+                  static_cast<int>(GhostType::Clyde) == 3,
+              "the ghost rows of the sheet follow the order of GhostType");
+
+static_assert(static_cast<int>(FruitType::Cherry) == 1 &&
+                  static_cast<int>(FruitType::Key) == 8,
+              "the fruit columns of the sheet follow the order of FruitType");
 
 namespace SpriteData {
 
-sf::IntRect pacman(int frame, Direction direction) {
-    switch (direction) {
-    case Direction::Right:
-        return {{frame * SPRITE_SIZE, 0}, {SPRITE_SIZE, SPRITE_SIZE}};
+namespace {
+constexpr int GHOST_FIRST_ROW = 4; ///< Row of Blinky. One row per ghost.
+constexpr int GHOST_EXTRA_COLUMN =
+    8; ///< Frightened ghosts and eyes start here.
 
-    case Direction::Left:
-        return {{frame * SPRITE_SIZE, SPRITE_SIZE}, {SPRITE_SIZE, SPRITE_SIZE}};
-
-    case Direction::Up:
-        return {{frame * SPRITE_SIZE, 2 * SPRITE_SIZE},
-                {SPRITE_SIZE, SPRITE_SIZE}};
-
-    case Direction::Down:
-        return {{frame * SPRITE_SIZE, 3 * SPRITE_SIZE},
-                {SPRITE_SIZE, SPRITE_SIZE}};
-
-    case Direction::Neutral:
-        break;
-    }
-
-    return {{2 * SPRITE_SIZE, 0}, {SPRITE_SIZE, SPRITE_SIZE}};
-}
-sf::IntRect pacmanLife() {
-    return {{8 * SPRITE_SIZE, SPRITE_SIZE}, {SPRITE_SIZE, SPRITE_SIZE}};
-}
-sf::IntRect pacmanDeath(int frame) {
-    return {{(frame + 2) * SPRITE_SIZE, 0}, {SPRITE_SIZE, SPRITE_SIZE}};
-}
-
-sf::IntRect ghost(GhostType type, Direction direction, int frame) {
-    int directionIndex = 1;
-    switch (direction) {
-    case Direction::Right:
-        directionIndex = 0;
-        break;
-    case Direction::Left:
-        directionIndex = 1;
-        break;
-    case Direction::Up:
-        directionIndex = 2;
-        break;
-    case Direction::Down:
-        directionIndex = 3;
-        break;
-    case Direction::Neutral:
-        break;
-    }
-
-    const int column = directionIndex * 2 + frame;
-    const int row = static_cast<int>(type) + 4;
-
+/// The rectangle of the cell at (column, row).
+sf::IntRect cell(int column, int row) {
     return sf::IntRect({column * SPRITE_SIZE, row * SPRITE_SIZE},
                        {SPRITE_SIZE, SPRITE_SIZE});
 }
 
-sf::IntRect ghostFrightened(bool white, int frame) {
-    const int column = 8 + (white ? 2 : 0) + frame;
-
-    return sf::IntRect({column * SPRITE_SIZE, 4 * SPRITE_SIZE},
-                       {SPRITE_SIZE, SPRITE_SIZE});
+/// A rectangle that is not aligned with the cells: it starts at pixel x of
+/// the given row and is width pixels wide (used by the 4-digit scores).
+sf::IntRect wideCell(int x, int row, int width) {
+    return sf::IntRect({x, row * SPRITE_SIZE}, {width, SPRITE_SIZE});
 }
 
-sf::IntRect ghostDead(Direction direction) {
-    int directionIndex = 1;
+/// Order of the directions in the sheet: right, left, up, down. Neutral uses
+/// left.
+int directionIndex(Direction direction) {
     switch (direction) {
     case Direction::Right:
-        directionIndex = 0;
-        break;
-    case Direction::Left:
-        directionIndex = 1;
-        break;
+        return 0;
     case Direction::Up:
-        directionIndex = 2;
-        break;
+        return 2;
     case Direction::Down:
-        directionIndex = 3;
-        break;
+        return 3;
+    case Direction::Left:
     case Direction::Neutral:
         break;
     }
+    return 1;
+}
+} // namespace
 
-    const int column = directionIndex + 8;
+sf::IntRect pacman(Direction direction, int frame) {
+    if (direction == Direction::Neutral)
+        return cell(2, 0); // the full circle
 
-    return sf::IntRect({column * SPRITE_SIZE, 5 * SPRITE_SIZE},
-                       {SPRITE_SIZE, SPRITE_SIZE});
+    // one row per direction, two frames per row
+    return cell(frame, directionIndex(direction));
 }
 
-sf::IntRect fruit(FruitType fruit) {
-    const int column = static_cast<int>(fruit);
-    return {{(1 + column) * SPRITE_SIZE, 3 * SPRITE_SIZE},
-            {SPRITE_SIZE, SPRITE_SIZE}};
+sf::IntRect pacmanLife() { return cell(8, 1); }
+
+sf::IntRect pacmanDeath(int frame) { return cell(frame + 2, 0); }
+
+sf::IntRect ghost(GhostType type, Direction direction, int frame) {
+    // two frames per direction, one row per ghost
+    return cell(directionIndex(direction) * 2 + frame,
+                GHOST_FIRST_ROW + static_cast<int>(type));
+}
+
+sf::IntRect ghostFrightened(bool white, int frame) {
+    // after the normal sprites, in Blinky's row: blue, then white
+    return cell(GHOST_EXTRA_COLUMN + (white ? 2 : 0) + frame, GHOST_FIRST_ROW);
+}
+
+sf::IntRect ghostDead(Direction direction) {
+    // in Pinky's row, after the normal sprites: one pair of eyes per direction
+    return cell(GHOST_EXTRA_COLUMN + directionIndex(direction),
+                GHOST_FIRST_ROW + 1);
+}
+
+sf::IntRect fruit(FruitType type) {
+    // one column per fruit, starting at column 2 (the cherry is 1)
+    return cell(1 + static_cast<int>(type), 3);
 }
 
 sf::IntRect scorePopup(int points) {
-    int row, column;
     switch (points) {
+    // ghosts: row 8, one cell each
     case 200:
-        row = 8;
-        column = 0;
-        break;
+        return cell(0, 8);
     case 400:
-        row = 8;
-        column = 1;
-        break;
+        return cell(1, 8);
     case 800:
-        row = 8;
-        column = 2;
-        break;
+        return cell(2, 8);
     case 1600:
-        row = 8;
-        column = 3;
-        break;
+        return cell(3, 8);
 
+    // fruits up to 700: row 9, one cell each
     case 100:
-        row = 9;
-        column = 0;
-        break;
+        return cell(0, 9);
     case 300:
-        row = 9;
-        column = 1;
-        break;
+        return cell(1, 9);
     case 500:
-        row = 9;
-        column = 2;
-        break;
+        return cell(2, 9);
     case 700:
-        row = 9;
-        column = 3;
-        break;
+        return cell(3, 9);
+
+    // the other fruit values have four digits and are wider than a cell
     case 1000:
-        row = 9;
-        column = 4;
-        return sf::IntRect({column * SPRITE_SIZE, row * SPRITE_SIZE},
-                           {SPRITE_SIZE + 4, SPRITE_SIZE});
+        return wideCell(4 * SPRITE_SIZE, 9, SPRITE_SIZE + 4);
     case 2000:
-        row = 10;
-        column = 4;
-        return sf::IntRect({column * SPRITE_SIZE - 4, row * SPRITE_SIZE},
-                           {SPRITE_SIZE + 8, SPRITE_SIZE});
+        return wideCell(4 * SPRITE_SIZE - 4, 10, SPRITE_SIZE + 8);
     case 3000:
-        row = 11;
-        column = 4;
-        return sf::IntRect({column * SPRITE_SIZE - 4, row * SPRITE_SIZE},
-                           {SPRITE_SIZE + 8, SPRITE_SIZE});
+        return wideCell(4 * SPRITE_SIZE - 4, 11, SPRITE_SIZE + 8);
     case 5000:
-        row = 12;
-        column = 4;
-        return sf::IntRect({column * SPRITE_SIZE - 4, row * SPRITE_SIZE},
-                           {SPRITE_SIZE + 8, SPRITE_SIZE});
+        return wideCell(4 * SPRITE_SIZE - 4, 12, SPRITE_SIZE + 8);
 
     default:
         return sf::IntRect();
     }
-    return sf::IntRect({column * SPRITE_SIZE, row * SPRITE_SIZE},
-                       {SPRITE_SIZE, SPRITE_SIZE});
 }
 
 } // namespace SpriteData

@@ -9,6 +9,9 @@ void Menu::moveUp() {
 void Menu::moveDown() { selected = (selected + 1) % OPTIONS.size(); }
 
 Menu::Action Menu::select() {
+    static_assert(OPTIONS.size() == static_cast<std::size_t>(Option::Quit) + 1,
+                  "OPTIONS needs one label for each Option");
+
     switch (static_cast<Option>(selected)) {
     case Option::Play:
         return Action::Play;
@@ -23,8 +26,6 @@ Menu::Action Menu::select() {
 
     return Action::None;
 }
-
-void Menu::back() { showMain(); }
 
 void Menu::typeLetter(char letter) {
     const auto code = static_cast<unsigned char>(letter);

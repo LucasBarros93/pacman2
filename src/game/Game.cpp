@@ -1,38 +1,59 @@
 #include "game/Game.hpp"
 #include "core/Core.hpp"
-
 #include "entities/Blinky.hpp"
-#include "entities/Ghost.hpp"
-#include "entities/Pacman.hpp"
-#include "game/FruitSpawner.hpp"
-#include "game/GameState.hpp"
-#include "game/Leaderboard.hpp"
-#include "graphics/MenuRenderer.hpp"
-#include "graphics/Renderer.hpp"
-#include "maze/Maze.hpp"
-#include "menus/Menu.hpp"
-#include "menus/MenuController.hpp"
+#include "entities/Fruit.hpp"
+#include "maze/MazeLayout.hpp"
 
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
+
 #include <algorithm>
 
 namespace {
-constexpr float CLEAR_PAUSE = 0.8f;
-constexpr float FLASH_INTERVAL = 0.25f;
-constexpr int FLASH_COUNT = 3;
-constexpr float READY_DURATION = 1.0f;
-constexpr float DEATH_FREEZE = 0.8f;
-constexpr float DEATH_FRAME_TIME = 0.12f;
-constexpr int DEATH_FRAMES = 12;
-constexpr float DEATH_END_PAUSE = 0.6f;
-constexpr float GAME_OVER_INPUT_DELAY = 0.5f;
-constexpr float GHOST_FREEZE_TIME = 0.8f;
-constexpr float FRUIT_POPUP_TIME = 2.0f;
+constexpr unsigned int WINDOW_WIDTH = 800;
+constexpr unsigned int WINDOW_HEIGHT = 600;
+constexpr unsigned int FRAME_RATE_LIMIT = 60;
+
+/// Longest time simulated in one frame, so a stall (like dragging the window)
+/// does not make characters jump through walls.
+constexpr float MAX_DELTA_TIME = 0.05f;
+
+constexpr const char *MAP_PATH = "./assets/maps/map.txt";
+constexpr const char *LEADERBOARD_PATH = "./assets/leaderboard/scores.txt";
+
+// timings, in seconds
+constexpr float READY_DURATION = 1.0f; ///< "READY!" at the start of a game.
+constexpr float CLEAR_PAUSE = 0.8f;    ///< Stillness before the maze flashes.
+constexpr float FLASH_INTERVAL =
+    0.25f;                     ///< Each white or normal phase of the flashing.
+constexpr int FLASH_COUNT = 3; ///< How many times the maze flashes.
+constexpr float DEATH_FREEZE = 0.8f; ///< Stillness before the death animation.
+constexpr float DEATH_FRAME_TIME =
+    0.12f;                              ///< Each frame of the death animation.
+constexpr int DEATH_FRAMES = 12;        ///< Frames of the death animation.
+constexpr float DEATH_END_PAUSE = 0.6f; ///< Empty maze after the animation.
+constexpr float GAME_OVER_INPUT_DELAY =
+    0.5f; ///< Keys are ignored for a moment on "GAME OVER".
+constexpr float GHOST_FREEZE_TIME = 0.8f; ///< Freeze after eating a ghost.
+constexpr float FRUIT_POPUP_TIME =
+    2.0f; ///< How long a fruit's points stay on screen.
+
+// Pac-Man stops for 1 frame per pellet and 3 per power pellet (at 60 FPS).
+// The value is half a frame below the number of frames on purpose, so the
+// pause does not depend on small variations of the frame time.
 constexpr float PELLET_STALL = 0.5f / 60.0f;
 constexpr float POWER_PELLET_STALL = 2.5f / 60.0f;
 
+// points
+constexpr int PELLET_POINTS = 10;
+constexpr int POWER_PELLET_POINTS = 50;
+constexpr int FIRST_GHOST_POINTS =
+    200; ///< Each next ghost of the same power pellet doubles it.
+constexpr int MAX_GHOST_DOUBLINGS = 3; ///< 200, 400, 800, 1600.
+
+/// Seconds between one ghost leaving the house and the next. It shrinks as
+/// the rounds go by.
 float ghostReleaseInterval(int round) {
     if (round == 1)
         return 4.0f;
@@ -40,6 +61,9 @@ float ghostReleaseInterval(int round) {
         return 3.0f;
     return 2.0f;
 }
+
+/// Seconds a power pellet frightens the ghosts. Simplified: the original
+/// game varies it from round to round.
 float frightenedDuration(int round) {
     if (round == 1)
         return 6.0f;
@@ -52,52 +76,62 @@ float frightenedDuration(int round) {
     return 2.0f;
 }
 
-} // namespace
+/// The direction asked by the arrow keys or WASD, or Direction::Neutral if
+/// none is held. With several keys held, up wins over down, then left, then
+/// right.
+Direction readDirectionKeys() {
+    using Key = sf::Keyboard::Key;
 
-Game::Game()
-    : window(sf::VideoMode({800, 600}), "Pacman"), gameState(),
-      fruitSpawner({13.5f, 17.0f}), maze("./assets/maps/map.txt"),
-      pacman({13.5f, 23.0f}), leaderboard("./assets/leaderboard/scores.txt"),
-      menu(), menuController(menu, leaderboard), renderer(window),
-      menuRenderer(window) {
-    window.setFramerateLimit(60);
-
-    // ghosts realease order is defined here
-    ghosts.push_back(std::make_unique<Blinky>(Position{13.5f, 11.f}));
-    ghosts.push_back(
-        std::make_unique<Ghost>(GhostType::Pinky, Position{13.5f, 14.f}));
-    ghosts.push_back(
-        std::make_unique<Ghost>(GhostType::Inky, Position{11.5f, 14.f}));
-    ghosts.push_back(
-        std::make_unique<Ghost>(GhostType::Clyde, Position{15.5f, 14.f}));
-}
-
-Direction Game::getInput() {
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) ||
-        sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
+    if (sf::Keyboard::isKeyPressed(Key::Up) ||
+        sf::Keyboard::isKeyPressed(Key::W))
         return Direction::Up;
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down) ||
-        sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
+    if (sf::Keyboard::isKeyPressed(Key::Down) ||
+        sf::Keyboard::isKeyPressed(Key::S))
         return Direction::Down;
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) ||
-        sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
+    if (sf::Keyboard::isKeyPressed(Key::Left) ||
+        sf::Keyboard::isKeyPressed(Key::A))
         return Direction::Left;
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) ||
-        sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
+    if (sf::Keyboard::isKeyPressed(Key::Right) ||
+        sf::Keyboard::isKeyPressed(Key::D))
         return Direction::Right;
 
     return Direction::Neutral;
 }
+} // namespace
+
+Game::Game()
+    : window(sf::VideoMode({WINDOW_WIDTH, WINDOW_HEIGHT}), "Pacman"),
+      maze(MAP_PATH), leaderboard(LEADERBOARD_PATH),
+      menuController(menu, leaderboard), renderer(window),
+      menuRenderer(window) {
+    window.setFramerateLimit(FRAME_RATE_LIMIT);
+    window.setKeyRepeatEnabled(false); // one KeyPressed per press
+
+    // The order of this vector is the order the ghosts leave the house
+    // (Blinky starts outside).
+    ghosts.push_back(std::make_unique<Blinky>());
+    ghosts.push_back(
+        std::make_unique<Ghost>(GhostType::Pinky, MazeLayout::PINKY_SPAWN));
+    ghosts.push_back(
+        std::make_unique<Ghost>(GhostType::Inky, MazeLayout::INKY_SPAWN));
+    ghosts.push_back(
+        std::make_unique<Ghost>(GhostType::Clyde, MazeLayout::CLYDE_SPAWN));
+}
 
 void Game::handleEvents() {
-    while (auto event = window.pollEvent()) {
+    while (const auto event = window.pollEvent()) {
         if (event->is<sf::Event::Closed>()) {
             window.close();
             return;
         }
+
+        // The arrow keys are read by polling, which also works while another
+        // window has the focus, so the game pauses when it loses it.
+        if (event->is<sf::Event::FocusLost>() && mode != GameMode::Paused)
+            togglePause();
 
         if (mode == GameMode::Menu) {
             switch (menuController.handleEvent(*event)) {
@@ -128,12 +162,16 @@ void Game::handleEvents() {
     }
 }
 
-void Game::resetRound() {
-    maze.reset();
-    resetActors();
-    fruitSpawner.resetRound();
-    dotsEatenThisRound = 0;
-    renderer.setMazeFlash(false);
+void Game::startNewGame() {
+    gameState.reset();
+    gameState.setHighScore(leaderboard.getTopScore());
+    resetRound();
+    startReady();
+}
+
+void Game::startNextRound() {
+    gameState.advanceLevel();
+    resetRound();
     mode = GameMode::Playing;
 }
 
@@ -143,13 +181,63 @@ void Game::startReady() {
     renderer.setShowReady(true);
 }
 
-void Game::updateReady(float deltaTime) {
-    modeTimer += deltaTime;
+void Game::startClearing() {
+    mode = GameMode::Clearing;
+    modeTimer = 0.0f;
+    pacman.stop();
+    fruitSpawner.resetRound();
+    popups.clear();
+}
 
-    if (modeTimer >= READY_DURATION) {
-        renderer.setShowReady(false);
-        mode = GameMode::Playing;
+void Game::startGhostFreeze(Ghost &ghost, int points) {
+    ghost.eat();
+    ghost.setVisible(false);
+    pacman.setVisible(false);
+
+    popups.push_back({ghost.getPosition(), points, GHOST_FREEZE_TIME});
+
+    mode = GameMode::EatingGhost;
+    modeTimer = 0.0f;
+}
+
+void Game::startGameOver() {
+    mode = GameMode::GameOver;
+    modeTimer = 0.0f;
+    renderer.setShowGameOver(true);
+}
+
+void Game::killPacman() {
+    for (const auto &ghost : ghosts)
+        ghost->setVisible(false);
+
+    mode = GameMode::Dying;
+    modeTimer = 0.0f;
+    fruitSpawner.resetRound();
+    popups.clear();
+}
+
+void Game::finishDeath() {
+    renderer.setPacmanDeathFrame(-1);
+    gameState.loseLife();
+
+    if (gameState.isGameOver()) {
+        startGameOver();
+        return;
     }
+
+    resetActors();
+    startReady();
+}
+
+void Game::finishGame() {
+    renderer.setMazeFlash(false);
+    renderer.setShowReady(false);
+    renderer.setShowGameOver(false);
+    renderer.setPaused(false);
+    renderer.setPacmanDeathFrame(-1);
+
+    menuController.onGameOver(gameState.getScore());
+    mode = GameMode::Menu;
 }
 
 void Game::togglePause() {
@@ -165,78 +253,21 @@ void Game::togglePause() {
     }
 }
 
-void Game::startNewGame() {
-    gameState.reset();
-    gameState.setHighScore(leaderboard.getTopScore());
-    resetRound();
-    startReady();
-}
-
-void Game::startNextRound() {
-    gameState.advanceLevel();
-    resetRound();
-}
-
-void Game::startClearing() {
-    mode = GameMode::Clearing;
-    modeTimer = 0.0f;
-    pacman.stop();
-    fruitSpawner.resetRound();
-}
-
-void Game::startGameOver() {
-    mode = GameMode::GameOver;
-    modeTimer = 0.0f;
-    renderer.setShowGameOver(true);
-}
-
-void Game::startGhostFreeze(Ghost &ghost, int points) {
-    ghost.eat();
-    ghost.setVisible(false);
-    pacman.setVisible(false);
-
-    popups.push_back({ghost.getPosition(), points, GHOST_FREEZE_TIME});
-
-    mode = GameMode::EatingGhost;
-    modeTimer = 0.0f;
-}
-
-void Game::finishGame() {
-    renderer.setMazeFlash(false);
-    renderer.setShowReady(false);
-    renderer.setShowGameOver(false);
-    renderer.setPaused(false);
-    renderer.setPacmanDeathFrame(-1);
-    menuController.onGameOver(gameState.getScore());
-    mode = GameMode::Menu;
-}
-
-void Game::killPacman() {
-    for (const auto &ghost : ghosts)
-        ghost->setVisible(false);
-    mode = GameMode::Dying;
-    modeTimer = 0.0f;
-    fruitSpawner.resetRound();
-    popups.clear();
-}
-
-void Game::finishDeath() {
-    renderer.setPacmanDeathFrame(-1);
-    gameState.loseLife();
-
-    if (gameState.getLives() < 0) {
-        startGameOver();
-        return;
-    }
-
+void Game::resetRound() {
+    maze.reset();
     resetActors();
-    startReady();
+    fruitSpawner.resetRound();
+    dotsEatenThisRound = 0;
+    renderer.setMazeFlash(false);
 }
 
 void Game::resetActors() {
     pacman.reset();
+
     for (const auto &ghost : ghosts)
         ghost->reset();
+
+    // the first ghost to leave does so right away
     ghostReleaseTimer = ghostReleaseInterval(gameState.getRound());
     popups.clear();
 }
@@ -249,53 +280,81 @@ void Game::frightenGhosts() {
         ghost->frighten(duration);
 }
 
-void Game::updatePlaying(float deltaTime) {
-    updatePopups(deltaTime);
-    pacman.trySetDirection(getInput(), maze);
-    pacman.update(maze, deltaTime);
+void Game::collectPellet() {
+    const auto collectible = maze.consumeCollectible(pacman.getPosition());
+    if (!collectible)
+        return;
 
-    for (const auto &ghost : ghosts)
-        ghost->update(maze, deltaTime);
+    const bool isPowerPellet = *collectible == CellType::PowerPellet;
 
-    updateGhostRelease(deltaTime);
+    gameState.addScore(isPowerPellet ? POWER_PELLET_POINTS : PELLET_POINTS);
+    ++dotsEatenThisRound;
+    fruitSpawner.onDotEaten(dotsEatenThisRound, gameState.getRound());
+    pacman.stall(isPowerPellet ? POWER_PELLET_STALL : PELLET_STALL);
 
+    if (isPowerPellet)
+        frightenGhosts();
+}
+
+void Game::collectFruit() {
+    const auto fruit = fruitSpawner.tryCollect(pacman.getPosition());
+    if (!fruit)
+        return;
+
+    const int points = scoreFor(fruit->type);
+    gameState.addScore(points);
+    popups.push_back({fruit->position, points, FRUIT_POPUP_TIME});
+}
+
+bool Game::handleGhostCollisions() {
     for (const auto &ghost : ghosts) {
         if (!Collision::overlaps(pacman.getPosition(), ghost->getPosition(),
                                  Collision::GHOST_RADIUS))
             continue;
 
         if (ghost->isEdible()) {
-            const int points = 200 << std::min(ghostsEatenInRow, 3);
+            const int points = FIRST_GHOST_POINTS << std::min(
+                                   ghostsEatenInRow, MAX_GHOST_DOUBLINGS);
             gameState.addScore(points);
             ++ghostsEatenInRow;
             startGhostFreeze(*ghost, points);
-            return;
-        } else if (ghost->isDeadly()) {
+            return true;
+        }
+
+        if (ghost->isDeadly()) {
             killPacman();
-            return;
+            return true;
         }
     }
 
+    return false;
+}
+
+void Game::updateReady(float deltaTime) {
+    modeTimer += deltaTime;
+
+    if (modeTimer >= READY_DURATION) {
+        renderer.setShowReady(false);
+        mode = GameMode::Playing;
+    }
+}
+
+void Game::updatePlaying(float deltaTime) {
+    updatePopups(deltaTime);
+
+    pacman.trySetDirection(readDirectionKeys(), maze);
+    pacman.update(maze, deltaTime);
+
+    for (const auto &ghost : ghosts)
+        ghost->update(maze, deltaTime);
+    updateGhostRelease(deltaTime);
+
+    if (handleGhostCollisions())
+        return; // Pac-Man died or ate a ghost: the mode changed
+
     fruitSpawner.update(deltaTime);
-
-    if (const auto collectible = maze.consumeCollectible(
-            pacman.getPosition(), Collision::PELLET_RADIUS)) {
-
-        gameState.addScore(*collectible == CellType::PowerPellet ? 50 : 10);
-        ++dotsEatenThisRound;
-        fruitSpawner.onDotEaten(dotsEatenThisRound, gameState.getRound());
-        pacman.stall(*collectible == CellType::PowerPellet ? POWER_PELLET_STALL
-                                                           : PELLET_STALL);
-
-        if (*collectible == CellType::PowerPellet)
-            frightenGhosts();
-    }
-
-    const auto fruit = fruitSpawner.getActiveFruit();
-    if (const auto points = fruitSpawner.tryCollect(pacman.getPosition())) {
-        gameState.addScore(*points);
-        popups.push_back({fruit->position, *points, FRUIT_POPUP_TIME});
-    }
+    collectPellet();
+    collectFruit();
 
     if (maze.getRemainingCollectibles() == 0)
         startClearing();
@@ -317,38 +376,22 @@ void Game::updateClearing(float deltaTime) {
 void Game::updateDying(float deltaTime) {
     modeTimer += deltaTime;
 
-    const float animTime = modeTimer - DEATH_FREEZE;
-    if (animTime < 0.0f)
-        return;
+    const float animationTime = modeTimer - DEATH_FREEZE;
+    if (animationTime < 0.0f)
+        return; // still frozen
 
-    const int frame = static_cast<int>(animTime / DEATH_FRAME_TIME);
+    const int frame = static_cast<int>(animationTime / DEATH_FRAME_TIME);
 
     if (frame < DEATH_FRAMES)
         renderer.setPacmanDeathFrame(frame);
     else
         pacman.setVisible(false);
 
-    if (animTime >= DEATH_FRAMES * DEATH_FRAME_TIME + DEATH_END_PAUSE)
+    if (animationTime >= DEATH_FRAMES * DEATH_FRAME_TIME + DEATH_END_PAUSE)
         finishDeath();
 }
 
 void Game::updateGameOver(float deltaTime) { modeTimer += deltaTime; }
-
-void Game::updateGhostRelease(float deltaTime) {
-    ghostReleaseTimer += deltaTime;
-
-    if (ghostReleaseTimer < ghostReleaseInterval(gameState.getRound()))
-        return;
-
-    // a ordem do vetor é a ordem de saída
-    for (const auto &ghost : ghosts) {
-        if (ghost->isInHouse()) {
-            ghost->leaveHouse();
-            ghostReleaseTimer = 0.0f;
-            return;
-        }
-    }
-}
 
 void Game::updateEatingGhost(float deltaTime) {
     modeTimer += deltaTime;
@@ -362,6 +405,22 @@ void Game::updateEatingGhost(float deltaTime) {
 
     pacman.setVisible(true);
     mode = GameMode::Playing;
+}
+
+void Game::updateGhostRelease(float deltaTime) {
+    ghostReleaseTimer += deltaTime;
+
+    if (ghostReleaseTimer < ghostReleaseInterval(gameState.getRound()))
+        return;
+
+    // the order of the vector is the order they leave
+    for (const auto &ghost : ghosts) {
+        if (ghost->isInHouse()) {
+            ghost->leaveHouse();
+            ghostReleaseTimer = 0.0f;
+            return;
+        }
+    }
 }
 
 void Game::updatePopups(float deltaTime) {
@@ -379,7 +438,8 @@ void Game::run() {
     sf::Clock clock;
 
     while (window.isOpen()) {
-        const float deltaTime = std::min(clock.restart().asSeconds(), 0.05f);
+        const float deltaTime =
+            std::min(clock.restart().asSeconds(), MAX_DELTA_TIME);
 
         handleEvents();
 
@@ -412,8 +472,9 @@ void Game::run() {
             break;
         case GameMode::Menu:
         case GameMode::Paused:
-            break;
+            break; // Paused: nothing is updated, the frozen frame is redrawn
         }
+
         renderer.render(pacman, ghosts, popups, gameState, fruitSpawner, maze);
     }
 }

@@ -1,5 +1,8 @@
 #include "menus/MenuController.hpp"
 #include "game/Leaderboard.hpp"
+#include "menus/MenuController.hpp"
+
+#include <SFML/Window/Keyboard.hpp>
 
 MenuController::MenuController(Menu &menu, Leaderboard &leaderboard)
     : menu{menu}, leaderboard{leaderboard} {}
@@ -56,7 +59,7 @@ void MenuController::handleLeaderboard(const sf::Event &event) {
     if (key->code == sf::Keyboard::Key::Escape ||
         key->code == sf::Keyboard::Key::Enter ||
         key->code == sf::Keyboard::Key::Space)
-        menu.back();
+        menu.showMain();
 }
 
 void MenuController::handleNameEntry(const sf::Event &event) {

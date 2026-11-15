@@ -1,24 +1,15 @@
 #include "game/FruitSpawner.hpp"
 #include "core/Core.hpp"
-#include "entities/Fruit.hpp"
 
 FruitSpawner::FruitSpawner(Position spawnPosition)
-    : spawnPosition(spawnPosition) {}
-
-Fruit FruitSpawner::createFruit(int round) const {
-    return Fruit{fruitTypeForRound(round), spawnPosition};
-}
+    : spawnPosition{spawnPosition} {}
 
 void FruitSpawner::onDotEaten(int dotsEaten, int round) {
-    if (activeFruit || spawnedFruits >= 2)
-        return;
-
     if (dotsEaten != FIRST_DOT && dotsEaten != SECOND_DOT)
         return;
 
-    activeFruit = createFruit(round);
+    activeFruit = Fruit{fruitTypeForRound(round), spawnPosition};
     remainingTime = FRUIT_DURATION;
-    ++spawnedFruits;
 }
 
 void FruitSpawner::update(float deltaTime) {
@@ -27,32 +18,25 @@ void FruitSpawner::update(float deltaTime) {
 
     remainingTime -= deltaTime;
 
-    if (remainingTime <= 0.0f) {
+    if (remainingTime <= 0.0f)
         activeFruit.reset();
-        remainingTime = 0.0f;
-    }
 }
 
-std::optional<int> FruitSpawner::tryCollect(Position pacmanPosition) {
-    if (!activeFruit.has_value())
+std::optional<Fruit> FruitSpawner::tryCollect(Position pacmanPosition) {
+    if (!activeFruit)
         return std::nullopt;
 
     if (!Collision::overlaps(pacmanPosition, activeFruit->position,
                              Collision::FRUIT_RADIUS))
         return std::nullopt;
 
-    const int points = scoreFor(activeFruit->type);
+    const Fruit collected = *activeFruit;
     activeFruit.reset();
-    remainingTime = 0.0f;
-    return points;
+    return collected;
 }
 
 const std::optional<Fruit> &FruitSpawner::getActiveFruit() const {
     return activeFruit;
 }
 
-void FruitSpawner::resetRound() {
-    activeFruit.reset();
-    spawnedFruits = 0;
-    remainingTime = 0.0f;
-}
+void FruitSpawner::resetRound() { activeFruit.reset(); }

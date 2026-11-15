@@ -1,8 +1,30 @@
 #include "entities/Entity.hpp"
-#include "core/Core.hpp"
 #include "maze/Maze.hpp"
 
 #include <cmath>
+
+namespace {
+/// The tile reached when moving in a direction. Along the axis of movement it
+/// rounds towards the front (so it is the tile being entered); along the
+/// other axis, and for Direction::Neutral, it rounds to the nearest tile.
+GridPosition tileAhead(Position from, Direction heading) {
+    const auto toInt = [](float value) { return static_cast<int>(value); };
+
+    switch (heading) {
+    case Direction::Up:
+        return {toInt(std::round(from.x)), toInt(std::floor(from.y))};
+    case Direction::Down:
+        return {toInt(std::round(from.x)), toInt(std::ceil(from.y))};
+    case Direction::Left:
+        return {toInt(std::floor(from.x)), toInt(std::round(from.y))};
+    case Direction::Right:
+        return {toInt(std::ceil(from.x)), toInt(std::round(from.y))};
+    case Direction::Neutral:
+        break;
+    }
+    return {toInt(std::round(from.x)), toInt(std::round(from.y))};
+}
+} // namespace
 
 Entity::Entity(Position position, Direction direction, float speed)
     : position{position}, direction{direction}, speed{speed},
@@ -13,96 +35,46 @@ Position Entity::getPosition() const { return position; }
 Direction Entity::getDirection() const { return direction; }
 
 GridPosition Entity::getCurrentGridPosition() const {
-    return getGridPosition(position, Direction::Neutral);
-}
-
-void Entity::setDirection(Direction newDirection) {
-    if (newDirection != Direction::Neutral)
-        this->direction = newDirection;
-}
-
-GridPosition Entity::getGridPosition(Position position,
-                                     Direction movementDirection) const {
-    switch (movementDirection) {
-    case Direction::Up:
-        return {static_cast<int>(std::round(position.x)),
-                static_cast<int>(std::floor(position.y))};
-
-    case Direction::Down:
-        return {static_cast<int>(std::round(position.x)),
-                static_cast<int>(std::ceil(position.y))};
-
-    case Direction::Left:
-        return {static_cast<int>(std::floor(position.x)),
-                static_cast<int>(std::round(position.y))};
-
-    case Direction::Right:
-        return {static_cast<int>(std::ceil(position.x)),
-                static_cast<int>(std::round(position.y))};
-
-    case Direction::Neutral:
-        return {static_cast<int>(std::round(position.x)),
-                static_cast<int>(std::round(position.y))};
-    }
-
-    return {0, 0};
+    return tileAhead(position, Direction::Neutral);
 }
 
 void Entity::setVisible(bool value) { visible = value; }
 
 bool Entity::isVisible() const { return visible; }
 
-GridPosition Entity::teleportHorizontal(const Maze &maze,
-                                        GridPosition gridPosition) const {
-    if (gridPosition.x >= maze.getWidth()) {
-        gridPosition.x = 0;
-    } else if (gridPosition.x < 0) {
-        gridPosition.x = maze.getWidth() - 1;
-    }
-
-    return gridPosition;
-}
-
 void Entity::update(const Maze &maze, float deltaTime) {
-    Position nextPosition = position;
+    Position next = position;
 
     switch (direction) {
     case Direction::Up:
-        nextPosition.y -= speed * deltaTime;
-        nextPosition.x = std::round(nextPosition.x);
+        next.y -= speed * deltaTime;
+        next.x = std::round(next.x);
         break;
-
     case Direction::Down:
-        nextPosition.y += speed * deltaTime;
-        nextPosition.x = std::round(nextPosition.x);
+        next.y += speed * deltaTime;
+        next.x = std::round(next.x);
         break;
-
     case Direction::Left:
-        nextPosition.x -= speed * deltaTime;
-        nextPosition.y = std::round(nextPosition.y);
+        next.x -= speed * deltaTime;
+        next.y = std::round(next.y);
         break;
-
     case Direction::Right:
-        nextPosition.x += speed * deltaTime;
-        nextPosition.y = std::round(nextPosition.y);
+        next.x += speed * deltaTime;
+        next.y = std::round(next.y);
         break;
-
     case Direction::Neutral:
         return;
     }
 
-    const GridPosition nextGridPosition =
-        getGridPosition(nextPosition, direction);
+    const GridPosition ahead = tileAhead(next, direction);
+    const GridPosition target = maze.wrap(ahead);
 
-    const GridPosition teleportPosition =
-        teleportHorizontal(maze, nextGridPosition);
+    // went through the tunnel: reappears at the other edge
+    if (target.x != ahead.x)
+        next.x = static_cast<float>(target.x);
 
-    if (teleportPosition.x != nextGridPosition.x) {
-        nextPosition.x = nextGridPosition.x < 0 ? maze.getWidth() - 1 : 0.0f;
-    }
-
-    if (maze.isWalkable(teleportPosition))
-        position = nextPosition;
+    if (maze.isWalkable(target))
+        position = next;
 }
 
 void Entity::reset() {
