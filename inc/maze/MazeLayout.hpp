@@ -3,6 +3,8 @@
 
 #include "core/Core.hpp"
 
+#include <array>
+
 /// @file MazeLayout.hpp
 /// @brief Fixed positions of assets/maps/map.txt, the only maze of the game.
 ///
@@ -45,6 +47,18 @@ constexpr int TUNNEL_RIGHT_START = 22;
 
 /// Row where the "READY!" and "GAME OVER" texts are drawn.
 constexpr float BANNER_ROW = 17.0f;
+
+/// @name Ghost AI
+/// @{
+/// Blinky's corner in scatter mode. It is outside the maze on purpose, so he
+/// can never reach it and keeps circling the top-right block.
+constexpr GridPosition BLINKY_SCATTER_TARGET{25, -3};
+
+/// Tiles where ghosts that are chasing or scattering cannot turn up: the two
+/// T-junctions above the ghost house and the two above Pac-Man's start.
+constexpr std::array<GridPosition, 4> NO_UP_TILES{
+    {{12, 11}, {15, 11}, {12, 23}, {15, 23}}};
+/// @}
 
 } // namespace MazeLayout
 

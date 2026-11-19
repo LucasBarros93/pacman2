@@ -2,6 +2,7 @@
 #include "core/Core.hpp"
 #include "entities/Blinky.hpp"
 #include "entities/Fruit.hpp"
+#include "game/GhostHouse.hpp"
 #include "maze/MazeLayout.hpp"
 
 #include <SFML/System/Clock.hpp>
@@ -51,16 +52,6 @@ constexpr int POWER_PELLET_POINTS = 50;
 constexpr int FIRST_GHOST_POINTS =
     200; ///< Each next ghost of the same power pellet doubles it.
 constexpr int MAX_GHOST_DOUBLINGS = 3; ///< 200, 400, 800, 1600.
-
-/// Seconds between one ghost leaving the house and the next. It shrinks as
-/// the rounds go by.
-float ghostReleaseInterval(int round) {
-    if (round == 1)
-        return 4.0f;
-    if (round < 4)
-        return 3.0f;
-    return 2.0f;
-}
 
 /// Seconds a power pellet frightens the ghosts. Simplified: the original
 /// game varies it from round to round.
@@ -112,7 +103,7 @@ Game::Game()
 
     // The order of this vector is the order the ghosts leave the house
     // (Blinky starts outside).
-    ghosts.push_back(std::make_unique<Blinky>());
+    ghosts.push_back(std::make_unique<Blinky>(pacman));
     ghosts.push_back(
         std::make_unique<Ghost>(GhostType::Pinky, MazeLayout::PINKY_SPAWN));
     ghosts.push_back(
@@ -226,6 +217,11 @@ void Game::finishDeath() {
     }
 
     resetActors();
+
+    // after the reset: Blinky's Elroy stays off until Clyde leaves
+    for (const auto &ghost : ghosts)
+        ghost->onPacmanDied();
+
     startReady();
 }
 
@@ -264,11 +260,14 @@ void Game::resetRound() {
 void Game::resetActors() {
     pacman.reset();
 
-    for (const auto &ghost : ghosts)
-        ghost->reset();
+    const int round = gameState.getRound();
+    ghostHouse.reset(round);
 
-    // the first ghost to leave does so right away
-    ghostReleaseTimer = ghostReleaseInterval(gameState.getRound());
+    for (const auto &ghost : ghosts) {
+        ghost->reset();
+        ghost->setRound(round);
+    }
+
     popups.clear();
 }
 
@@ -345,9 +344,9 @@ void Game::updatePlaying(float deltaTime) {
     pacman.trySetDirection(readDirectionKeys(), maze);
     pacman.update(maze, deltaTime);
 
+    ghostHouse.update(deltaTime, ghosts);
     for (const auto &ghost : ghosts)
         ghost->update(maze, deltaTime);
-    updateGhostRelease(deltaTime);
 
     if (handleGhostCollisions())
         return; // Pac-Man died or ate a ghost: the mode changed
@@ -405,22 +404,6 @@ void Game::updateEatingGhost(float deltaTime) {
 
     pacman.setVisible(true);
     mode = GameMode::Playing;
-}
-
-void Game::updateGhostRelease(float deltaTime) {
-    ghostReleaseTimer += deltaTime;
-
-    if (ghostReleaseTimer < ghostReleaseInterval(gameState.getRound()))
-        return;
-
-    // the order of the vector is the order they leave
-    for (const auto &ghost : ghosts) {
-        if (ghost->isInHouse()) {
-            ghost->leaveHouse();
-            ghostReleaseTimer = 0.0f;
-            return;
-        }
-    }
 }
 
 void Game::updatePopups(float deltaTime) {

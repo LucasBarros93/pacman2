@@ -5,6 +5,7 @@
 #include "entities/Pacman.hpp"
 #include "game/FruitSpawner.hpp"
 #include "game/GameState.hpp"
+#include "game/GhostHouse.hpp"
 #include "game/Leaderboard.hpp"
 #include "game/ScorePopup.hpp"
 #include "graphics/MenuRenderer.hpp"
@@ -59,6 +60,8 @@ class Game {
     Renderer renderer;
     MenuRenderer menuRenderer;
     std::vector<ScorePopup> popups; ///< Scores being shown on the maze.
+    GhostHouse ghostHouse; ///< Tells when the ghosts switch between scatter
+                           ///< and chase.
 
     GameMode mode = GameMode::Menu;
     GameMode modeBeforePause =
@@ -68,8 +71,6 @@ class Game {
         0; ///< Kept when Pac-Man dies, so fruits do not repeat.
     float modeTimer =
         0.0f; ///< Seconds in the current mode (for the timed ones).
-    float ghostReleaseTimer =
-        0.0f;                 ///< Seconds since the last ghost left the house.
     int ghostsEatenInRow = 0; ///< Ghosts eaten with the current power pellet.
 
     /// @brief Handles every pending window event (menus, pause, closing).
@@ -118,9 +119,6 @@ class Game {
     void updateGameOver(float deltaTime);
     void updateEatingGhost(float deltaTime);
     /// @}
-
-    /// @brief Lets the next waiting ghost out when its time comes.
-    void updateGhostRelease(float deltaTime);
 
     /// @brief Counts down the popups and removes the ones that ended.
     void updatePopups(float deltaTime);

@@ -13,24 +13,31 @@ class Maze;
 enum class GhostState {
     InHouse, ///< Waiting inside the ghost house for its turn to leave.
     Leaving, ///< Walking out of the house along a fixed route.
-    Roaming, ///< Out in the maze, choosing a direction at every tile center.
+    Scatter, ///< Out in the maze, heading to its own corner.
+    Chase,   ///< Out in the maze, hunting Pac-Man.
     Dead,    ///< Eaten: only the eyes are left, heading back to the house.
     Entering ///< The eyes going into the house along a fixed route.
 };
 
 /// @brief A ghost.
 ///
-/// Inside the maze a ghost only decides where to go when it passes through
-/// the center of a tile, and it never turns back (except in a dead end).
-/// Being frightened is separate from the state: a frightened ghost keeps its
-/// state and only changes speed, sprite and what happens when it is touched.
+/// Out in the maze (Scatter or Chase) a ghost decides where to go only at the
+/// center of a tile, like in the original game: among the directions it can
+/// take (never turning back) it picks the one whose next tile is closest, in a
+/// straight line, to its target tile, and ties go to up, left, down, right.
+/// It cannot turn up at four tiles of the maze (MazeLayout::NO_UP_TILES).
+/// Frightened ghosts choose at random and dead ones head to the house.
 ///
-/// Subclasses give each ghost its own behavior by overriding
-/// chooseDirection(). By default a ghost picks randomly.
+/// The mode (scatter or chase) is the same for all ghosts and comes from
+/// Game, through setMode(). A ghost that is still in the house remembers it
+/// and takes it when it leaves.
+///
+/// Subclasses give each ghost its own target by overriding chooseDirection().
+/// By default a ghost picks at random.
 class Ghost : public Entity {
   private:
     static constexpr float DEFAULT_SPEED =
-        6.0f; ///< Tiles per second when roaming.
+        6.0f; ///< Tiles per second in the maze.
     static constexpr float FRIGHTENED_SPEED =
         3.0f; ///< Tiles per second when frightened.
     static constexpr float DEAD_SPEED =
@@ -46,14 +53,24 @@ class Ghost : public Entity {
     GhostState state; ///< What it is doing now.
     GhostState
         spawnState; ///< The state it starts in (and returns to on reset).
+    GhostMode mode = GhostMode::Scatter; ///< The mode of the game, as last told
+                                         ///< by setMode().
+    int round = 1; ///< The current round, as last told by setRound().
 
     float frightenedTime = 0.0f; ///< Seconds left of the frightened effect.
     std::vector<Position>
         route; ///< Points to follow while leaving or entering the house.
     std::size_t routeIndex = 0; ///< The next point of @ref route.
 
+    /// @brief Whether the ghost is out in the maze (scatter or chase).
+    [[nodiscard]] bool isOut() const;
+
+    /// @brief The state a ghost takes when it is out, according to @ref mode.
+    [[nodiscard]] GhostState outState() const;
+
     /// @brief The directions the ghost can take at its current tile: free
-    ///        ones, except turning back (unless it is a dead end).
+    ///        ones, except turning back (unless it is a dead end) and, for
+    ///        the "no up" tiles, going up.
     std::vector<Direction> getAvailableDirections(const Maze &maze) const;
 
     /// @brief Moves in the maze, deciding the next direction at tile centers.
@@ -67,28 +84,39 @@ class Ghost : public Entity {
     void startEntering();
 
     /// @brief Speed given by the state, before the tunnel limit.
-    float stateSpeed() const;
+    float stateSpeed(const Maze &maze) const;
 
     /// @brief Tells whether the ghost is in the slow part of the tunnel.
     bool inTunnel() const;
 
   protected:
-    /// @brief Picks the next direction at a tile center.
+    /// @brief Picks the next direction at a tile center, for a ghost that is
+    ///        scattering or chasing (not frightened or dead).
     /// @param maze The maze.
     /// @param options Directions the ghost can take (never empty).
     /// @return One element of @p options.
     virtual Direction chooseDirection(const Maze &maze,
                                       const std::vector<Direction> &options);
 
+    /// @brief Speed of a ghost that is out and not frightened.
+    /// @param maze The maze.
+    virtual float runSpeed(const Maze &maze) const;
+
     /// @brief Picks the option that gets closest to a target tile.
     ///
     /// Distances are compared in straight line. Ties go to the option that
     /// comes first in @p options.
     /// @param options Directions the ghost can take (never empty).
-    /// @param target The tile to approach.
+    /// @param target The tile to approach. It can be outside the maze.
     /// @return One element of @p options.
     Direction chooseTowards(const std::vector<Direction> &options,
                             GridPosition target) const;
+
+    /// @brief Whether the ghost is out and in scatter mode.
+    [[nodiscard]] bool isScattering() const;
+
+    /// @brief The current round.
+    [[nodiscard]] int getRound() const;
 
   public:
     /// @param type Which ghost it is.
@@ -103,9 +131,27 @@ class Ghost : public Entity {
     /// @brief Moves the ghost for one frame, according to its state.
     void update(const Maze &maze, float deltaTime) override;
 
-    /// @brief Back to the starting position, direction and state, and no
-    ///        longer frightened.
+    /// @brief Back to the starting position, direction and state, in scatter
+    ///        mode and no longer frightened.
     void reset() override;
+
+    /// @brief Tells the ghost the mode of the game.
+    ///
+    /// A ghost that is out turns around when the mode really changes. One
+    /// that is still in the house keeps it for when it leaves.
+    /// @param newMode The new mode.
+    void setMode(GhostMode newMode);
+
+    /// @brief Tells the ghost which round it is.
+    void setRound(int newRound);
+
+    /// @brief Called when Pac-Man loses a life. Does nothing by default.
+    virtual void onPacmanDied();
+
+    /// @brief Called when a ghost has just been let out of the house. Does
+    ///        nothing by default.
+    /// @param releasedType Which ghost it was.
+    virtual void onGhostReleased(GhostType releasedType);
 
     /// @brief Pac-Man ate the ghost: only the eyes are left, going back to
     ///        the house.
@@ -117,8 +163,7 @@ class Ghost : public Entity {
 
     /// @brief Makes the ghost frightened for a while.
     ///
-    /// Dead ghosts are not affected. A ghost that is out in the maze turns
-    /// around at once.
+    /// Dead ghosts are not affected. A ghost that is out turns around at once.
     /// @param duration How long the effect lasts, in seconds.
     void frighten(float duration);
 

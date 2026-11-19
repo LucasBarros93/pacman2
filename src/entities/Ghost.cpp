@@ -32,6 +32,16 @@ std::mt19937 &randomEngine() {
     return engine;
 }
 
+Direction pickRandom(const std::vector<Direction> &options) {
+    std::uniform_int_distribution<std::size_t> pick(0, options.size() - 1);
+    return options[pick(randomEngine())];
+}
+
+bool isNoUpTile(GridPosition tile) {
+    const auto &tiles = MazeLayout::NO_UP_TILES;
+    return std::find(tiles.begin(), tiles.end(), tile) != tiles.end();
+}
+
 float sign(float value) {
     return value > 0.0f ? 1.0f : (value < 0.0f ? -1.0f : 0.0f);
 }
@@ -45,10 +55,30 @@ Ghost::Ghost(GhostType type, Position spawnPosition, Direction initialDirection,
 void Ghost::reset() {
     Entity::reset();
     state = spawnState;
+    mode = GhostMode::Scatter; // every round starts in scatter
     route.clear();
     routeIndex = 0;
     frightenedTime = 0.0f;
 }
+
+void Ghost::setMode(GhostMode newMode) {
+    if (newMode == mode)
+        return;
+
+    mode = newMode;
+
+    if (isOut()) {
+        state = outState();
+        direction =
+            opposite(direction); // a mode change makes ghosts turn around
+    }
+}
+
+void Ghost::setRound(int newRound) { round = newRound; }
+
+void Ghost::onPacmanDied() {}
+
+void Ghost::onGhostReleased(GhostType) {}
 
 void Ghost::eat() {
     state = GhostState::Dead;
@@ -56,6 +86,18 @@ void Ghost::eat() {
 }
 
 GhostType Ghost::getType() const { return type; }
+
+bool Ghost::isOut() const {
+    return state == GhostState::Scatter || state == GhostState::Chase;
+}
+
+GhostState Ghost::outState() const {
+    return mode == GhostMode::Scatter ? GhostState::Scatter : GhostState::Chase;
+}
+
+bool Ghost::isScattering() const { return state == GhostState::Scatter; }
+
+int Ghost::getRound() const { return round; }
 
 bool Ghost::isInHouse() const { return state == GhostState::InHouse; }
 
@@ -67,9 +109,7 @@ bool Ghost::isDead() const {
 
 bool Ghost::isFrightened() const { return frightenedTime > 0.0f; }
 
-bool Ghost::isEdible() const {
-    return isFrightened() && state == GhostState::Roaming;
-}
+bool Ghost::isEdible() const { return isFrightened() && isOut(); }
 
 bool Ghost::isDeadly() const { return !isFrightened() && !isDead(); }
 
@@ -86,7 +126,7 @@ void Ghost::frighten(float duration) {
 
     frightenedTime = duration;
 
-    if (state == GhostState::Roaming)
+    if (isOut())
         direction = opposite(direction);
 }
 
@@ -109,9 +149,10 @@ void Ghost::startEntering() {
 
 Direction Ghost::chooseDirection(const Maze &,
                                  const std::vector<Direction> &options) {
-    std::uniform_int_distribution<std::size_t> pick(0, options.size() - 1);
-    return options[pick(randomEngine())];
+    return pickRandom(options);
 }
+
+float Ghost::runSpeed(const Maze &) const { return DEFAULT_SPEED; }
 
 Direction Ghost::chooseTowards(const std::vector<Direction> &options,
                                GridPosition target) const {
@@ -141,11 +182,22 @@ std::vector<Direction> Ghost::getAvailableDirections(const Maze &maze) const {
         Direction::Up, Direction::Left, Direction::Down, Direction::Right};
 
     const GridPosition tile = getCurrentGridPosition();
+
+    // the "no up" tiles only restrict ghosts that are scattering or chasing
+    const bool noUp = isOut() && !isFrightened() && isNoUpTile(tile);
+
     std::vector<Direction> options;
 
-    for (const Direction candidate : ALL)
-        if (candidate != opposite(direction) && maze.canStep(tile, candidate))
+    for (const Direction candidate : ALL) {
+        if (candidate == opposite(direction))
+            continue;
+
+        if (candidate == Direction::Up && noUp)
+            continue;
+
+        if (maze.canStep(tile, candidate))
             options.push_back(candidate);
+    }
 
     // dead end: the only way out is to turn back
     if (options.empty())
@@ -154,12 +206,12 @@ std::vector<Direction> Ghost::getAvailableDirections(const Maze &maze) const {
     return options;
 }
 
-float Ghost::stateSpeed() const {
+float Ghost::stateSpeed(const Maze &maze) const {
     if (isDead())
         return DEAD_SPEED;
     if (isFrightened())
         return FRIGHTENED_SPEED;
-    return DEFAULT_SPEED;
+    return runSpeed(maze);
 }
 
 bool Ghost::inTunnel() const {
@@ -219,9 +271,13 @@ void Ghost::updateWalking(const Maze &maze, float deltaTime) {
 
     const std::vector<Direction> options = getAvailableDirections(maze);
 
-    const Direction next = (state == GhostState::Dead)
-                               ? chooseTowards(options, MazeLayout::DEAD_TARGET)
-                               : chooseDirection(maze, options);
+    Direction next;
+    if (state == GhostState::Dead)
+        next = chooseTowards(options, MazeLayout::DEAD_TARGET);
+    else if (isFrightened())
+        next = pickRandom(options);
+    else
+        next = chooseDirection(maze, options);
 
     // when turning (or stopped by a wall), align with the tile center so the
     // ghost does not slide sideways
@@ -236,7 +292,7 @@ void Ghost::update(const Maze &maze, float deltaTime) {
         frightenedTime = std::max(0.0f, frightenedTime - deltaTime);
 
     // the speed is recomputed every frame from the current state
-    speed = stateSpeed();
+    speed = stateSpeed(maze);
     if (!isDead() && inTunnel())
         speed = std::min(speed, TUNNEL_SPEED);
 
@@ -246,7 +302,7 @@ void Ghost::update(const Maze &maze, float deltaTime) {
 
     case GhostState::Leaving:
         if (followRoute(deltaTime)) {
-            state = GhostState::Roaming;
+            state = outState();
             direction = Direction::Left;
         }
         break;
@@ -258,7 +314,8 @@ void Ghost::update(const Maze &maze, float deltaTime) {
         }
         break;
 
-    case GhostState::Roaming:
+    case GhostState::Scatter:
+    case GhostState::Chase:
     case GhostState::Dead:
         updateWalking(maze, deltaTime);
         break;

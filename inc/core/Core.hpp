@@ -90,6 +90,14 @@ enum class Direction {
 ///          sheet (guarded by a static_assert), so the order must match it.
 enum class GhostType { Blinky, Pinky, Inky, Clyde };
 
+/// @brief What the ghosts try to do while they walk in the maze.
+///
+/// Being frightened is separate: it works on top of the mode.
+enum class GhostMode {
+    Scatter, ///< Each ghost heads to its own corner of the maze.
+    Chase    ///< Each ghost hunts Pac-Man in its own way.
+};
+
 /// @brief What a maze tile contains.
 enum class CellType {
     Wall,        ///< Blocks every entity.
