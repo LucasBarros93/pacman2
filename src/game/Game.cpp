@@ -2,6 +2,7 @@
 #include "core/Core.hpp"
 #include "entities/Blinky.hpp"
 #include "entities/Fruit.hpp"
+#include "entities/Pinky.hpp"
 #include "game/GhostHouse.hpp"
 #include "maze/MazeLayout.hpp"
 
@@ -104,8 +105,7 @@ Game::Game()
     // The order of this vector is the order the ghosts leave the house
     // (Blinky starts outside).
     ghosts.push_back(std::make_unique<Blinky>(pacman));
-    ghosts.push_back(
-        std::make_unique<Ghost>(GhostType::Pinky, MazeLayout::PINKY_SPAWN));
+    ghosts.push_back(std::make_unique<Pinky>(pacman));
     ghosts.push_back(
         std::make_unique<Ghost>(GhostType::Inky, MazeLayout::INKY_SPAWN));
     ghosts.push_back(
