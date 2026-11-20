@@ -55,6 +55,8 @@ constexpr float BANNER_ROW = 17.0f;
 constexpr GridPosition BLINKY_SCATTER_TARGET{25, -3};
 /// Pinky's corner in scatter mode (top-left, also outside the maze).
 constexpr GridPosition PINKY_SCATTER_TARGET{2, -3};
+/// Inky's corner in scatter mode (bottom-right, also outside the maze).
+constexpr GridPosition INKY_SCATTER_TARGET{27, 31};
 
 /// Tiles where ghosts that are chasing or scattering cannot turn up: the two
 /// T-junctions above the ghost house and the two above Pac-Man's start.
