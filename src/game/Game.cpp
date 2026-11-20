@@ -1,11 +1,11 @@
 #include "game/Game.hpp"
 #include "core/Core.hpp"
 #include "entities/Blinky.hpp"
+#include "entities/Clyde.hpp"
 #include "entities/Fruit.hpp"
 #include "entities/Inky.hpp"
 #include "entities/Pinky.hpp"
 #include "game/GhostHouse.hpp"
-#include "maze/MazeLayout.hpp"
 
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
@@ -109,8 +109,7 @@ Game::Game()
     const Ghost &blinky = *ghosts.back();
     ghosts.push_back(std::make_unique<Pinky>(pacman));
     ghosts.push_back(std::make_unique<Inky>(pacman, blinky));
-    ghosts.push_back(
-        std::make_unique<Ghost>(GhostType::Clyde, MazeLayout::CLYDE_SPAWN));
+    ghosts.push_back(std::make_unique<Clyde>(pacman));
 }
 
 void Game::handleEvents() {
