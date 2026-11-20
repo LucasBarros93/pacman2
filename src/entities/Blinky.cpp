@@ -24,7 +24,7 @@ int elroyDotsLeft(int round) {
 } // namespace
 
 Blinky::Blinky(const Pacman &pacman, Position spawnPosition)
-    : Ghost(GhostType::Blinky, spawnPosition, Direction::Left,
+    : Ghost(GhostType::Blinky, spawnPosition, Direction::Right,
             GhostState::Scatter),
       pacman{pacman} {}
 

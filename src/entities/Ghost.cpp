@@ -303,7 +303,8 @@ void Ghost::update(const Maze &maze, float deltaTime) {
     case GhostState::Leaving:
         if (followRoute(deltaTime)) {
             state = outState();
-            direction = Direction::Left;
+            direction =
+                chooseDirection(maze, {Direction::Left, Direction::Right});
         }
         break;
 
