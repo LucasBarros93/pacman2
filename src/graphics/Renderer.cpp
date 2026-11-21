@@ -25,6 +25,11 @@ constexpr float HUD_ICON_ZOOM =
 constexpr float PELLET_SIZE = 0.10f; ///< Radius of a pellet, in tiles.
 constexpr float POWER_PELLET_SIZE =
     0.30f; ///< Radius of a power pellet, in tiles.
+const sf::Color
+    PELLET_COLOR(255, 184,
+                 174); ///< Pellets and power pellets, as in the arcade (peach).
+constexpr float POWER_PELLET_BLINK_INTERVAL =
+    0.23f; ///< Seconds the power pellets stay on or off (about 14 frames).
 constexpr int ANIMATION_INTERVAL_MS = 200; ///< Time between animation frames.
 constexpr int FRUITS_IN_HUD =
     7; ///< Fruits of the last rounds shown at the bottom.
@@ -91,8 +96,10 @@ void Renderer::setShowGameOver(bool show) { showGameOver = show; }
 
 void Renderer::setPaused(bool value) {
     paused = value;
-    if (!value)
+    if (!value) {
         animationClock.restart();
+        blinkClock.restart();
+    }
 }
 
 void Renderer::setMazeFlash(bool flash) { mazeFlash = flash; }
@@ -139,11 +146,11 @@ void Renderer::renderCollectibles(const Maze &maze,
     // two shapes, reused for every pellet
     sf::CircleShape pellet(transform.cellSize * PELLET_SIZE);
     pellet.setOrigin({pellet.getRadius(), pellet.getRadius()});
-    pellet.setFillColor(sf::Color::White);
+    pellet.setFillColor(PELLET_COLOR);
 
     sf::CircleShape powerPellet(transform.cellSize * POWER_PELLET_SIZE);
     powerPellet.setOrigin({powerPellet.getRadius(), powerPellet.getRadius()});
-    powerPellet.setFillColor(sf::Color::White);
+    powerPellet.setFillColor(PELLET_COLOR);
 
     for (int y = 0; y < maze.getHeight(); ++y) {
         for (int x = 0; x < maze.getWidth(); ++x) {
@@ -151,6 +158,9 @@ void Renderer::renderCollectibles(const Maze &maze,
 
             if (type != CellType::Pellet && type != CellType::PowerPellet)
                 continue;
+
+            if (type == CellType::PowerPellet && !powerPelletsOn)
+                continue; // blinking: off phase
 
             sf::CircleShape &shape =
                 (type == CellType::PowerPellet) ? powerPellet : pellet;
@@ -288,15 +298,21 @@ void Renderer::render(const Pacman &pacman,
                       const std::vector<ScorePopup> &popups,
                       const GameState &gameState,
                       const FruitSpawner &fruitSpawner, const Maze &maze) {
-    // The animation only runs while the game does: it stops when paused and
+    // The animations only run while the game does: they stop when paused and
     // while Pac-Man is hidden (the freeze after eating a ghost).
-    if (!paused && pacman.isVisible() &&
-        animationClock.getElapsedTime().asMilliseconds() >
-            ANIMATION_INTERVAL_MS) {
+    const bool running = !paused && pacman.isVisible();
+
+    if (running && animationClock.getElapsedTime().asMilliseconds() >
+                       ANIMATION_INTERVAL_MS) {
         animationFrame = (animationFrame + 1) % 2;
         animationClock.restart();
     }
 
+    if (running &&
+        blinkClock.getElapsedTime().asSeconds() > POWER_PELLET_BLINK_INTERVAL) {
+        powerPelletsOn = !powerPelletsOn;
+        blinkClock.restart();
+    }
     const MazeTransform transform = getMazeTransform(maze);
 
     window.clear();

@@ -67,6 +67,10 @@ class Renderer {
     int pacmanDeathFrame =
         -1; ///< Frame of the death animation, or -1 when not dying.
 
+    sf::Clock blinkClock; ///< Times the blinking of the power pellets.
+    bool powerPelletsOn =
+        true; ///< Whether the power pellets are visible right now.
+
     bool mazeFlash = false;    ///< Draw the maze in white.
     bool showReady = false;    ///< Show the "READY!" text.
     bool showGameOver = false; ///< Show the "GAME OVER" text.
