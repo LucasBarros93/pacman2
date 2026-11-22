@@ -28,8 +28,8 @@ constexpr float POWER_PELLET_SIZE =
 const sf::Color
     PELLET_COLOR(255, 184,
                  174); ///< Pellets and power pellets, as in the arcade (peach).
-constexpr float POWER_PELLET_BLINK_INTERVAL =
-    0.23f; ///< Seconds the power pellets stay on or off (about 14 frames).
+const sf::Color POWER_PELLET_DIM_COLOR(
+    110, 80, 76); ///< Power pellet in the dim phase of the blinking.
 constexpr int ANIMATION_INTERVAL_MS = 200; ///< Time between animation frames.
 constexpr int FRUITS_IN_HUD =
     7; ///< Fruits of the last rounds shown at the bottom.
@@ -98,7 +98,6 @@ void Renderer::setPaused(bool value) {
     paused = value;
     if (!value) {
         animationClock.restart();
-        blinkClock.restart();
     }
 }
 
@@ -150,7 +149,8 @@ void Renderer::renderCollectibles(const Maze &maze,
 
     sf::CircleShape powerPellet(transform.cellSize * POWER_PELLET_SIZE);
     powerPellet.setOrigin({powerPellet.getRadius(), powerPellet.getRadius()});
-    powerPellet.setFillColor(PELLET_COLOR);
+    powerPellet.setFillColor(animationFrame ? PELLET_COLOR
+                                            : POWER_PELLET_DIM_COLOR);
 
     for (int y = 0; y < maze.getHeight(); ++y) {
         for (int x = 0; x < maze.getWidth(); ++x) {
@@ -158,9 +158,6 @@ void Renderer::renderCollectibles(const Maze &maze,
 
             if (type != CellType::Pellet && type != CellType::PowerPellet)
                 continue;
-
-            if (type == CellType::PowerPellet && !powerPelletsOn)
-                continue; // blinking: off phase
 
             sf::CircleShape &shape =
                 (type == CellType::PowerPellet) ? powerPellet : pellet;
@@ -308,11 +305,6 @@ void Renderer::render(const Pacman &pacman,
         animationClock.restart();
     }
 
-    if (running &&
-        blinkClock.getElapsedTime().asSeconds() > POWER_PELLET_BLINK_INTERVAL) {
-        powerPelletsOn = !powerPelletsOn;
-        blinkClock.restart();
-    }
     const MazeTransform transform = getMazeTransform(maze);
 
     window.clear();
