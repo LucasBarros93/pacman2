@@ -1,4 +1,5 @@
 #include "entities/Ghost.hpp"
+#include "core/Difficulty.hpp"
 #include "maze/Maze.hpp"
 #include "maze/MazeLayout.hpp"
 
@@ -295,6 +296,8 @@ void Ghost::update(const Maze &maze, float deltaTime) {
     speed = stateSpeed(maze);
     if (!isDead() && inTunnel())
         speed = std::min(speed, TUNNEL_SPEED);
+    if (!isDead())
+        speed *= Difficulty::ghostSpeedScale(round);
 
     switch (state) {
     case GhostState::InHouse:

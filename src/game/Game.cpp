@@ -1,5 +1,6 @@
 #include "game/Game.hpp"
 #include "core/Core.hpp"
+#include "core/Difficulty.hpp"
 #include "entities/Blinky.hpp"
 #include "entities/Clyde.hpp"
 #include "entities/Fruit.hpp"
@@ -54,20 +55,6 @@ constexpr int POWER_PELLET_POINTS = 50;
 constexpr int FIRST_GHOST_POINTS =
     200; ///< Each next ghost of the same power pellet doubles it.
 constexpr int MAX_GHOST_DOUBLINGS = 3; ///< 200, 400, 800, 1600.
-
-/// Seconds a power pellet frightens the ghosts. Simplified: the original
-/// game varies it from round to round.
-float frightenedDuration(int round) {
-    if (round == 1)
-        return 6.0f;
-    if (round == 2)
-        return 5.0f;
-    if (round == 3)
-        return 4.0f;
-    if (round == 4)
-        return 3.0f;
-    return 2.0f;
-}
 
 /// The direction asked by the arrow keys or WASD, or Direction::Neutral if
 /// none is held. With several keys held, up wins over down, then left, then
@@ -258,9 +245,10 @@ void Game::resetRound() {
 }
 
 void Game::resetActors() {
-    pacman.reset();
-
     const int round = gameState.getRound();
+    pacman.reset();
+    pacman.setRound(round);
+
     ghostHouse.reset(round);
 
     for (const auto &ghost : ghosts) {
@@ -274,7 +262,7 @@ void Game::resetActors() {
 void Game::frightenGhosts() {
     ghostsEatenInRow = 0;
 
-    const float duration = frightenedDuration(gameState.getRound());
+    const float duration = Difficulty::frightenedDuration(gameState.getRound());
     for (const auto &ghost : ghosts)
         ghost->frighten(duration);
 }

@@ -22,6 +22,10 @@ class Pacman : public Entity {
     /// @param spawnPosition Where Pac-Man starts, in tiles.
     explicit Pacman(Position spawnPosition = MazeLayout::PACMAN_SPAWN);
 
+    /// @brief Sets his speed for a round (he gets faster as the rounds go by).
+    /// @param round The round number, starting at 1.
+    void setRound(int round);
+
     /// @brief Changes direction if the tile in that direction is walkable.
     /// @param newDirection The direction the player asked for.
     /// @param maze The maze Pac-Man is in.

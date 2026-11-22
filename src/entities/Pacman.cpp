@@ -1,8 +1,13 @@
 #include "entities/Pacman.hpp"
+#include "core/Difficulty.hpp"
 #include "maze/Maze.hpp"
 
 Pacman::Pacman(Position spawnPosition)
     : Entity(spawnPosition, Direction::Neutral, DEFAULT_SPEED) {}
+
+void Pacman::setRound(int round) {
+    speed = DEFAULT_SPEED * Difficulty::pacmanSpeedScale(round);
+}
 
 bool Pacman::trySetDirection(Direction newDirection, const Maze &maze) {
     if (!maze.canStep(getCurrentGridPosition(), newDirection))

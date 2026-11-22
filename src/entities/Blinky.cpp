@@ -1,27 +1,7 @@
 #include "entities/Blinky.hpp"
+#include "core/Difficulty.hpp"
 #include "entities/Pacman.hpp"
 #include "maze/Maze.hpp"
-
-namespace {
-/// Pellets left when Cruise Elroy 1 starts. Elroy 2 starts at half of it.
-int elroyDotsLeft(int round) {
-    if (round == 1)
-        return 20;
-    if (round == 2)
-        return 30;
-    if (round <= 5)
-        return 40;
-    if (round <= 8)
-        return 50;
-    if (round <= 11)
-        return 60;
-    if (round <= 14)
-        return 80;
-    if (round <= 18)
-        return 100;
-    return 120;
-}
-} // namespace
 
 Blinky::Blinky(const Pacman &pacman, Position spawnPosition)
     : Ghost(GhostType::Blinky, spawnPosition, Direction::Right,
@@ -44,7 +24,7 @@ int Blinky::getElroyLevel(const Maze &maze) const {
     if (elroySuspended)
         return 0;
 
-    const int threshold = elroyDotsLeft(getRound());
+    const int threshold = Difficulty::elroyDotsLeft(getRound());
     const int dotsLeft = maze.getRemainingCollectibles();
 
     if (dotsLeft <= threshold / 2)
