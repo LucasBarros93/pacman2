@@ -144,7 +144,7 @@ void Game::startNewGame() {
     gameState.reset();
     gameState.setHighScore(leaderboard.getTopScore());
     resetRound();
-    startReady();
+    startReady(true);
 }
 
 void Game::startNextRound() {
@@ -153,9 +153,16 @@ void Game::startNextRound() {
     mode = GameMode::Playing;
 }
 
-void Game::startReady() {
+void Game::startReady(bool withIntro) {
     mode = GameMode::Ready;
     modeTimer = 0.0f;
+    readyDuration = READY_DURATION;
+
+    if (withIntro) {
+        audio.playIntro();
+        readyDuration = audio.getIntroDuration();
+    }
+
     renderer.setShowReady(true);
 }
 
@@ -165,6 +172,7 @@ void Game::startClearing() {
     pacman.stop();
     fruitSpawner.resetRound();
     popups.clear();
+    audio.stopAll();
 }
 
 void Game::startGhostFreeze(Ghost &ghost, int points) {
@@ -192,6 +200,8 @@ void Game::killPacman() {
     modeTimer = 0.0f;
     fruitSpawner.resetRound();
     popups.clear();
+    audio.stopAll();
+    deathSoundStarted = false;
 }
 
 void Game::finishDeath() {
@@ -209,7 +219,7 @@ void Game::finishDeath() {
     for (const auto &ghost : ghosts)
         ghost->onPacmanDied();
 
-    startReady();
+    startReady(false);
 }
 
 void Game::finishGame() {
@@ -221,18 +231,21 @@ void Game::finishGame() {
 
     menuController.onGameOver(gameState.getScore());
     mode = GameMode::Menu;
+    audio.stopAll();
 }
 
 void Game::togglePause() {
     if (mode == GameMode::Paused) {
         mode = modeBeforePause;
         renderer.setPaused(false);
+        audio.resume();
     } else if (mode == GameMode::Ready || mode == GameMode::Playing ||
                mode == GameMode::Clearing || mode == GameMode::Dying ||
                mode == GameMode::EatingGhost) {
         modeBeforePause = mode;
         mode = GameMode::Paused;
         renderer.setPaused(true);
+        audio.pause();
     }
 }
 
@@ -276,6 +289,7 @@ void Game::collectPellet() {
 
     gameState.addScore(isPowerPellet ? POWER_PELLET_POINTS : PELLET_POINTS);
     ++dotsEatenThisRound;
+    audio.playChomp();
     fruitSpawner.onDotEaten(dotsEatenThisRound, gameState.getRound());
     pacman.stall(isPowerPellet ? POWER_PELLET_STALL : PELLET_STALL);
 
@@ -290,6 +304,7 @@ void Game::collectFruit() {
 
     const int points = scoreFor(fruit->type);
     gameState.addScore(points);
+    audio.playEatFruit();
     popups.push_back({fruit->position, points, FRUIT_POPUP_TIME});
 }
 
@@ -304,6 +319,7 @@ bool Game::handleGhostCollisions() {
                                    ghostsEatenInRow, MAX_GHOST_DOUBLINGS);
             gameState.addScore(points);
             ++ghostsEatenInRow;
+            audio.playEatGhost();
             startGhostFreeze(*ghost, points);
             return true;
         }
@@ -320,7 +336,7 @@ bool Game::handleGhostCollisions() {
 void Game::updateReady(float deltaTime) {
     modeTimer += deltaTime;
 
-    if (modeTimer >= READY_DURATION) {
+    if (modeTimer >= readyDuration) {
         renderer.setShowReady(false);
         mode = GameMode::Playing;
     }
@@ -336,6 +352,7 @@ void Game::updatePlaying(float deltaTime) {
     for (const auto &ghost : ghosts)
         ghost->update(maze, deltaTime);
 
+    updateGhostSounds();
     if (handleGhostCollisions())
         return; // Pac-Man died or ate a ghost: the mode changed
 
@@ -366,6 +383,11 @@ void Game::updateDying(float deltaTime) {
     const float animationTime = modeTimer - DEATH_FREEZE;
     if (animationTime < 0.0f)
         return; // still frozen
+
+    if (!deathSoundStarted) {
+        audio.playDeath();
+        deathSoundStarted = true;
+    }
 
     const int frame = static_cast<int>(animationTime / DEATH_FRAME_TIME);
 
@@ -403,6 +425,18 @@ void Game::updatePopups(float deltaTime) {
                                     return popup.remaining <= 0.0f;
                                 }),
                  popups.end());
+}
+
+void Game::updateGhostSounds() {
+    const bool frightened =
+        std::any_of(ghosts.begin(), ghosts.end(),
+                    [](const auto &ghost) { return ghost->isFrightened(); });
+
+    const bool dead =
+        std::any_of(ghosts.begin(), ghosts.end(),
+                    [](const auto &ghost) { return ghost->isDead(); });
+
+    audio.setGhostLoops(frightened, dead);
 }
 
 void Game::run() {

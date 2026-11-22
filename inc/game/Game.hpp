@@ -1,6 +1,7 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
+#include "audio/Audio.hpp"
 #include "entities/Ghost.hpp"
 #include "entities/Pacman.hpp"
 #include "game/FruitSpawner.hpp"
@@ -48,6 +49,7 @@ class Game {
     };
 
     sf::RenderWindow window;
+    Audio audio;
     GameState gameState;
     FruitSpawner fruitSpawner;
     Maze maze;
@@ -73,6 +75,11 @@ class Game {
         0.0f; ///< Seconds in the current mode (for the timed ones).
     int ghostsEatenInRow = 0; ///< Ghosts eaten with the current power pellet.
 
+    float readyDuration = 0.0f; ///< Seconds the "READY!" lasts (as long as the
+                                ///< intro at the start of a game).
+    bool deathSoundStarted = false; ///< The death sound plays once per death,
+                                    ///< when the animation starts.
+
     /// @brief Handles every pending window event (menus, pause, closing).
     void handleEvents();
 
@@ -80,7 +87,7 @@ class Game {
     /// @{
     void startNewGame();
     void startNextRound();
-    void startReady();
+    void startReady(bool withIntro);
     void startClearing();
     void startGhostFreeze(Ghost &ghost, int points);
     void startGameOver();
@@ -122,6 +129,10 @@ class Game {
 
     /// @brief Counts down the popups and removes the ones that ended.
     void updatePopups(float deltaTime);
+
+    /// @brief Turns the frightened and dead loops on or off according to the
+    /// ghosts.
+    void updateGhostSounds();
 
   public:
     /// @throws std::runtime_error If the map, the images or the font cannot

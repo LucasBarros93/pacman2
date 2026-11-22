@@ -13,7 +13,7 @@ DEP := $(OBJ:.o=.d)
 # Compilator and flags
 CXX := g++
 CXXFLAGS := -Wall -Wextra -I$(INC_DIR) -std=c++17 -MMD -MP
-LDFLAGS := -lsfml-graphics -lsfml-window -lsfml-system
+LDFLAGS := -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 
 # Main rules
 all: $(EXEC)
