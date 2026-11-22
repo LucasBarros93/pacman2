@@ -151,6 +151,7 @@ void Game::startNextRound() {
     gameState.advanceLevel();
     resetRound();
     mode = GameMode::Playing;
+    startReady(false);
 }
 
 void Game::startReady(bool withIntro) {
