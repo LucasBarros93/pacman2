@@ -19,6 +19,7 @@ class Audio {
     sf::SoundBuffer eatFruitBuffer;
     sf::SoundBuffer eatGhostBuffer;
     sf::SoundBuffer deathBuffer;
+    sf::SoundBuffer ghostBuffer;
     sf::SoundBuffer frightenedBuffer;
     sf::SoundBuffer deadBuffer;
 
@@ -27,11 +28,12 @@ class Audio {
     sf::Sound eatFruit;
     sf::Sound eatGhost;
     sf::Sound death;
+    sf::Sound ghostLoop;
     sf::Sound frightenedLoop;
     sf::Sound deadLoop;
 
     /// @brief Every sound, to pause, resume or stop them all at once.
-    std::array<sf::Sound *, 7> allSounds();
+    std::array<sf::Sound *, 8> allSounds();
 
     /// @brief Starts a loop if it is off and should be on, or stops it if it
     ///        is on and should be off.
