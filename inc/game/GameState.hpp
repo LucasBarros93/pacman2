@@ -44,7 +44,8 @@ class GameState {
     /// Gives the extra life when the score reaches 10000 (only once per game).
     /// Zero or negative values are ignored.
     /// @param points How many points to add.
-    void addScore(int points);
+    /// @return True if an extra life was awarded, false otherwise.
+    bool addScore(int points);
 
     /// @brief Takes one life away. With no spare lives left the count goes to
     ///        -1 (game over) and stays there.

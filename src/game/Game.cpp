@@ -281,6 +281,11 @@ void Game::frightenGhosts() {
         ghost->frighten(duration);
 }
 
+void Game::addScore(int points) {
+    if (gameState.addScore(points))
+        audio.playUp();
+}
+
 void Game::collectPellet() {
     const auto collectible = maze.consumeCollectible(pacman.getPosition());
     if (!collectible)
@@ -288,7 +293,7 @@ void Game::collectPellet() {
 
     const bool isPowerPellet = *collectible == CellType::PowerPellet;
 
-    gameState.addScore(isPowerPellet ? POWER_PELLET_POINTS : PELLET_POINTS);
+    addScore(isPowerPellet ? POWER_PELLET_POINTS : PELLET_POINTS);
     ++dotsEatenThisRound;
     audio.playChomp();
     fruitSpawner.onDotEaten(dotsEatenThisRound, gameState.getRound());
@@ -304,7 +309,7 @@ void Game::collectFruit() {
         return;
 
     const int points = scoreFor(fruit->type);
-    gameState.addScore(points);
+    addScore(points);
     audio.playEatFruit();
     popups.push_back({fruit->position, points, FRUIT_POPUP_TIME});
 }
@@ -318,7 +323,7 @@ bool Game::handleGhostCollisions() {
         if (ghost->isEdible()) {
             const int points = FIRST_GHOST_POINTS << std::min(
                                    ghostsEatenInRow, MAX_GHOST_DOUBLINGS);
-            gameState.addScore(points);
+            addScore(points);
             ++ghostsEatenInRow;
             audio.playEatGhost();
             startGhostFreeze(*ghost, points);

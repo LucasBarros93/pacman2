@@ -106,6 +106,11 @@ class Game {
     /// @brief Frightens every ghost (a power pellet was eaten).
     void frightenGhosts();
 
+    /// @brief Adds points to the score and plays the extra-life sound if
+    ///        a new life is awarded.
+    /// @param points How many points to add.
+    void addScore(int points);
+
     /// @brief Lets Pac-Man eat the pellet he is on, if any.
     void collectPellet();
 

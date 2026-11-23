@@ -14,6 +14,7 @@ constexpr const char *DEATH_PATH = "assets/audios/death.mp3";
 constexpr const char *GHOST_PATH = "assets/audios/ghost.mp3";
 constexpr const char *FRIGHTENED_PATH = "assets/audios/ghost-frighted.mp3";
 constexpr const char *DEAD_PATH = "assets/audios/ghost-dead.mp3";
+constexpr const char *UP_PATH = "assets/audios/up.mp3";
 
 sf::SoundBuffer loadBuffer(const std::string &path) {
     sf::SoundBuffer buffer;
@@ -31,17 +32,17 @@ Audio::Audio()
       eatGhostBuffer(loadBuffer(EAT_GHOST_PATH)),
       deathBuffer(loadBuffer(DEATH_PATH)), ghostBuffer(loadBuffer(GHOST_PATH)),
       frightenedBuffer(loadBuffer(FRIGHTENED_PATH)),
-      deadBuffer(loadBuffer(DEAD_PATH)), intro(introBuffer), chomp(chompBuffer),
-      eatFruit(eatFruitBuffer), eatGhost(eatGhostBuffer), death(deathBuffer),
-      ghostLoop(ghostBuffer), frightenedLoop(frightenedBuffer),
-      deadLoop(deadBuffer) {
+      deadBuffer(loadBuffer(DEAD_PATH)), upBuffer(loadBuffer(UP_PATH)),
+      intro(introBuffer), chomp(chompBuffer), eatFruit(eatFruitBuffer),
+      eatGhost(eatGhostBuffer), death(deathBuffer), ghostLoop(ghostBuffer),
+      frightenedLoop(frightenedBuffer), deadLoop(deadBuffer), up(upBuffer) {
     frightenedLoop.setLooping(true);
     deadLoop.setLooping(true);
 }
 
-std::array<sf::Sound *, 8> Audio::allSounds() {
-    return {&intro, &chomp,     &eatFruit,       &eatGhost,
-            &death, &ghostLoop, &frightenedLoop, &deadLoop};
+std::array<sf::Sound *, 9> Audio::allSounds() {
+    return {&intro,     &chomp,          &eatFruit, &eatGhost, &death,
+            &ghostLoop, &frightenedLoop, &deadLoop, &up};
 }
 
 void Audio::setLoop(sf::Sound &sound, bool on) {
@@ -65,6 +66,8 @@ void Audio::playEatFruit() { eatFruit.play(); }
 void Audio::playEatGhost() { eatGhost.play(); }
 
 void Audio::playDeath() { death.play(); }
+
+void Audio::playUp() { up.play(); }
 
 void Audio::setGhostLoops(bool frightened, bool dead) {
     setLoop(ghostLoop, !dead && !frightened);

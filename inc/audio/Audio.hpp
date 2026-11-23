@@ -22,6 +22,7 @@ class Audio {
     sf::SoundBuffer ghostBuffer;
     sf::SoundBuffer frightenedBuffer;
     sf::SoundBuffer deadBuffer;
+    sf::SoundBuffer upBuffer;
 
     sf::Sound intro;
     sf::Sound chomp;
@@ -31,9 +32,10 @@ class Audio {
     sf::Sound ghostLoop;
     sf::Sound frightenedLoop;
     sf::Sound deadLoop;
+    sf::Sound up;
 
     /// @brief Every sound, to pause, resume or stop them all at once.
-    std::array<sf::Sound *, 8> allSounds();
+    std::array<sf::Sound *, 9> allSounds();
 
     /// @brief Starts a loop if it is off and should be on, or stops it if it
     ///        is on and should be off.
@@ -52,6 +54,7 @@ class Audio {
     void playEatFruit();
     void playEatGhost();
     void playDeath();
+    void playUp();
 
     /// @brief Turns the ghost loops on or off. The eyes have priority: while
     ///        any of them is on the way home, the frightened sound is silent.

@@ -10,16 +10,19 @@ int GameState::getRound() const { return round; }
 
 bool GameState::isGameOver() const { return lives < 0; }
 
-void GameState::addScore(int points) {
+bool GameState::addScore(int points) {
     if (points <= 0)
-        return;
+        return false;
 
     score += points;
 
     if (!extraLifeGiven && score >= EXTRA_LIFE_SCORE) {
         extraLifeGiven = true;
         ++lives;
+        return true;
     }
+
+    return false;
 }
 
 void GameState::loseLife() {
